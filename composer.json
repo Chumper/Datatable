@@ -1,0 +1,26 @@
+{
+    "name": "chumper/datatable",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nils Plaschke",
+            "email": "github@nilsplaschke.de"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0",
+        "illuminate/support": "4.0.x",
+        "illuminate/view": "4.0.x",
+        "illuminate/foundation": "4.0.*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "3.7.*",
+        "mockery/mockery": "dev-master"
+    },
+    "autoload": {
+        "psr-0": {
+            "Chumper\\Datatable": "src/"
+        }
+    },
+    "minimum-stability": "dev"
+}
