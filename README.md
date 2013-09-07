@@ -18,6 +18,11 @@ I would be really thankful if you can provide a test that points to the issue.
 
 * If you supply `created_at` or `updated_at` in `showColumns` it will return the object, not the string.
 
+##TODO
+
+* add a method to search only in the given columns
+* same for the order ability
+
 ##Features
 
 This package supports:
