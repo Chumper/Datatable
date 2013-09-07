@@ -1,7 +1,7 @@
 Datatable
 =========
 
-This is a laravel 4 package for the server and client side of datatables at http://datatables.net/
+This is a __laravel 4 package__ for the server and client side of datatables at http://datatables.net/
 
 I developed this package because i was not happy with the only existing package at https://github.com/bllim/laravel4-datatables-package
 so i developed this package with in my opinion is superior.
@@ -28,6 +28,18 @@ This package supports:
 *   Use your own functions and presenters in your columns
 *   Search in your custom defined columns ( Collection only!!! )
 *   Tested! (Ok, maybe not fully, but I did my best :) )
+
+##Installation
+
+This package is available on http://packagist.org, just add it to your composer.json
+	
+	"chumper/datatable": "dev-master"
+
+It also has a ServiceProvider for usage in Laravel4, add the following to your app.php
+	
+	'Chumper\Datatable\DatatableServiceProvider'
+	
+You can then access it under the `Datatable` alias.
 
 ##HTML Example
 
