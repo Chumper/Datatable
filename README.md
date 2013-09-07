@@ -102,10 +102,12 @@ For further performance improvement you can limit the number of columns and rows
 	Datatable::collection($users)->...
 
 **query($query)**
+
 This will set the internal engine to a Eloquent query...
 This is not finished yet, so please be patient.
 
 **showColumns(...$columns)**
+
 This will add the named columns to the result.
 >   Note: You need to pass the name in the format you would access it on the model or array.
 >   example: in the db: `last_name`, on the model `lastname` -> showColumns('lastname')
@@ -113,21 +115,26 @@ This will add the named columns to the result.
 You can provide as many names as you like
 
 **addColumn($name, $function)**
+
 Will add a custom field to the result set, in the function you will get the whole model or array for that row
 
 **make($query)**
+
 This will handle the input data of the request and provides the result set.
 > Without this command no response will be returned.
 
 **clearColumns($query)**
+
 This will reset all columns, mainly used for testing and debugging, not really useful for you.
 >   If you don't provide any column with `showColumn` or `addColumn` then no column will be shown.
 >   The columns in the query or collection do not have any influence which column will be shown.
 
 **getOrder($query)**
+
 This will return an array with the columns that will be shown, mainly used for testing and debugging, not really useful for you.
 
 **getColumn($query)**
+
 Will get a column by its name, mainly used for testing and debugging, not really useful for you.
 
 ###Table
