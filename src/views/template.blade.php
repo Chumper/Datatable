@@ -1,25 +1,35 @@
-<table id="users" class="table table-bordered responsive">
+<table class="table table-bordered {{ $class = str_random(8) }}">
     <colgroup>
-        <col class="con1" />
+        @for ($i = 0; $i < count($columns); $i++)
+        <col class="con{{ $i }}" />
+        @endfor
     </colgroup>
     <thead>
     <tr>
-        <th class="head1">Last</th>
-        <th class="head1">Last</th>
-        <th class="head1">Last</th>
+        @foreach($columns as $i => $c)
+        <th class="head{{ $i }}">{{ $c }}</th>
+        @endforeach
     </tr>
     </thead>
     <tbody>
+    @foreach($data as $d)
+    <tr>
+        @foreach($d as $dd)
+        <td>{{ $dd }}</td>
+        @endforeach
+    </tr>
+    @endforeach
     </tbody>
 </table>
 <script type="text/javascript">
     jQuery(document).ready(function(){
         // dynamic table
-        jQuery('#users').dataTable({
+        jQuery('.{{ $class }}').dataTable({
             "sPaginationType": "full_numbers",
             "bProcessing": false,
-            "bServerSide": true,
-            "sAjaxSource": "{{ URL::to('auth/users/table') }}"
+            @foreach ($options as $k => $o)
+            {{ json_encode($k) }}: {{ json_encode($o) }},
+            @endforeach
             //"fnDrawCallback": function(oSettings) {
             //    jQuery.uniform.update();
             //}

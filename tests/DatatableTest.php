@@ -1,6 +1,7 @@
 <?php
 
 use Chumper\Datatable\Datatable;
+use Illuminate\Support\Collection;
 
 class DatatableTest extends PHPUnit_Framework_TestCase {
 
@@ -17,7 +18,11 @@ class DatatableTest extends PHPUnit_Framework_TestCase {
 
     public function testReturnInstances()
     {
-        $api = $this->dt->api($this->mock);
+        $api = $this->dt->query($this->mock);
+
+        $this->assertInstanceOf('Chumper\Datatable\Api', $api);
+
+        $api = $this->dt->collection(new Collection());
 
         $this->assertInstanceOf('Chumper\Datatable\Api', $api);
 

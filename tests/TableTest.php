@@ -1,10 +1,15 @@
 <?php
 
-use Chumper\Datatable\Table;
-use Illuminate\Foundation\Testing\TestCase;
-use Illuminate\View\Environment;
+//TODO setData should accept a collection instead of an array of arrays
 
-class TableTest extends TestCase {
+use Chumper\Datatable\Table;
+
+class TableTest extends PHPUnit_Framework_TestCase {
+
+    /**
+     * @var \Mockery\Mock
+     */
+    private $view;
 
     /**
      * @var Table
@@ -15,8 +20,15 @@ class TableTest extends TestCase {
     {
         parent::setUp();
         $this->table = new Table();
-        $test = Mockery::mock('View');
-        $test->shouldReceive('make')->once();
+
+        //View Mock
+        $app = Mockery::mock('AppMock');
+        $app->shouldReceive('instance')->once()->andReturn($app);
+
+        Illuminate\Support\Facades\Facade::setFacadeApplication($app);
+
+        $this->view = Mockery::mock('ViewMock');
+        Illuminate\Support\Facades\View::swap($this->view);
     }
 
     /**
@@ -51,12 +63,20 @@ class TableTest extends TestCase {
 
     public function testRender()
     {
-        $table1 = $this->table->addColumn('foo')
-            ->render();
+        $this->view->shouldReceive('make')->once()
+            ->with('datatable::template', array(
+                'options'   => array(),
+                'data'      => array(),
+                'columns'   => array(
+                    'foo'
+                ),
 
+            ))->andReturn(true);
 
+        $table1 = $this->table->addColumn('foo')->render();
 
-        //$should = $this->getTable1Result();
+        $this->assertTrue($table1);
+
     }
 
     public function testSetData()
@@ -89,4 +109,8 @@ class TableTest extends TestCase {
         $this->assertEquals('foo/url',$return['sAjaxSource']);
     }
 
+    protected function tearDown()
+    {
+        Mockery::close();
+    }
 }
