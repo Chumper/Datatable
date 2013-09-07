@@ -9,7 +9,7 @@ so i developed this package with in my opinion is superior.
 ##Please note
 
 At the moment i only finished the collection part, so this package will work with collections but not with queries.
-I am working on that, so this is a package under development and you use it at your **own** risk.
+I am working on that, so this is a package under development and you use it at your **own** risk. 
 
 Please let me know any issues or features you want to have in the issues section.
 I would be really thankful if you can provide a test that points to the issue.
