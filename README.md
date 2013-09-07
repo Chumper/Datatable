@@ -95,6 +95,7 @@ The first two are for the server side, the third one is a helper to generate the
 ###Collection & Query
 
 **collection($collection)**
+
 Will set the internal engine to the collection.
 For further performance improvement you can limit the number of columns and rows, i.e.:
 
@@ -118,35 +119,59 @@ You can provide as many names as you like
 
 Will add a custom field to the result set, in the function you will get the whole model or array for that row
 
-**make($query)**
+**make()**
 
 This will handle the input data of the request and provides the result set.
 > Without this command no response will be returned.
 
-**clearColumns($query)**
+**clearColumns()**
 
 This will reset all columns, mainly used for testing and debugging, not really useful for you.
 >   If you don't provide any column with `showColumn` or `addColumn` then no column will be shown.
 >   The columns in the query or collection do not have any influence which column will be shown.
 
-**getOrder($query)**
+**getOrder()**
 
 This will return an array with the columns that will be shown, mainly used for testing and debugging, not really useful for you.
 
-**getColumn($query)**
+**getColumn($name)**
 
 Will get a column by its name, mainly used for testing and debugging, not really useful for you.
 
 ###Table
 
-**setUrl($query)**
-**setOptions($query)**
-**addColumn($query)**
-**countColumns($query)**
-**getData($query)**
-**getOptions($query)**
-**render($query)**
-**setData($query)**
+**setUrl($url)**
+
+Will set the URL and options for fetching the content via ajax.
+
+**setOptions($name, $value) OR setOptions($array)**
+
+Will set a single option or an array of options for the jquery call.
+
+**addColumn($name)**
+
+Will add a column to the table, where the name will be rendered on the table head.
+So you can provide the string that should be shown.
+
+**countColumns()**
+
+This will return the number of columns that will be rendered later. Mainly for testing and debugging.
+
+**getData()**
+
+Will return the data that will be rendered into the table as an array.
+
+**getOptions()**
+
+Get all options as an array.
+
+**render()**
+
+Renders the table
+
+**setData($data)**
+
+Expects an array of arrays and will render this data when the table is shown.
 
 ##License
 
