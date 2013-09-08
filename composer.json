@@ -1,11 +1,15 @@
 {
     "name": "chumper/datatable",
     "description": "This is a laravel 4 package for the server and client side of datatablaes at http://datatables.net/",
-    "tags" : ["laravel","datatables", "ajax", "jquery"],
+    "keywords" : ["laravel","datatables", "ajax", "jquery"],
+    "license": "MIT",
+    "homepage": "http://github.com/Chumper/datatable",
     "authors": [
         {
             "name": "Nils Plaschke",
-            "email": "github@nilsplaschke.de"
+            "email": "github@nilsplaschke.de",
+            "homepage": "http://nilsplaschke.de",
+            "role": "Developer"
         }
     ],
     "require": {
