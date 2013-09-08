@@ -6,6 +6,8 @@ This is a __laravel 4 package__ for the server and client side of datatables at 
 I developed this package because i was not happy with the only existing package at https://github.com/bllim/laravel4-datatables-package
 so i developed this package with in my opinion is superior.
 
+![Image](https://raw.github.com/Chumper/Datatable/master/datatable.jpg)
+
 ##Please note
 
 At the moment i only finished the collection part, so this package will work with collections but not with queries.
