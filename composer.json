@@ -1,6 +1,7 @@
 {
     "name": "chumper/datatable",
-    "description": "",
+    "description": "This is a laravel 4 package for the server and client side of datatablaes at http://datatables.net/",
+    "tags" : ["laravel","datatables", "ajax", "jquery"],
     "authors": [
         {
             "name": "Nils Plaschke",

@@ -15,7 +15,7 @@
     @foreach($data as $d)
     <tr>
         @foreach($d as $dd)
-        <td>{{ $dd }}</td>
+        <td valign="middle">{{ $dd }}</td>
         @endforeach
     </tr>
     @endforeach
