@@ -42,18 +42,63 @@ This package is available on http://packagist.org, just add it to your composer.
 	
 	"chumper/datatable": "dev-master"
 
-It also has a ServiceProvider for usage in Laravel4, add the following to your app.php
-	
-	'Chumper\Datatable\DatatableServiceProvider'
-	
+It also has a ServiceProvider for usage in Laravel4. Add these lines to app.php:
+
+```php
+    // providers array:	
+	'Chumper\Datatable\DatatableServiceProvider',
+
+    // aliases array:
+    'Datatable' => 'Chumper\Datatable\Facades\Datatable',
+```
+
 You can then access it under the `Datatable` alias.
+
+
+##Basic Usage
+
+* Create two routes: One to deliver the view to the user, the other for datatable data, eg:
+
+```php
+    Route::resource('users', 'UsersController');
+    Route::get('api/users', array('as'=>'api.users', 'uses'=>'UsersController@getDatatable'));
+```
+
+* Your main route will deliver a view to the user. This view should include references to your local copy of [datatables](http://datatables.net/). In the example below, files were copied from the datatables/media directories and written to public/assets. Please note that the scripts must be located above the call to Datatable:
+
+```php
+    <link rel="stylesheet" type="text/css" href="/assets/css/jquery.dataTables.css">
+    <script type="text/javascript" src="/assets/js/jquery.js"></script>
+    <script type="text/javascript" src="/assets/js/jquery.dataTables.min.js"></script>
+
+    {{ DataTable::table()
+    ->addColumn('id','Name')       // these are the column headings to be shown  
+    ->setUrl(route('api.users'))   // this is the route where data will be retrieved
+    ->render() }}
+```
+
+* Create a controller function to return your data in a way that can be read by Datatables:
+
+```php
+    public function getDatatable()
+    {
+        return Datatable::collection(User::all(array('id','name')))
+        ->showColumns('id', 'name')
+        ->make();
+    }
+```
+
+You should now have a working datatable on your page.
+
 
 ##HTML Example
 
+```php
 	Datatable::table()
     ->addColumn('id',Lang::get('user.lastname'))
 	->setUrl(URL::to('auth/users/table'))
-    ->render(),
+    ->render();
+```
 
 This will generate a HTML table with two columns (id, lastname -> your translation) and will set the URL for the ajax request.
 
@@ -61,6 +106,8 @@ This will generate a HTML table with two columns (id, lastname -> your translati
 >   The reason is that for example i use Basset and everybody wants to do it their way...
 
 ##Server Example
+
+```php
 	Datatable::collection(User::all())
     ->showColumns('id')
     ->addColumn('name',function($model)
@@ -68,6 +115,7 @@ This will generate a HTML table with two columns (id, lastname -> your translati
             return $model->getPresenter()->yourProperty
         }
     )->make();
+```
 
 This will generate a server side datatable handler from the collection `User::all()`.
 It will add the `id` column to the result and also a custom column called `name`.
@@ -76,6 +124,7 @@ with the object the collection holds. In this case it would be the `User` model.
 
 You could now also access all relationship, so it would be easy for a book model to show the author relationship.
 
+```php
 	Datatable::collection(User::all())
     ->showColumns('id')
     ->addColumn('name',function($model)
@@ -83,6 +132,7 @@ You could now also access all relationship, so it would be easy for a book model
             return $model->author->name;
         }
     )->make();
+```
 
 >   Note: If you pass a collection of arrays to the `collection` method you will have an array in the function, not a model.
 
