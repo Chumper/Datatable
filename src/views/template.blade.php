@@ -7,7 +7,7 @@
     <thead>
     <tr>
         @foreach($columns as $i => $c)
-        <th class="head{{ $i }}">{{ $c }}</th>
+        <th align="center" valign="middle" class="head{{ $i }}">{{ $c }}</th>
         @endforeach
     </tr>
     </thead>
@@ -15,7 +15,7 @@
     @foreach($data as $d)
     <tr>
         @foreach($d as $dd)
-        <td valign="middle">{{ $dd }}</td>
+        <td>{{ $dd }}</td>
         @endforeach
     </tr>
     @endforeach

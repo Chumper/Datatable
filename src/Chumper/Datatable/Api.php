@@ -33,6 +33,11 @@ class Api {
     private $engine;
 
     /**
+     * @var array
+     */
+    private $showColumns;
+
+    /**
      * @param EngineInterface $engine
      */
     function __construct(EngineInterface $engine)
@@ -95,6 +100,7 @@ class Api {
     {
         foreach (func_get_args() as $property) {
             $this->columns->put($property, new FunctionColumn(function($model) use($property){return $model[$property];}));
+            $this->showColumns[] = $property;
         }
         return $this;
     }
@@ -108,7 +114,7 @@ class Api {
         $this->handleInputs();
 
         $output = array(
-            "aaData" => $this->engine->make($this->columns)->toArray(),
+            "aaData" => $this->engine->make($this->columns, $this->showColumns)->toArray(),
             "sEcho" => intval($this->sEcho),
             "iTotalRecords" => $this->engine->totalCount(),
             "iTotalDisplayRecords" => $this->engine->count(),

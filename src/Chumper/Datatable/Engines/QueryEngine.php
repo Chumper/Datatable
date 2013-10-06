@@ -1,49 +1,82 @@
 <?php namespace Chumper\Datatable\Engines;
 
+use Illuminate\Database\Query\Builder;
+
 class QueryEngine implements EngineInterface {
+
+    /**
+     * @var Builder
+     */
+    public $builder;
+    /**
+     * @var Builder
+     */
+    public $originalBuilder;
+    public $search;
+
+    function __construct(Builder $builder)
+    {
+        $this->builder = $builder;
+        $this->originalBuilder = $builder;
+    }
 
     public function order($column, $oder = EngineInterface::ORDER_ASC)
     {
-        // TODO: Implement order() method.
+        $this->builder->orderBy($column, $oder);
     }
 
     public function search($value)
     {
-        // TODO: Implement search() method.
+        $this->search = $value;
     }
 
     public function skip($value)
     {
-        // TODO: Implement skip() method.
+        $this->builder->skip($value);
     }
 
     public function take($value)
     {
-        // TODO: Implement take() method.
+        $this->builder->take($value);
     }
 
     public function count()
     {
-        // TODO: Implement count() method.
+        return $this->builder->count();
     }
 
     public function totalCount()
     {
-        // TODO: Implement totalCount() method.
+        return $this->originalBuilder->count();
     }
 
     public function getArray()
     {
-        // TODO: Implement getArray() method.
+        return $this->getCollection()->toArray();
     }
 
     public function reset()
     {
-        // TODO: Implement reset() method.
+        $this->builder = $this->originalBuilder;
     }
 
-    public function make($columns)
+    public function make($columns, $showColumns = array())
     {
-        // TODO: Implement make() method.
+        $this->doInternalSearch($columns);
+        return $this->getCollection();
+    }
+
+    //--------PRIVATE FUNCTIONS
+
+    private function getCollection()
+    {
+        return $this->builder->get();
+    }
+
+    private function doInternalSearch($columns)
+    {
+        foreach ($columns as $c) {
+            $this->builder->orWhere($c,'like',$this->search);
+        }
     }
 }

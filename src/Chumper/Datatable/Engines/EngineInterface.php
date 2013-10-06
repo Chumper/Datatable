@@ -2,14 +2,14 @@
 
 interface EngineInterface {
 
-    const ORDER_ASC = 1;
-    const ORDER_DESC = 2;
+    const ORDER_ASC = 'asc';
+    const ORDER_DESC = 'desc';
 
     public function order($column, $order);
     public function search($value);
     public function skip($value);
     public function take($value);
-    public function make($columns);
+    public function make($columns, $showColumns = array());
     public function count();
     public function totalCount();
     public function getArray();

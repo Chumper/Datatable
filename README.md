@@ -105,6 +105,14 @@ This will generate a HTML table with two columns (id, lastname -> your translati
 >   Note: This package will **NOT** include the `datatable.js`, that is your work to do.
 >   The reason is that for example i use Basset and everybody wants to do it their way...
 
+If you want to provide your own template fpr the table just provide the path to the view in laravel style.
+
+```php
+	Datatable::table()
+        ->addColumn('id',Lang::get('user.lastname'))
+    	->setUrl(URL::to('auth/users/table'))
+        ->render('views.templates.datatable');
+```
 ##Server Example
 
 ```php
@@ -140,14 +148,15 @@ The order of the columns is always defined by the user and will be the same orde
 
 ##Query or Collection?
 
-There is a difference between query() and relationship().
-A collection will be compiled before any operation like search or order will be performed so that it can also include your custom fields.
+There is a difference between query() and collection().
+A collection will be compiled before any operation - like search or order - will be performed so that it can also include your custom fields.
 This said the collection method is not as performing as the query method where the search and order will be tackled before we query the database.
 
 So if you have a lot of Entries (100k+) a collection will not perform well because we need to compile the whole amount of entries to provide accurate sets.
 A query on the other side is not able to perform a search or orderBy correctly on your custom field functions.
 
 >   TLTR: If you have no custom fields, then use query() it will be much faster
+>   If you have custom fields but don't want to provide search and/or order on the fields use query().
 >   Collection is the choice if you have data from somewhere else, just wrap it into a collection and you are good to go.
 >   If you have custom fields and want to provide search and/or order on these, you need to use a collection.
 

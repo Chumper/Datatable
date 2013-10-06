@@ -116,7 +116,7 @@ class CollectionEngine implements EngineInterface {
         $this->workingCollection = $this->collection;
     }
 
-    public function make($columns)
+    public function make($columns, $showColumns = array())
     {
         $this->compileArray($columns);
         $this->doInternalSearch();
