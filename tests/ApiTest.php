@@ -100,6 +100,10 @@ class ApiTest extends PHPUnit_Framework_TestCase {
         $this->api->showColumns('name', 'email');
 
         $this->assertEquals(array('id','name','email'), $this->api->getOrder());
+
+        $this->api->showColumns(array('foo', 'bar'));
+
+        $this->assertEquals(array('id','name','email', 'foo', 'bar'), $this->api->getOrder());
     }
 
     public function make()
