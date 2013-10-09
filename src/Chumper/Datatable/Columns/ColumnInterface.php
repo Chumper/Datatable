@@ -16,4 +16,15 @@ interface ColumnInterface {
      */
     public function run($model);
 
+    /**
+     * @param $name The name of the column
+     * @return void
+     */
+    public function setName($name);
+
+    /**
+     * @return String The name of the column
+     */
+    public function getName();
+
 }

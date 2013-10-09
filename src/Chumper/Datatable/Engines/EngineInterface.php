@@ -9,7 +9,7 @@ interface EngineInterface {
     public function search($value);
     public function skip($value);
     public function take($value);
-    public function make($columns, $showColumns = array());
+    public function make($columns, $showColumns = array(), $searchColumns = array());
     public function count();
     public function totalCount();
     public function getArray();

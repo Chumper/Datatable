@@ -60,9 +60,9 @@ class QueryEngine implements EngineInterface {
         $this->builder = $this->originalBuilder;
     }
 
-    public function make($columns, $showColumns = array())
+    public function make($columns, $showColumns = array(), $searchColumns = array())
     {
-        $this->doInternalSearch($columns);
+        $this->doInternalSearch($showColumns);
         return $this->getCollection();
     }
 

@@ -41,6 +41,15 @@ class QueryEngineTest extends PHPUnit_Framework_TestCase {
 
         $this->c->search('test');
         $collection = $this->c->make(array('foo'));
+
+        //
+
+        $this->builder->shouldReceive('orWhere')->once()->with('foo','like','test');
+        $this->builder->shouldReceive('get')->once();
+
+        $this->c->search('test');
+        $collection = $this->c->make(array('foo','bar'),array('foo'));
+
     }
 
     public function testSkip()
@@ -59,7 +68,7 @@ class QueryEngineTest extends PHPUnit_Framework_TestCase {
 
     public function testComplex()
     {
-        /*$engine = new QueryEngine(new Collection($this->getRealArray()));
+        $engine = new QueryEngine($this->builder);
 
         $engine->search('t');
         $test = $engine->make($this->getRealColumns())->toArray();
@@ -89,7 +98,9 @@ class QueryEngineTest extends PHPUnit_Framework_TestCase {
         $engine->search('0');
         $test = $engine->make($this->getRealColumns())->toArray();
 
-        $this->assertTrue($this->arrayHasKeyValue('0','Taylor',$test));*/
+        $this->assertTrue($this->arrayHasKeyValue('0','Taylor',$test));
+
+
 
     }
 
@@ -98,17 +109,6 @@ class QueryEngineTest extends PHPUnit_Framework_TestCase {
         Mockery::close();
     }
 
-    private function getTestArray()
-    {
-        return array(
-            array(
-                'id' => 'foo'
-            ),
-            array(
-                'id' => 'eoo'
-            )
-        );
-    }
     private function getRealArray()
     {
         return array(

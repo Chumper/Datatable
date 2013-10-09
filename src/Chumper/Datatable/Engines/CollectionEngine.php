@@ -116,10 +116,10 @@ class CollectionEngine implements EngineInterface {
         $this->workingCollection = $this->collection;
     }
 
-    public function make($columns, $showColumns = array())
+    public function make($columns, $showColumns = array(), $searchColumns = array())
     {
         $this->compileArray($columns);
-        $this->doInternalSearch();
+        $this->doInternalSearch($searchColumns);
         $this->doInternalOrder();
 
         return $this->workingCollection->slice($this->skip,$this->limit);
@@ -127,7 +127,7 @@ class CollectionEngine implements EngineInterface {
 
     //--------------PRIVATE FUNCTIONS-----------------
 
-    private function doInternalSearch()
+    private function doInternalSearch($columns)
     {
         if(is_null($this->search) or empty($this->search))
             return;

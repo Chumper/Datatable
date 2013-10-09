@@ -15,7 +15,10 @@ use Illuminate\Support\Facades\Response;
  */
 class Api {
 
-    //TODO create new functions where to search on
+    /**
+     * @var array
+     */
+    public $searchColumns = array();
 
     /**
      * @var
@@ -114,13 +117,21 @@ class Api {
         $this->handleInputs();
 
         $output = array(
-            "aaData" => $this->engine->make($this->columns, $this->showColumns)->toArray(),
+            "aaData" => $this->engine->make($this->columns, $this->showColumns, $this->searchColumns)->toArray(),
             "sEcho" => intval($this->sEcho),
             "iTotalRecords" => $this->engine->totalCount(),
             "iTotalDisplayRecords" => $this->engine->count(),
         );
 
         return Response::json($output);
+    }
+
+    public function searchColumns()
+    {
+        foreach (func_get_args() as $property) {
+            $this->searchColumns[] = $property;
+        }
+        return $this;
     }
 
     //-------------PRIVATE FUNCTIONS-------------------

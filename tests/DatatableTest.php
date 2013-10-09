@@ -16,6 +16,9 @@ class DatatableTest extends PHPUnit_Framework_TestCase {
         $this->mock = Mockery::mock('Illuminate\Database\Query\Builder');
     }
 
+    /**
+     * @expectedException Exception
+     */
     public function testReturnInstances()
     {
         $api = $this->dt->query($this->mock);
@@ -29,6 +32,8 @@ class DatatableTest extends PHPUnit_Framework_TestCase {
         $table = $this->dt->table();
 
         $this->assertInstanceOf('Chumper\Datatable\Table', $table);
+
+        $this->dt->from('foo');
     }
 
 }
