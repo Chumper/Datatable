@@ -99,9 +99,13 @@ class Api {
     /**
      * @return $this
      */
-    public function showColumns()
+    public function showColumns($cols)
     {
-        foreach (func_get_args() as $property) {
+        if ( ! is_array($cols)) {
+            $cols = func_get_args();
+        }
+
+        foreach ($cols as $property) {
             $this->columns->put($property, new FunctionColumn(function($model) use($property){return $model[$property];}));
             $this->showColumns[] = $property;
         }
