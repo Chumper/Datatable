@@ -65,6 +65,25 @@ class TableTest extends PHPUnit_Framework_TestCase {
         $this->assertTrue(False);  // should throw exception before here
     }
 
+    /**
+     * @expectedException Exception
+     */
+    public function testSetCustomValues()
+    {
+        $this->table->setCustomValues('foo', 'bar');
+        $this->assertArrayHasKey('foo', $this->table->getCustomValues());
+
+        $this->table->setCustomValues(array(
+            'foo2' => 'bar2',
+            'foo3' => 'bar3'
+        ));
+        $this->assertArrayHasKey('foo2', $this->table->getCustomValues());
+        $this->assertArrayHasKey('foo3', $this->table->getCustomValues());
+
+        $this->table->setCustomValues('foo', 'bar', 'baz');
+        $this->assertTrue(False);  // should throw exception before here
+    }
+
     public function testAddColumn()
     {
         $this->table->addColumn('foo');
@@ -86,6 +105,7 @@ class TableTest extends PHPUnit_Framework_TestCase {
             ->with('datatable::template', array(
                 'options'   => array(),
                 'callbacks' => array(),
+                'values'    => array(),
                 'data'      => array(),
                 'columns'   => array(
                     'foo'

@@ -37,5 +37,6 @@
             //    jQuery.uniform.update();
             //}
         });
+        // custom values are available via $values array
     });
 </script>
