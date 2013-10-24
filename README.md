@@ -217,6 +217,19 @@ Will set the URL and options for fetching the content via ajax.
 
 Will set a single option or an array of options for the jquery call.
 
+**setCallbacks($name, $value) OR setCallbacks($array)**
+
+Will set a single callback function or an array of callbacks for the jquery call. DataTables callback functions are described at https://datatables.net/usage/callbacks. For example, 
+
+```php
+    ->setCallbacks(
+        'fnServerParams', 'function ( aoData ) {
+            aoData.push( { "name": "more_data", "value": "my_value" } );
+        }'
+    )
+
+```
+
 **addColumn($name)**
 
 Will add a column to the table, where the name will be rendered on the table head.

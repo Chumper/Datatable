@@ -46,6 +46,25 @@ class TableTest extends PHPUnit_Framework_TestCase {
         $this->table->setOptions('foo', 'bar', 'baz');
     }
 
+    /**
+     * @expectedException Exception
+     */
+    public function testSetCallbacks()
+    {
+        $this->table->setCallbacks('foo', 'bar');
+        $this->assertArrayHasKey('foo', $this->table->getCallbacks());
+
+        $this->table->setCallbacks(array(
+            'foo2' => 'bar2',
+            'foo3' => 'bar3'
+        ));
+        $this->assertArrayHasKey('foo2', $this->table->getCallbacks());
+        $this->assertArrayHasKey('foo3', $this->table->getCallbacks());
+
+        $this->table->setCallbacks('foo', 'bar', 'baz');
+        $this->assertTrue(False);  // should throw exception before here
+    }
+
     public function testAddColumn()
     {
         $this->table->addColumn('foo');
@@ -66,6 +85,7 @@ class TableTest extends PHPUnit_Framework_TestCase {
         $this->view->shouldReceive('make')->once()
             ->with('datatable::template', array(
                 'options'   => array(),
+                'callbacks' => array(),
                 'data'      => array(),
                 'columns'   => array(
                     'foo'

@@ -30,6 +30,9 @@
             @foreach ($options as $k => $o)
             {{ json_encode($k) }}: {{ json_encode($o) }},
             @endforeach
+            @foreach ($callbacks as $k => $o)
+            {{ json_encode($k) }}: {{ $o }},
+            @endforeach
             //"fnDrawCallback": function(oSettings) {
             //    jQuery.uniform.update();
             //}

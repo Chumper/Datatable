@@ -20,6 +20,10 @@ class Table {
     /**
      * @var array
      */
+    private $callbacks = array();
+    /**
+     * @var array
+     */
     private $data = array();
 
     /**
@@ -73,6 +77,29 @@ class Table {
     }
 
     /**
+     * @return $this
+     * @throws \Exception
+     */
+    public function setCallbacks()
+    {
+        if(func_num_args() == 2)
+        {
+            $this->callbacks[func_get_arg(0)] = func_get_arg(1);
+        }
+        else if(func_num_args() == 1 && is_array(func_get_arg(0)))
+        {
+            foreach (func_get_arg(0) as $key => $value)
+            {
+                $this->callbacks[$key] = $value;
+            }
+        }
+        else
+            throw new Exception('Invalid number of callbacks provided for the method "setCallbacks"');
+
+        return $this;
+    }
+
+    /**
      * @param array $data
      * @return $this
      */
@@ -104,6 +131,14 @@ class Table {
     /**
      * @return array
      */
+    public function getCallbacks()
+    {
+        return $this->callbacks;
+    }
+
+    /**
+     * @return array
+     */
     public function getData()
     {
         return $this->data;
@@ -120,6 +155,7 @@ class Table {
 
         return View::make($view,array(
             'options'   => $this->options,
+            'callbacks' => $this->callbacks,
             'data'      => $this->data,
             'columns'   => $this->columns,
         ));
