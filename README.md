@@ -217,6 +217,19 @@ Will set the URL and options for fetching the content via ajax.
 
 Will set a single option or an array of options for the jquery call.
 
+**setCallbacks($name, $value) OR setCallbacks($array)**
+
+Will set a single callback function or an array of callbacks for the jquery call. DataTables callback functions are described at https://datatables.net/usage/callbacks. For example, 
+
+```php
+    ->setCallbacks(
+        'fnServerParams', 'function ( aoData ) {
+            aoData.push( { "name": "more_data", "value": "my_value" } );
+        }'
+    )
+
+```
+
 **addColumn($name)**
 
 Will add a column to the table, where the name will be rendered on the table head.
@@ -236,11 +249,40 @@ Get all options as an array.
 
 **render()**
 
-Renders the table
+Renders the table. You can customize this by passing a view name. 
 
 **setData($data)**
 
 Expects an array of arrays and will render this data when the table is shown.
+
+**setCustomValues($name, $value) OR setCustomValues($array)**
+
+Will set a single custom value, or an array of custom values, which will be passed to the view. You can access these values in your custom view file. For example, if you wanted to click anywhere on a row to go to a record (where the record id is in the first column of the table):
+
+In the calling view:
+
+```php
+{{ DataTable::table()
+    ->addColumn($columns)
+    ->setUrl($ajaxRouteToTableData)
+    ->setCustomValues('table-url', $pathToTableDataLinks)
+    ->render('my.datatable.template') }}
+```
+
+In the datatable view (eg, 'my.datatable.template'):
+
+```js
+    @if (isset($values['table-url']))
+        $('.{{$class}}').hover(function() {
+            $(this).css('cursor', 'pointer');
+        });
+        $('.{{$class}}').on('click', 'tbody tr', function(e) {
+            $id = e.currentTarget.children[0].innerHTML;
+            $url = e.currentTarget.baseURI;
+            document.location.href = "{{ $values['table-url'] }}/" + $id;
+        });
+    @endif
+```
 
 ##License
 
