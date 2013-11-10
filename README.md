@@ -34,9 +34,9 @@ This package supports:
 There are some differences between the collection part and the query part of this package.
 The differences are:
 
- | Collection | Query
- | - |:-:| :-:|
-Speed | - | +
+|  Difference  | Collection | Query |
+| --- |:----------:| :----:|
+|Speed| - | +
 Custom fields | + | +
 Search in custom fields | + | -
 Order by custom fields | + | -
@@ -186,7 +186,7 @@ The second one is for the server side, the first one is a helper to generate the
 
 ###Collection & Query
 
-**from($mixed)
+**from($mixed)**
 
 Will set the internal engine to the best fitting one based on the input.
 If you want to set one explicitly just select one of the methods below.
@@ -218,12 +218,12 @@ This will add the named columns to the result.
 
 You can provide as many names as you like
 
-**searchColumns(..$fields)
+**searchColumns(..$fields)**
 
 Will enable the table to allow search only in the given columns.
 Please note that a collection behaves different to a builder object.
 
-**orderColumns(..$fields)
+**orderColumns(..$fields)**
 
 Will enable the table to allow ordering only in the given columns.
 Please note that a collection behaves different to a builder object.
