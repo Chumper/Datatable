@@ -95,6 +95,8 @@ You can then access it under the `Datatable` alias.
     {
         return Datatable::collection(User::all(array('id','name')))
         ->showColumns('id', 'name')
+        ->searchColumns('name')
+        ->orderColumns('id','name')
         ->make();
     }
 ```
