@@ -6,7 +6,7 @@ class TextColumnTest extends PHPUnit_Framework_TestCase {
 
     public function testWorking()
     {
-        $column = new TextColumn('FooBar');
+        $column = new TextColumn('foo', 'FooBar');
         $this->assertEquals('FooBar', $column->run(array()));
     }
 

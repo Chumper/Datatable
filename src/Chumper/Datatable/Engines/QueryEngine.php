@@ -1,6 +1,7 @@
 <?php namespace Chumper\Datatable\Engines;
 
-use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 
 class QueryEngine implements EngineInterface {
 
@@ -12,9 +13,22 @@ class QueryEngine implements EngineInterface {
      * @var Builder
      */
     public $originalBuilder;
+
+    /**
+     * @var String search term
+     */
     public $search;
 
-    function __construct(Builder $builder)
+    /**
+     * @var Collection the returning collection
+     */
+    private $resultCollection;
+
+    private $orderColumn = -1;
+
+    private $orderOrder;
+
+    function __construct($builder)
     {
         $this->builder = $builder;
         $this->originalBuilder = $builder;
@@ -22,7 +36,8 @@ class QueryEngine implements EngineInterface {
 
     public function order($column, $oder = EngineInterface::ORDER_ASC)
     {
-        $this->builder->orderBy($column, $oder);
+        $this->orderColumn = $column;
+        $this->orderOrder = $oder;
     }
 
     public function search($value)
@@ -60,23 +75,61 @@ class QueryEngine implements EngineInterface {
         $this->builder = $this->originalBuilder;
     }
 
-    public function make($columns, $showColumns = array(), $searchColumns = array())
+    public function make(Collection $columns, array $searchColumns = array())
     {
-        $this->doInternalSearch($showColumns);
-        return $this->getCollection();
+        $this->doInternalSearch($searchColumns);
+        $this->doInternalOrder($columns);
+        return $this->compile($columns);
     }
 
     //--------PRIVATE FUNCTIONS
 
+    /**
+     * @return Collection
+     */
     private function getCollection()
     {
-        return $this->builder->get();
+        $result = $this->builder->get();
+        if(is_array($result))
+            return new Collection($result);
+        return $result;
     }
 
     private function doInternalSearch($columns)
     {
+        if(empty($this->search))
+            return;
+
         foreach ($columns as $c) {
-            $this->builder->orWhere($c,'like',$this->search);
+            $this->builder->orWhere($c,'like','%'.$this->search.'%');
+        }
+    }
+
+    private function compile($columns)
+    {
+        $result = $this->getCollection();
+        $this->resultCollection = $result->map(function($row) use ($columns) {
+            $entry = array();
+            foreach ($columns as $col)
+            {
+                $entry[] =  $col->run($row);
+            }
+            return $entry;
+        });
+        return $this->resultCollection;
+    }
+
+    private function doInternalOrder(Collection $columns)
+    {
+        $i = 0;
+        foreach($columns as $col)
+        {
+            if($i == $this->orderColumn)
+            {
+                $this->builder->orderBy($col->getName(), $this->orderOrder);
+                return;
+            }
+            $i++;
         }
     }
 }

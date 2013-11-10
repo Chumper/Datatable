@@ -6,7 +6,7 @@ class FunctionColumnTest extends PHPUnit_Framework_TestCase {
 
     public function testSimple()
     {
-        $column = new FunctionColumn(function($model){
+        $column = new FunctionColumn('foo',function($model){
             return "FooBar";
         });
         $this->assertEquals('FooBar', $column->run(array()));
@@ -14,7 +14,7 @@ class FunctionColumnTest extends PHPUnit_Framework_TestCase {
 
     public function testAdvanced()
     {
-        $column = new FunctionColumn(function($model){
+        $column = new FunctionColumn('foo',function($model){
             return $model['text'];
         });
         $this->assertEquals('FooBar', $column->run(array('text' => 'FooBar')));
@@ -22,7 +22,7 @@ class FunctionColumnTest extends PHPUnit_Framework_TestCase {
 
     public function testAdvanced2()
     {
-        $column = new FunctionColumn(function($model){
+        $column = new FunctionColumn('foo',function($model){
             return $model['text'].'Bar';
         });
         $this->assertEquals('FooBar', $column->run(array('text' => 'Foo')));

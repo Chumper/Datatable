@@ -33,8 +33,6 @@ class CollectionEngine implements EngineInterface {
      */
     private $collection;
 
-    private $compiledArray;
-
     /**
      * @param Collection $collection
      */
@@ -99,7 +97,7 @@ class CollectionEngine implements EngineInterface {
      */
     public function getArray()
     {
-        $this->doInternalSearch();
+        $this->doInternalSearch(new Collection(), array());
         $this->doInternalOrder();
 
         return array_values($this->workingCollection
@@ -116,10 +114,10 @@ class CollectionEngine implements EngineInterface {
         $this->workingCollection = $this->collection;
     }
 
-    public function make($columns, $showColumns = array(), $searchColumns = array())
+    public function make(Collection $columns, array $searchColumns = array())
     {
         $this->compileArray($columns);
-        $this->doInternalSearch($searchColumns);
+        $this->doInternalSearch($columns, $searchColumns);
         $this->doInternalOrder();
 
         return $this->workingCollection->slice($this->skip,$this->limit);
@@ -127,18 +125,33 @@ class CollectionEngine implements EngineInterface {
 
     //--------------PRIVATE FUNCTIONS-----------------
 
-    private function doInternalSearch($columns)
+    private function doInternalSearch(Collection $columns, array $searchColumns)
     {
         if(is_null($this->search) or empty($this->search))
             return;
 
         $value = $this->search;
+        $toSearch = array();
 
-        $this->workingCollection = $this->workingCollection->filter(function($row) use ($value)
+        // Map the searchColumns to the real columns
+        $ii = 0;
+        foreach($columns as $i => $col)
         {
-            foreach($row as $col)
+            if(in_array($columns->get($i)->getName(), $searchColumns))
             {
-                if(str_contains(strtolower($col),strtolower($value)))
+                $toSearch[] = $ii;
+            }
+            $ii++;
+        }
+
+        $this->workingCollection = $this->workingCollection->filter(function($row) use ($value, $toSearch)
+        {
+            for($i = 0; $i < count($row); $i++)
+            {
+                if(!in_array($i, $toSearch))
+                    continue;
+
+                if(str_contains(strtolower($row[$i]),strtolower($value)))
                     return true;
             }
         });

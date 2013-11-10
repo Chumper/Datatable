@@ -1,34 +1,17 @@
 <?php namespace Chumper\Datatable\Columns;
 
-class FunctionColumn implements ColumnInterface {
+class FunctionColumn extends BaseColumn {
 
     private $callable;
-    private $name;
 
-    function __construct($callable)
+    function __construct($name, $callable)
     {
+        parent::__construct($name);
         $this->callable = $callable;
     }
 
     public function run($model)
     {
         return call_user_func($this->callable,$model);
-    }
-
-    /**
-     * @param $name String The name of the column
-     * @return void
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
-    }
-
-    /**
-     * @return String The name of the column
-     */
-    public function getName()
-    {
-        return $this->name;
     }
 }

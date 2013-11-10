@@ -8,33 +8,44 @@ so i developed this package with in my opinion is superior.
 
 ![Image](https://raw.github.com/Chumper/Datatable/master/datatable.jpg)
 
-##Please note
-
-At the moment i only finished the collection part, so this package will work with collections but not with queries.
-I am working on that, so this is a package under development and you use it at your **own** risk. 
-
-Please let me know any issues or features you want to have in the issues section.
-I would be really thankful if you can provide a test that points to the issue.
-
 ##Known Issues
 
-* If you supply `created_at` or `updated_at` in `showColumns` it will return the object, not the string.
+* None so far
 
 ##TODO
 
-* add a method to search only in the given columns
-* same for the order ability
+* make the two engines behave exactly the same.
 
 ##Features
 
 This package supports:
 
-*   Support for Collections and Query strings (only Collections atm, not finished and tested for queries)
+*   Support for Collections and Query Builder
 *   Easy to add and order columns
 *   Includes a simple helper for the HTML side
 *   Use your own functions and presenters in your columns
 *   Search in your custom defined columns ( Collection only!!! )
+*   Define your specific fields for searching and ordering
+*   Add custom javascript values for the table
 *   Tested! (Ok, maybe not fully, but I did my best :) )
+
+##Please note!
+
+There are some differences between the collection part and the query part of this package.
+The differences are:
+
+ | Collection | Query
+ | - |:-:| :-:|
+Speed | - | +
+Custom fields | + | +
+Search in custom fields | + | -
+Order by custom fields | + | -
+Search outside the shown data (e.g.) database | - | +
+
+For a detailed explanation please see the video below.
+
+Please let me know any issues or features you want to have in the issues section.
+I would be really thankful if you can provide a test that points to the issue.
 
 ##Installation
 
@@ -89,7 +100,6 @@ You can then access it under the `Datatable` alias.
 ```
 
 You should now have a working datatable on your page.
-
 
 ##HTML Example
 
@@ -160,17 +170,26 @@ A query on the other side is not able to perform a search or orderBy correctly o
 >   Collection is the choice if you have data from somewhere else, just wrap it into a collection and you are good to go.
 >   If you have custom fields and want to provide search and/or order on these, you need to use a collection.
 
-##Available function
+Please also note that there is a significant difference betweeen the search and order functionality if you use query compared to collections.
+Please see the following video for more details.
 
-This package is seperated into three smaller ones:
+##Available functions
 
-1.  Datatable::collection()
-2.  Datatable::query()
-3.  Datatable::table()
+This package is separated into two smaller parts:
 
-The first two are for the server side, the third one is a helper to generate the needed table and javascript call.
+1.  Datatable::table()
+2.  Datatable::from()
+    1. Datatable::collection()
+    2. Datatable::query()
+
+The second one is for the server side, the first one is a helper to generate the needed table and javascript calls.
 
 ###Collection & Query
+
+**from($mixed)
+
+Will set the internal engine to the best fitting one based on the input.
+If you want to set one explicitly just select one of the methods below.
 
 **collection($collection)**
 
@@ -183,7 +202,13 @@ For further performance improvement you can limit the number of columns and rows
 **query($query)**
 
 This will set the internal engine to a Eloquent query...
-This is not finished yet, so please be patient.
+E.g.:
+
+	$users = DB::table('users');
+	Datatable::collection($users)->...
+
+The query engine is much faster than the collection engine but also lacks some functionality,
+for further information look at the table above.
 
 **showColumns(...$columns)**
 
@@ -193,9 +218,42 @@ This will add the named columns to the result.
 
 You can provide as many names as you like
 
+**searchColumns(..$fields)
+
+Will enable the table to allow search only in the given columns.
+Please note that a collection behaves different to a builder object.
+
+**orderColumns(..$fields)
+
+Will enable the table to allow ordering only in the given columns.
+Please note that a collection behaves different to a builder object.
+
 **addColumn($name, $function)**
 
 Will add a custom field to the result set, in the function you will get the whole model or array for that row
+E.g.:
+```php
+	Datatable::collection(User::all())
+    ->addColumn('name',function($model)
+        {
+            return $model->author->name;
+        }
+    )->make();
+```
+You can also just add a predefined Column, like a DateColumn, a FunctionColumn, or a TextColumn
+E.g.:
+```php
+	$column = new TextColumn('foo', 'bar'); // Will always return the text bar
+	//$column = new FunctionColumn('foo', function($model){return $model->bar}); // Will return the bar column
+	//$column = new DateColumn('foo', DateColumn::TIME); // Will return the foo date object as toTimeString() representation
+	//$column = new DateColumn('foo', DateColumn::CUSTOM, 'd.M.Y H:m:i'); // Will return the foo date object as custom representation
+
+	Datatable::collection(User::all())
+    ->addColumn($column)
+    ->make();
+```
+
+PLease look into the specific Columns for further information.
 
 **make()**
 
@@ -256,9 +314,10 @@ Will return the data that will be rendered into the table as an array.
 
 Get all options as an array.
 
-**render()**
+**render($view = template.blade)**
 
-Renders the table. You can customize this by passing a view name. 
+Renders the table. You can customize this by passing a view name.
+Please see the template inside the package for further information of how the data is passed to the view.
 
 **setData($data)**
 

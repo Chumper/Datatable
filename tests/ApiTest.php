@@ -132,6 +132,36 @@ class ApiTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals($should,$result->getContent());
     }
 
+    public function testSearchColumns()
+    {
+        $this->api->searchColumns('id');
+
+        $this->assertEquals(array('id'), $this->api->getSearchingColumns());
+
+        $this->api->searchColumns('name', 'email');
+
+        $this->assertEquals(array('name','email'), $this->api->getSearchingColumns());
+
+        $this->api->searchColumns(array('foo', 'bar'));
+
+        $this->assertEquals(array('foo', 'bar'), $this->api->getSearchingColumns());
+    }
+
+    public function testOrderColumns()
+    {
+        $this->api->orderColumns('id');
+
+        $this->assertEquals(array('id'), $this->api->getOrderingColumns());
+
+        $this->api->orderColumns('name', 'email');
+
+        $this->assertEquals(array('name','email'), $this->api->getOrderingColumns());
+
+        $this->api->orderColumns(array('foo', 'bar'));
+
+        $this->assertEquals(array('foo', 'bar'), $this->api->getOrderingColumns());
+    }
+
     protected function tearDown()
     {
         Mockery::close();

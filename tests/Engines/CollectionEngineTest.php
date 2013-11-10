@@ -1,6 +1,7 @@
 <?php
 
 use Chumper\Datatable\Columns\FunctionColumn;
+use Chumper\Datatable\Columns\TextColumn;
 use Chumper\Datatable\Engines\CollectionEngine;
 use Chumper\Datatable\Engines\EngineInterface;
 use Illuminate\Support\Collection;
@@ -59,15 +60,55 @@ class CollectionEngineTest extends PHPUnit_Framework_TestCase {
     {
         $engine = new CollectionEngine(new Collection($this->getTestArray()));
 
-        $engine->search('foo');
+        $engine->search('eoo');
 
         $should = array(
             array(
-                'id' => 'foo'
+                'eoo'
             )
         );
 
-        $this->assertEquals($should, $engine->getArray());
+        $this->assertEquals($should, $engine->make($this->getTestColumns(), array('id'))->toArray());
+
+        //------------------TEST 2-----------------
+        // search in outputed data
+        $engine = new CollectionEngine(new Collection(array(array('foo', 'foo2', 'foo3'),array('bar', 'bar2', 'bar3'))));
+
+        $engine->search('foo2');
+
+        $should = array(
+            array(
+                'foo - foo2',
+                'foo3',
+                'foo - foo3'
+            )
+        );
+
+        $this->assertEquals($should, $engine->make(new Collection(array(
+            new FunctionColumn('bla', function($row){return $row[0]." - ".$row[1];}),
+            new FunctionColumn('1', function($row){return $row[2];}),
+            new FunctionColumn('bla3', function($row){return $row[0]." - ".$row[2];})
+        )), array('bla', 1))->toArray());
+
+        //------------------TEST 3-----------------
+        // search in initial data
+        // TODO: Search in initial data columns?
+
+        $engine = new CollectionEngine(new Collection(array(array('foo', 'foo2', 'foo3'),array('bar', 'bar2', 'bar3'))));
+
+        $engine->search('foo2');
+
+        $should = array(
+            array(
+                'foo - foo3',
+                'foo2'
+            )
+        );
+
+        $this->assertEquals($should, $engine->make(new Collection(array(
+            new FunctionColumn('bla3', function($row){return $row[0]." - ".$row[2];}),
+            new FunctionColumn('1', function($row){return $row[1];})
+        )), array('bla3', 1))->toArray());
     }
 
     public function testSkip()
@@ -103,7 +144,7 @@ class CollectionEngineTest extends PHPUnit_Framework_TestCase {
         $engine = new CollectionEngine(new Collection($this->getRealArray()));
 
         $engine->search('t');
-        $test = $engine->make($this->getRealColumns())->toArray();
+        $test = $engine->make(new Collection($this->getRealColumns()),array('foo','bar'))->toArray();
 
         $this->assertTrue($this->arrayHasKeyValue('0','Nils',$test));
         $this->assertTrue($this->arrayHasKeyValue('0','Taylor',$test));
@@ -112,7 +153,7 @@ class CollectionEngineTest extends PHPUnit_Framework_TestCase {
         $engine = new CollectionEngine(new Collection($this->getRealArray()));
 
         $engine->search('plasch');
-        $test = $engine->make($this->getRealColumns())->toArray();
+        $test = $engine->make(new Collection($this->getRealColumns()),array('foo','bar'))->toArray();
 
         $this->assertTrue($this->arrayHasKeyValue('0','Nils',$test));
 
@@ -120,7 +161,7 @@ class CollectionEngineTest extends PHPUnit_Framework_TestCase {
         $engine = new CollectionEngine(new Collection($this->getRealArray()));
 
         $engine->search('tay');
-        $test = $engine->make($this->getRealColumns())->toArray();
+        $test = $engine->make(new Collection($this->getRealColumns()),array('foo','bar'))->toArray();
 
         $this->assertTrue($this->arrayHasKeyValue('0','Taylor',$test));
 
@@ -128,7 +169,7 @@ class CollectionEngineTest extends PHPUnit_Framework_TestCase {
         $engine = new CollectionEngine(new Collection($this->getRealArray()));
 
         $engine->search('0');
-        $test = $engine->make($this->getRealColumns())->toArray();
+        $test = $engine->make(new Collection($this->getRealColumns()),array('foo','bar'))->toArray();
 
         $this->assertTrue($this->arrayHasKeyValue('0','Taylor',$test));
 
@@ -167,8 +208,17 @@ class CollectionEngineTest extends PHPUnit_Framework_TestCase {
     private function getRealColumns()
     {
         return array(
-            new FunctionColumn(function($m){return $m['name'];}),
-            new FunctionColumn(function($m){return $m['email'];}),
+            new FunctionColumn('foo', function($m){return $m['name'];}),
+            new FunctionColumn('bar', function($m){return $m['email'];}),
+        );
+    }
+
+    private function getTestColumns()
+    {
+        return new Collection(
+            array(
+                new FunctionColumn('id', function($row){return $row['id'];}),
+            )
         );
     }
 

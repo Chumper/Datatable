@@ -20,6 +20,7 @@ class QueryEngineTest extends PHPUnit_Framework_TestCase {
     public function setUp()
     {
         $this->builder = Mockery::mock('Illuminate\Database\Query\Builder');
+
         $this->c = new QueryEngine($this->builder);
     }
 
@@ -36,20 +37,11 @@ class QueryEngineTest extends PHPUnit_Framework_TestCase {
 
     public function testSearch()
     {
-        $this->builder->shouldReceive('orWhere')->with('foo','like','test');
-        $this->builder->shouldReceive('get')->once();
+        $this->builder->shouldReceive('orWhere')->with('foo','like','%test%');
+        $this->builder->shouldReceive('get')->once()->andReturn(new Collection($this->getRealArray()));
 
         $this->c->search('test');
-        $collection = $this->c->make(array('foo'));
-
-        //
-
-        $this->builder->shouldReceive('orWhere')->once()->with('foo','like','test');
-        $this->builder->shouldReceive('get')->once();
-
-        $this->c->search('test');
-        $collection = $this->c->make(array('foo','bar'),array('foo'));
-
+        $collection = $this->c->make(new Collection($this->getRealColumns()), array('foo'));
     }
 
     public function testSkip()
@@ -70,33 +62,35 @@ class QueryEngineTest extends PHPUnit_Framework_TestCase {
     {
         $engine = new QueryEngine($this->builder);
 
+        $this->builder->shouldReceive('get')->andReturn(new Collection($this->getRealArray()));
+
         $engine->search('t');
-        $test = $engine->make($this->getRealColumns())->toArray();
+        $test = $engine->make(new Collection($this->getRealColumns()),array())->toArray();
 
         $this->assertTrue($this->arrayHasKeyValue('0','Nils',$test));
         $this->assertTrue($this->arrayHasKeyValue('0','Taylor',$test));
 
         //Test2
-        $engine = new QueryEngine(new Collection($this->getRealArray()));
+        $engine = new QueryEngine($this->builder);
 
         $engine->search('plasch');
-        $test = $engine->make($this->getRealColumns())->toArray();
+        $test = $engine->make(new Collection($this->getRealColumns()))->toArray();
 
         $this->assertTrue($this->arrayHasKeyValue('0','Nils',$test));
 
         //test3
-        $engine = new QueryEngine(new Collection($this->getRealArray()));
+        $engine = new QueryEngine($this->builder);
 
         $engine->search('tay');
-        $test = $engine->make($this->getRealColumns())->toArray();
+        $test = $engine->make(new Collection($this->getRealColumns()))->toArray();
 
         $this->assertTrue($this->arrayHasKeyValue('0','Taylor',$test));
 
         //test4
-        $engine = new QueryEngine(new Collection($this->getRealArray()));
+        $engine = new QueryEngine($this->builder);
 
         $engine->search('0');
-        $test = $engine->make($this->getRealColumns())->toArray();
+        $test = $engine->make(new Collection($this->getRealColumns()))->toArray();
 
         $this->assertTrue($this->arrayHasKeyValue('0','Taylor',$test));
 
@@ -126,8 +120,8 @@ class QueryEngineTest extends PHPUnit_Framework_TestCase {
     private function getRealColumns()
     {
         return array(
-            new FunctionColumn(function($m){return $m['name'];}),
-            new FunctionColumn(function($m){return $m['email'];}),
+            new FunctionColumn('foo', function($m){return $m['name'];}),
+            new FunctionColumn('bar', function($m){return $m['email'];}),
         );
     }
 

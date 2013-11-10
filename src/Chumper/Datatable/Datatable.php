@@ -3,7 +3,7 @@
 use Chumper\Datatable\Engines\CollectionEngine;
 use Chumper\Datatable\Engines\QueryEngine;
 use Exception;
-use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
 /**
@@ -31,18 +31,18 @@ class Datatable {
     }
 
     /**
-     * @param $data Collection|Builder
+     * @param $data Collection|Builder|\Illuminate\Database\Query\Builder
      * @throws Exception
      * @return Api
      */
-    public function from($data)
+    public static function from($data)
     {
-        if(is_subclass_of($data, 'Illuminate\Support\Collection'))
+        if($data instanceof Collection)
             return new Api(new CollectionEngine($data));
-        if(is_subclass_of($data, 'Illuminate\Database\Query\Builder'))
-            return new Api(new CollectionEngine($data));
+        else if($data instanceof \Illuminate\Database\Query\Builder OR $data instanceof Builder)
+            return new Api(new QueryEngine($data));
 
-        throw new Exception('The data you provided is not supported: '.class_basename($data));
+        throw new Exception('The data you provided is not supported: '.get_class($data));
     }
 
     /**

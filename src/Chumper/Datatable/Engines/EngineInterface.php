@@ -1,5 +1,7 @@
 <?php namespace Chumper\Datatable\Engines;
 
+use Illuminate\Support\Collection;
+
 interface EngineInterface {
 
     const ORDER_ASC = 'asc';
@@ -9,7 +11,7 @@ interface EngineInterface {
     public function search($value);
     public function skip($value);
     public function take($value);
-    public function make($columns, $showColumns = array(), $searchColumns = array());
+    public function make(Collection $columns, array $searchColumns = array());
     public function count();
     public function totalCount();
     public function getArray();

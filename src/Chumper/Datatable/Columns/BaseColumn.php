@@ -1,12 +1,23 @@
 <?php namespace Chumper\Datatable\Columns;
 
 /**
- * Interface for the columns that will be used by the user
- *
- * Class ColumnInterface
+ * Class BaseColumn
  * @package Chumper\Datatable\Columns
  */
-interface ColumnInterface {
+abstract class BaseColumn {
+
+    /**
+     * @var String name of the column
+     */
+    protected $name;
+
+    /**
+     * @param $name
+     */
+    function __construct($name)
+    {
+        $this->name = $name;
+    }
 
     /**
      * @param mixed $model The data to pass to the column,
@@ -14,17 +25,13 @@ interface ColumnInterface {
      * @return mixed the return value of the implementation,
      *              should be text in most of the cases
      */
-    public function run($model);
-
-    /**
-     * @param $name The name of the column
-     * @return void
-     */
-    public function setName($name);
+    public abstract function run($model);
 
     /**
      * @return String The name of the column
      */
-    public function getName();
-
+    public function getName()
+    {
+        return $this->name;
+    }
 }

@@ -1,5 +1,6 @@
 <?php namespace Chumper\Datatable;
 
+use Chumper\Datatable\Columns\DateColumn;
 use Chumper\Datatable\Columns\FunctionColumn;
 use Chumper\Datatable\Columns\TextColumn;
 use Chumper\Datatable\Engines\EngineInterface;
@@ -14,11 +15,6 @@ use Illuminate\Support\Facades\Response;
  * @package Chumper\Datatable
  */
 class Api {
-
-    /**
-     * @var array
-     */
-    public $searchColumns = array();
 
     /**
      * @var
@@ -38,7 +34,17 @@ class Api {
     /**
      * @var array
      */
-    private $showColumns;
+    private $searchColumns = array();
+
+    /**
+     * @var array
+     */
+    private $showColumns = array();
+
+    /**
+     * @var array
+     */
+    private $orderColumns = array();
 
     /**
      * @param EngineInterface $engine
@@ -56,16 +62,21 @@ class Api {
      */
     public function addColumn()
     {
-        if(func_num_args() != 2)
+        if(func_num_args() != 2 && func_num_args() != 1)
             throw new Exception('Invalid number of arguments');
 
-        if(is_callable(func_get_arg(1)))
+        if(func_num_args() == 1)
         {
-            $this->columns->put(func_get_arg(0), new FunctionColumn(func_get_arg(1)));
+            //add a predefined column
+            $this->columns->put(func_get_arg(0)->getName(), func_get_arg(0));
+        }
+        else if(is_callable(func_get_arg(1)))
+        {
+            $this->columns->put(func_get_arg(0), new FunctionColumn(func_get_arg(0), func_get_arg(1)));
         }
         else
         {
-            $this->columns->put(func_get_arg(0), new TextColumn(func_get_arg(0)));
+            $this->columns->put(func_get_arg(0), new TextColumn(func_get_arg(0),func_get_arg(1)));
         }
         return $this;
     }
@@ -88,6 +99,22 @@ class Api {
     }
 
     /**
+     * @return array
+     */
+    public function getOrderingColumns()
+    {
+        return $this->orderColumns;
+    }
+
+    /**
+     * @return array
+     */
+    public function getSearchingColumns()
+    {
+        return $this->searchColumns;
+    }
+
+    /**
      * @return $this
      */
     public function clearColumns()
@@ -97,6 +124,7 @@ class Api {
     }
 
     /**
+     * @param $cols
      * @return $this
      */
     public function showColumns($cols)
@@ -106,7 +134,15 @@ class Api {
         }
 
         foreach ($cols as $property) {
-            $this->columns->put($property, new FunctionColumn(function($model) use($property){return $model[$property];}));
+            //quick fix for created_at and updated_at columns
+            if(in_array($property, array('created_at', 'updated_at')))
+            {
+                $this->columns->put($property, new DateColumn($property, DateColumn::DAY_DATE));
+            }
+            else
+            {
+               $this->columns->put($property, new FunctionColumn($property, function($model) use($property){return is_array($model)?$model[$property]:$model->$property;}));
+            }
             $this->showColumns[] = $property;
         }
         return $this;
@@ -119,9 +155,10 @@ class Api {
     {
         //TODO Handle all inputs
         $this->handleInputs();
+        $this->prepareSearchColumns();
 
         $output = array(
-            "aaData" => $this->engine->make($this->columns, $this->showColumns, $this->searchColumns)->toArray(),
+            "aaData" => $this->engine->make($this->columns, $this->searchColumns)->toArray(),
             "sEcho" => intval($this->sEcho),
             "iTotalRecords" => $this->engine->totalCount(),
             "iTotalDisplayRecords" => $this->engine->count(),
@@ -130,10 +167,38 @@ class Api {
         return Response::json($output);
     }
 
-    public function searchColumns()
+    /**
+     * @param $cols
+     * @return $this
+     */
+    public function searchColumns($cols)
     {
-        foreach (func_get_args() as $property) {
+        if ( ! is_array($cols)) {
+            $cols = func_get_args();
+        }
+
+        $this->searchColumns = array();
+
+        foreach ($cols as $property) {
             $this->searchColumns[] = $property;
+        }
+        return $this;
+    }
+
+    /**
+     * @param $cols
+     * @return $this
+     */
+    public function orderColumns($cols)
+    {
+        if ( ! is_array($cols)) {
+            $cols = func_get_args();
+        }
+
+        $this->orderColumns = array();
+
+        foreach ($cols as $property) {
+            $this->orderColumns[] = $property;
         }
         return $this;
     }
@@ -186,7 +251,23 @@ class Api {
         else
             $direction = EngineInterface::ORDER_ASC;
 
-        $this->engine->order($value, $direction);
+        //check if order is allowed
+        if(empty($this->orderColumns))
+        {
+           $this->engine->order($value, $direction);
+           return;
+        }
+
+        $i = 0;
+        foreach($this->columns as $name => $column)
+        {
+            if($i == $value && in_array($name, $this->orderColumns))
+            {
+                $this->engine->order($value, $direction);
+                return;
+            }
+            $i++;
+        }
     }
 
     /**
@@ -194,9 +275,16 @@ class Api {
      */
     private function handleInputs()
     {
+        //Handle all inputs magically
         foreach (Input::all() as $key => $input) {
             if(method_exists($this, $function = 'handle'.$key))
                 $this->$function($input);
         }
+    }
+
+    private function prepareSearchColumns()
+    {
+        if(count($this->searchColumns) == 0 || empty($this->searchColumns))
+            $this->searchColumns = $this->showColumns;
     }
 }
