@@ -1,6 +1,5 @@
 <?php namespace Chumper\Datatable\Engines;
 
-use DB;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
