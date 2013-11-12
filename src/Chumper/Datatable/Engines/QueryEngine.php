@@ -1,5 +1,6 @@
 <?php namespace Chumper\Datatable\Engines;
 
+use DB;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
@@ -28,10 +29,12 @@ class QueryEngine implements EngineInterface {
 
     private $orderOrder;
 
+    private $collection = null;
+
     function __construct($builder)
     {
         $this->builder = $builder;
-        $this->originalBuilder = $builder;
+        $this->originalBuilder = clone $builder;
     }
 
     public function order($column, $oder = EngineInterface::ORDER_ASC)
@@ -57,7 +60,8 @@ class QueryEngine implements EngineInterface {
 
     public function count()
     {
-        return $this->builder->count();
+        $counter = clone $this->builder;
+        return $counter->skip(0)->take(0)->count();
     }
 
     public function totalCount()
@@ -67,7 +71,7 @@ class QueryEngine implements EngineInterface {
 
     public function getArray()
     {
-        return $this->getCollection()->toArray();
+       return $this->getCollection()->toArray();
     }
 
     public function reset()
@@ -89,10 +93,13 @@ class QueryEngine implements EngineInterface {
      */
     private function getCollection()
     {
-        $result = $this->builder->get();
-        if(is_array($result))
-            return new Collection($result);
-        return $result;
+        if($this->collection == null)
+        {
+            $this->collection = $this->builder->get();
+            if(is_array($this->collection))
+                $this->collection = new Collection($this->collection);
+        }
+        return $this->collection;
     }
 
     private function doInternalSearch($columns)
@@ -107,8 +114,7 @@ class QueryEngine implements EngineInterface {
 
     private function compile($columns)
     {
-        $result = $this->getCollection();
-        $this->resultCollection = $result->map(function($row) use ($columns) {
+        $this->resultCollection = $this->getCollection()->map(function($row) use ($columns) {
             $entry = array();
             foreach ($columns as $col)
             {
