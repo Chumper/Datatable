@@ -4,7 +4,7 @@ Datatable
 This is a __laravel 4 package__ for the server and client side of datatables at http://datatables.net/
 
 I developed this package because i was not happy with the only existing package at https://github.com/bllim/laravel4-datatables-package
-so i developed this package with in my opinion is superior.
+so i developed this package which in my opinion is superior.
 
 ![Image](https://raw.github.com/Chumper/Datatable/master/datatable.jpg)
 
@@ -82,7 +82,7 @@ You can then access it under the `Datatable` alias.
     <script type="text/javascript" src="/assets/js/jquery.js"></script>
     <script type="text/javascript" src="/assets/js/jquery.dataTables.min.js"></script>
 
-    {{ DataTable::table()
+    {{ Datatable::table()
     ->addColumn('id','Name')       // these are the column headings to be shown  
     ->setUrl(route('api.users'))   // this is the route where data will be retrieved
     ->render() }}
@@ -95,6 +95,8 @@ You can then access it under the `Datatable` alias.
     {
         return Datatable::collection(User::all(array('id','name')))
         ->showColumns('id', 'name')
+        ->searchColumns('name')
+        ->orderColumns('id','name')
         ->make();
     }
 ```
