@@ -24,11 +24,30 @@ class QueryEngine implements EngineInterface {
      */
     private $resultCollection;
 
+    /**
+     * @var int The column to sort after
+     */
     private $orderColumn = -1;
 
+    /**
+     * @var mixed Determines the order the result should be sorted after
+     */
     private $orderOrder;
 
+    /**
+     * @var Collection the resulting collection
+     */
     private $collection = null;
+
+    /**
+     * @var int Determines if the result should be skipped
+     */
+    private $skip = 0;
+
+    /**
+     * @var int Determines if the result should be taken
+     */
+    private $take = 0;
 
     function __construct($builder)
     {
@@ -49,18 +68,18 @@ class QueryEngine implements EngineInterface {
 
     public function skip($value)
     {
-        $this->builder->skip($value);
+        $this->skip = $value;
     }
 
     public function take($value)
     {
-        $this->builder->take($value);
+        $this->take = $value;
     }
 
     public function count()
     {
         $counter = clone $this->builder;
-        return $counter->skip(0)->take(0)->count();
+        return $counter->count();
     }
 
     public function totalCount()
@@ -94,7 +113,16 @@ class QueryEngine implements EngineInterface {
     {
         if($this->collection == null)
         {
+            if($this->skip > 0)
+            {
+                $this->builder = $this->builder->skip($this->skip);
+            }
+            if($this->take > 0)
+            {
+                $this->builder = $this->builder->take($this->take);
+            }
             $this->collection = $this->builder->get();
+
             if(is_array($this->collection))
                 $this->collection = new Collection($this->collection);
         }
@@ -106,9 +134,12 @@ class QueryEngine implements EngineInterface {
         if(empty($this->search))
             return;
 
-        foreach ($columns as $c) {
-            $this->builder->orWhere($c,'like','%'.$this->search.'%');
-        }
+        $search = $this->search;
+        $this->builder = $this->builder->where(function($query) use ($columns, $search) {
+            foreach ($columns as $c) {
+                $query->orWhere($c,'like','%'.$search.'%');
+            }
+        });
     }
 
     private function compile($columns)
@@ -131,7 +162,7 @@ class QueryEngine implements EngineInterface {
         {
             if($i == $this->orderColumn)
             {
-                $this->builder->orderBy($col->getName(), $this->orderOrder);
+                $this->builder = $this->builder->orderBy($col->getName(), $this->orderOrder);
                 return;
             }
             $i++;

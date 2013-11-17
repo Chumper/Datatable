@@ -37,8 +37,9 @@ class QueryEngineTest extends PHPUnit_Framework_TestCase {
 
     public function testSearch()
     {
-        $this->builder->shouldReceive('orWhere')->with('foo','like','%test%');
+        $this->builder->shouldReceive('where')->withAnyArgs()->andReturn($this->builder);
         $this->builder->shouldReceive('get')->once()->andReturn(new Collection($this->getRealArray()));
+        $this->builder->shouldReceive('orderBy')->withAnyArgs()->andReturn($this->builder);
 
         $this->c->search('test');
         $collection = $this->c->make(new Collection($this->getRealColumns()), array('foo'));
@@ -46,16 +47,22 @@ class QueryEngineTest extends PHPUnit_Framework_TestCase {
 
     public function testSkip()
     {
-        $this->builder->shouldReceive('skip')->once()->with(10);
+        $this->builder->shouldReceive('skip')->once()->with(10)->andReturn($this->builder);
+        $this->builder->shouldReceive('get')->once()->andReturn(new Collection($this->getRealArray()));
+        $this->builder->shouldReceive('orderBy')->withAnyArgs()->andReturn($this->builder);
 
         $this->c->skip(10);
+        $this->c->make(new Collection($this->getRealColumns()), array('foo'));
     }
 
     public function testTake()
     {
-        $this->builder->shouldReceive('take')->once()->with(10);
+        $this->builder->shouldReceive('take')->once()->with(10)->andReturn($this->builder);
+        $this->builder->shouldReceive('get')->once()->andReturn(new Collection($this->getRealArray()));
+        $this->builder->shouldReceive('orderBy')->withAnyArgs()->andReturn($this->builder);
 
         $this->c->take(10);
+        $this->c->make(new Collection($this->getRealColumns()), array('foo'));
     }
 
     public function testComplex()
@@ -63,6 +70,7 @@ class QueryEngineTest extends PHPUnit_Framework_TestCase {
         $engine = new QueryEngine($this->builder);
 
         $this->builder->shouldReceive('get')->andReturn(new Collection($this->getRealArray()));
+        $this->builder->shouldReceive('where')->withAnyArgs()->andReturn($this->builder);
 
         $engine->search('t');
         $test = $engine->make(new Collection($this->getRealColumns()),array())->toArray();
