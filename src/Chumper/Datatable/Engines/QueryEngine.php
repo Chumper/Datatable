@@ -1,6 +1,7 @@
 <?php namespace Chumper\Datatable\Engines;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
 
 class QueryEngine implements EngineInterface {
@@ -51,8 +52,16 @@ class QueryEngine implements EngineInterface {
 
     function __construct($builder)
     {
-        $this->builder = $builder;
-        $this->originalBuilder = clone $builder;
+        if($builder instanceof Relation)
+        {
+            $this->builder = $builder->getBaseQuery();
+            $this->originalBuilder = clone $builder->getBaseQuery();
+        }
+        else
+        {
+            $this->builder = $builder;
+            $this->originalBuilder = clone $builder;
+        }
     }
 
     public function order($column, $oder = EngineInterface::ORDER_ASC)
@@ -99,29 +108,31 @@ class QueryEngine implements EngineInterface {
 
     public function make(Collection $columns, array $searchColumns = array())
     {
-        $this->doInternalSearch($searchColumns);
-        $this->doInternalOrder($columns);
-        return $this->compile($columns);
+        $builder = clone $this->builder;
+        $builder = $this->doInternalSearch($builder, $searchColumns);
+        $builder = $this->doInternalOrder($builder, $columns);
+        return $this->compile($builder, $columns);
     }
 
     //--------PRIVATE FUNCTIONS
 
     /**
+     * @param $builder
      * @return Collection
      */
-    private function getCollection()
+    private function getCollection($builder)
     {
         if($this->collection == null)
         {
             if($this->skip > 0)
             {
-                $this->builder = $this->builder->skip($this->skip);
+                $builder = $builder->skip($this->skip);
             }
             if($this->take > 0)
             {
-                $this->builder = $this->builder->take($this->take);
+                $builder = $builder->take($this->take);
             }
-            $this->collection = $this->builder->get();
+            $this->collection = $builder->get();
 
             if(is_array($this->collection))
                 $this->collection = new Collection($this->collection);
@@ -129,22 +140,23 @@ class QueryEngine implements EngineInterface {
         return $this->collection;
     }
 
-    private function doInternalSearch($columns)
+    private function doInternalSearch($builder, $columns)
     {
         if(empty($this->search))
-            return;
+            return $builder;
 
         $search = $this->search;
-        $this->builder = $this->builder->where(function($query) use ($columns, $search) {
+        $builder = $builder->where(function($query) use ($columns, $search) {
             foreach ($columns as $c) {
                 $query->orWhere($c,'like','%'.$search.'%');
             }
         });
+        return $builder;
     }
 
-    private function compile($columns)
+    private function compile($builder, $columns)
     {
-        $this->resultCollection = $this->getCollection()->map(function($row) use ($columns) {
+        $this->resultCollection = $this->getCollection($builder)->map(function($row) use ($columns) {
             $entry = array();
             foreach ($columns as $col)
             {
@@ -155,17 +167,18 @@ class QueryEngine implements EngineInterface {
         return $this->resultCollection;
     }
 
-    private function doInternalOrder(Collection $columns)
+    private function doInternalOrder($builder, $columns)
     {
         $i = 0;
         foreach($columns as $col)
         {
             if($i == $this->orderColumn)
             {
-                $this->builder = $this->builder->orderBy($col->getName(), $this->orderOrder);
-                return;
+                $builder = $builder->orderBy($col->getName(), $this->orderOrder);
+                return $builder;
             }
             $i++;
         }
+        return $builder;
     }
 }
