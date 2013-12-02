@@ -17,5 +17,6 @@ interface EngineInterface {
     public function getArray();
     public function reset();
     public function setSearchStrip();
+    public function setOrderStrip();
 
 }

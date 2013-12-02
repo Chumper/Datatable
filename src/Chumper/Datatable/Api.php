@@ -209,6 +209,12 @@ class Api {
         return $this;
     }
 
+    public function stripOrderColumns()
+    {
+        $this->engine->setOrderStrip();
+        return $this;
+    }
+
     //-------------PRIVATE FUNCTIONS-------------------
 
     /**

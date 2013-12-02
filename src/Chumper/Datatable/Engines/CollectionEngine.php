@@ -39,6 +39,11 @@ class CollectionEngine implements EngineInterface {
     private $stripSearch = false;
 
     /**
+     * @var boolean
+     */
+    private $stripOrder = false;
+
+    /**
      * @param Collection $collection
      */
     function __construct(Collection $collection)
@@ -176,8 +181,17 @@ class CollectionEngine implements EngineInterface {
             return;
 
         $column = $this->orderColumn;
-        $this->workingCollection->sortBy(function($row) use ($column) {
-            return $row[$column];
+        $stripOrder = $this->stripOrder;
+        $this->workingCollection->sortBy(function($row) use ($column,$stripOrder) {
+
+            if($stripOrder)
+            {
+                return strip_tags($row[$column]);
+            }
+            else
+            {
+                return $row[$column];
+            }
         });
 
         if($this->orderDirection == EngineInterface::ORDER_DESC)
@@ -199,5 +213,10 @@ class CollectionEngine implements EngineInterface {
     public function setSearchStrip()
     {
         $this->stripSearch = true;
+    }
+
+    public function setOrderStrip()
+    {
+        $this->stripOrder = true;
     }
 }

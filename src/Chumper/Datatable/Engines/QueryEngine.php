@@ -192,4 +192,9 @@ class QueryEngine implements EngineInterface {
     {
         // can not be implemented with the Query engine!
     }
+
+    public function setOrderStrip()
+    {
+        // can not be implemented with the Query engine!
+    }
 }
