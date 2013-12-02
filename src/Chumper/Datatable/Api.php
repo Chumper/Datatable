@@ -203,6 +203,12 @@ class Api {
         return $this;
     }
 
+    public function stripSearchColumns()
+    {
+        $this->engine->setSearchStrip();
+        return $this;
+    }
+
     //-------------PRIVATE FUNCTIONS-------------------
 
     /**

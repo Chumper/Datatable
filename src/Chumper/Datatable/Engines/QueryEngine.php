@@ -50,6 +50,11 @@ class QueryEngine implements EngineInterface {
      */
     private $take = 0;
 
+    /**
+     * @var int Determines the count of the items
+     */
+    private $counter = 0;
+
     function __construct($builder)
     {
         if($builder instanceof Relation)
@@ -87,8 +92,7 @@ class QueryEngine implements EngineInterface {
 
     public function count()
     {
-        $counter = clone $this->builder;
-        return $counter->count();
+        return $this->counter;
     }
 
     public function totalCount()
@@ -98,7 +102,7 @@ class QueryEngine implements EngineInterface {
 
     public function getArray()
     {
-       return $this->getCollection()->toArray();
+       return $this->getCollection($this->builder)->toArray();
     }
 
     public function reset()
@@ -156,6 +160,8 @@ class QueryEngine implements EngineInterface {
 
     private function compile($builder, $columns)
     {
+        $this->counter = $builder->count();
+
         $this->resultCollection = $this->getCollection($builder)->map(function($row) use ($columns) {
             $entry = array();
             foreach ($columns as $col)
@@ -180,5 +186,10 @@ class QueryEngine implements EngineInterface {
             $i++;
         }
         return $builder;
+    }
+
+    public function setSearchStrip()
+    {
+        // can not be implemented with the Query engine!
     }
 }

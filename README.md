@@ -257,6 +257,13 @@ E.g.:
 
 PLease look into the specific Columns for further information.
 
+**stripSearchColumns()**
+
+If you use the search functionality ( Collection only ) then you can advice
+all columns to strip any HTML and PHP tags before searching this column.
+
+This can be useful if you return a link to the model detail but still want to provide search ability in this column.
+
 **make()**
 
 This will handle the input data of the request and provides the result set.
@@ -353,6 +360,9 @@ In the datatable view (eg, 'my.datatable.template'):
         });
     @endif
 ```
+##Applications
+
+https://github.com/hillelcoren/invoice-ninja (by Hillel Coren)
 
 ##License
 

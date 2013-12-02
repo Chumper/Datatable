@@ -39,6 +39,7 @@ class QueryEngineTest extends PHPUnit_Framework_TestCase {
     {
         $this->builder->shouldReceive('where')->withAnyArgs()->andReturn($this->builder);
         $this->builder->shouldReceive('get')->once()->andReturn(new Collection($this->getRealArray()));
+        $this->builder->shouldReceive('count')->once()->andReturn(10);
         $this->builder->shouldReceive('orderBy')->withAnyArgs()->andReturn($this->builder);
 
         $this->c->search('test');
@@ -49,6 +50,7 @@ class QueryEngineTest extends PHPUnit_Framework_TestCase {
     {
         $this->builder->shouldReceive('skip')->once()->with(10)->andReturn($this->builder);
         $this->builder->shouldReceive('get')->once()->andReturn(new Collection($this->getRealArray()));
+        $this->builder->shouldReceive('count')->once()->andReturn(10);
         $this->builder->shouldReceive('orderBy')->withAnyArgs()->andReturn($this->builder);
 
         $this->c->skip(10);
@@ -59,6 +61,7 @@ class QueryEngineTest extends PHPUnit_Framework_TestCase {
     {
         $this->builder->shouldReceive('take')->once()->with(10)->andReturn($this->builder);
         $this->builder->shouldReceive('get')->once()->andReturn(new Collection($this->getRealArray()));
+        $this->builder->shouldReceive('count')->once()->andReturn(10);
         $this->builder->shouldReceive('orderBy')->withAnyArgs()->andReturn($this->builder);
 
         $this->c->take(10);
@@ -71,6 +74,7 @@ class QueryEngineTest extends PHPUnit_Framework_TestCase {
 
         $this->builder->shouldReceive('get')->andReturn(new Collection($this->getRealArray()));
         $this->builder->shouldReceive('where')->withAnyArgs()->andReturn($this->builder);
+        $this->builder->shouldReceive('count')->times(4)->andReturn(10);
 
         $engine->search('t');
         $test = $engine->make(new Collection($this->getRealColumns()),array())->toArray();

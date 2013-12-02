@@ -16,5 +16,6 @@ interface EngineInterface {
     public function totalCount();
     public function getArray();
     public function reset();
+    public function setSearchStrip();
 
 }

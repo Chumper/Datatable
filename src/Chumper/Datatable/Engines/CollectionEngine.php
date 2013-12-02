@@ -34,6 +34,11 @@ class CollectionEngine implements EngineInterface {
     private $collection;
 
     /**
+     * @var boolean
+     */
+    private $stripSearch = false;
+
+    /**
      * @param Collection $collection
      */
     function __construct(Collection $collection)
@@ -151,8 +156,16 @@ class CollectionEngine implements EngineInterface {
                 if(!in_array($i, $toSearch))
                     continue;
 
-                if(str_contains(strtolower($row[$i]),strtolower($value)))
-                    return true;
+                if($this->stripSearch)
+                {
+                    if(str_contains(strtolower(strip_tags($row[$i])),strtolower($value)))
+                        return true;
+                }
+                else
+                {
+                    if(str_contains(strtolower($row[$i]),strtolower($value)))
+                        return true;
+                }
             }
         });
     }
@@ -181,5 +194,10 @@ class CollectionEngine implements EngineInterface {
             }
             return $entry;
         });
+    }
+
+    public function setSearchStrip()
+    {
+        $this->stripSearch = true;
     }
 }
