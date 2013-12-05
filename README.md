@@ -264,6 +264,23 @@ all columns to strip any HTML and PHP tags before searching this column.
 
 This can be useful if you return a link to the model detail but still want to provide search ability in this column.
 
+**setSearchWithAlias()**
+
+If you want to use an alias column on the query engine and you don't get the correct results back while searching then you should try this flag.
+E.g.:
+```php
+		Datatable::from(DB::table("users")->select('firstname', "users.email as email2")->join('partners','users.partner_id','=','partners.id'))
+        ->showColumns('firstname','email2')
+        ->setSearchWithAlias()
+        ->searchColumns("email2")
+```
+
+In SQL it is not allowed to have an alias in the where part (used for searching) and therefore the results will not counted correctly.
+
+With this flag you enable aliases in the search part (email2 in searchColumns).
+
+Please be aware that this flag will slow down your application, since we are getting the results back twice to count them manually.
+
 **make()**
 
 This will handle the input data of the request and provides the result set.
