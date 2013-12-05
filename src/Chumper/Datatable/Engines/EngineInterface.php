@@ -18,5 +18,6 @@ interface EngineInterface {
     public function reset();
     public function setSearchStrip();
     public function setOrderStrip();
+    public function setSearchWithAlias();
 
 }

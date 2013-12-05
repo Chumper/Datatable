@@ -55,6 +55,11 @@ class QueryEngine implements EngineInterface {
      */
     private $counter = 0;
 
+    /**
+     * @var boolean Determines if the alias should be allowed in the search
+     */
+    private $searchWithAlias = false;
+
     function __construct($builder)
     {
         if($builder instanceof Relation)
@@ -113,9 +118,24 @@ class QueryEngine implements EngineInterface {
     public function make(Collection $columns, array $searchColumns = array())
     {
         $builder = clone $this->builder;
+        $countBuilder = clone $this->builder;
+
         $builder = $this->doInternalSearch($builder, $searchColumns);
+        $countBuilder = $this->doInternalSearch($countBuilder, $searchColumns);
+
+        if($this->searchWithAlias)
+        {
+            $this->counter = count($countBuilder->get());
+        }
+        else
+        {
+            $this->counter = $countBuilder->count();
+        }
+
         $builder = $this->doInternalOrder($builder, $columns);
-        return $this->compile($builder, $columns);
+        $collection = $this->compile($builder, $columns);
+
+        return $collection;
     }
 
     //--------PRIVATE FUNCTIONS
@@ -136,6 +156,7 @@ class QueryEngine implements EngineInterface {
             {
                 $builder = $builder->take($this->take);
             }
+            //dd($this->builder->toSql());
             $this->collection = $builder->get();
 
             if(is_array($this->collection))
@@ -160,9 +181,9 @@ class QueryEngine implements EngineInterface {
 
     private function compile($builder, $columns)
     {
-        $this->counter = $builder->count();
+        $this->resultCollection = $this->getCollection($builder);
 
-        $this->resultCollection = $this->getCollection($builder)->map(function($row) use ($columns) {
+        $this->resultCollection = $this->resultCollection->map(function($row) use ($columns) {
             $entry = array();
             foreach ($columns as $col)
             {
@@ -196,5 +217,10 @@ class QueryEngine implements EngineInterface {
     public function setOrderStrip()
     {
         // can not be implemented with the Query engine!
+    }
+
+    public function setSearchWithAlias()
+    {
+        $this->searchWithAlias = true;
     }
 }

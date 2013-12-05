@@ -219,4 +219,9 @@ class CollectionEngine implements EngineInterface {
     {
         $this->stripOrder = true;
     }
+
+    public function setSearchWithAlias()
+    {
+        // can not be implemented with the Collection engine!
+    }
 }

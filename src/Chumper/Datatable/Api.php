@@ -215,6 +215,12 @@ class Api {
         return $this;
     }
 
+    public function setSearchWithAlias()
+    {
+        $this->engine->setSearchWithAlias();
+        return $this;
+    }
+
     //-------------PRIVATE FUNCTIONS-------------------
 
     /**
