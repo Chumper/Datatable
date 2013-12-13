@@ -9,6 +9,7 @@ interface EngineInterface {
 
     public function order($column, $order);
     public function search($value);
+    public function columnSearch($columnName, $value);
     public function skip($value);
     public function take($value);
     public function make(Collection $columns, array $searchColumns = array());

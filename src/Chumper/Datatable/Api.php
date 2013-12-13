@@ -289,15 +289,48 @@ class Api {
     }
 
     /**
+     * @param int $columnIndex
+     * @param string $searchValue
+     *
+     * @return void
+     */
+    private function handleSingleColumnSearch($columnIndex, $searchValue)
+    {
+        if (!isset($this->searchColumns[$columnIndex])) return;
+        if (empty($searchValue)) return;
+
+        $columnName = $this->searchColumns[$columnIndex];
+        $this->engine->columnSearch($columnName, $searchValue);
+    }
+
+    /**
      *
      */
     private function handleInputs()
     {
         //Handle all inputs magically
         foreach (Input::all() as $key => $input) {
+            if ($this->isParameterForSingleColumnSearch($key)) {
+                $columnIndex = (int)substr($key, -1);
+                $this->handleSingleColumnSearch($columnIndex, $input);
+                
+                continue;
+            }
+            
             if(method_exists($this, $function = 'handle'.$key))
                 $this->$function($input);
         }
+    }
+    
+    /**
+     * @param $parameterName
+     *
+     * @return bool
+     */
+    private function isParameterForSingleColumnSearch($parameterName)
+    {
+        static $parameterNamePrefix = 'sSearch_';
+        return strncmp($parameterName, $parameterNamePrefix, strlen($parameterNamePrefix)) === 0;
     }
 
     private function prepareSearchColumns()

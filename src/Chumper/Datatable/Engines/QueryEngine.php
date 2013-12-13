@@ -21,6 +21,11 @@ class QueryEngine implements EngineInterface {
     public $search;
 
     /**
+     * @var array single column searches
+     */
+    public $columnSearches = array();
+
+    /**
      * @var Collection the returning collection
      */
     private $resultCollection;
@@ -83,6 +88,11 @@ class QueryEngine implements EngineInterface {
     public function search($value)
     {
         $this->search = $value;
+    }
+
+    public function columnSearch($columnName, $value)
+    {
+        $this->columnSearches[$columnName] = $value;
     }
 
     public function skip($value)
@@ -167,16 +177,32 @@ class QueryEngine implements EngineInterface {
 
     private function doInternalSearch($builder, $columns)
     {
-        if(empty($this->search))
-            return $builder;
+        if (!empty($this->search)) {
+            $this->buildSearchQuery($builder, $columns);
+        }
 
+        if (!empty($this->columnSearches)) {
+            $this->buildSingleColumnSearches($builder);
+        }
+
+        return $builder;
+    }
+
+    private function buildSearchQuery($builder, $columns)
+    {
         $search = $this->search;
-        $builder = $builder->where(function($query) use ($columns, $search) {
+        $builder->where(function($query) use ($columns, $search) {
             foreach ($columns as $c) {
                 $query->orWhere($c,'like','%'.$search.'%');
             }
         });
-        return $builder;
+    }
+
+    private function buildSingleColumnSearches($builder)
+    {
+        foreach ($this->columnSearches as $columnName => $searchValue) {
+            $builder->where($columnName, 'like', '%' . $searchValue . '%');
+        }
     }
 
     private function compile($builder, $columns)

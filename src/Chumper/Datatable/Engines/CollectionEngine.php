@@ -71,6 +71,15 @@ class CollectionEngine implements EngineInterface {
     }
 
     /**
+     * @param string $columnName
+     * @param mixed $value
+     */
+    public function columnSearch($columnName, $value)
+    {
+        // is not implemented in this engine
+    }
+
+    /**
      * @param $value
      */
     public function skip($value)
