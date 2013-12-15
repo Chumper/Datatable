@@ -44,6 +44,11 @@ class CollectionEngine implements EngineInterface {
     private $stripOrder = false;
 
     /**
+     * @var bool Determines if the search should be case sensitive or not
+     */
+    private $caseSensitiveSearch = false;
+
+    /**
      * @param Collection $collection
      */
     function __construct(Collection $collection)
@@ -133,6 +138,12 @@ class CollectionEngine implements EngineInterface {
         return $this->workingCollection->slice($this->skip,$this->limit);
     }
 
+
+    public function setCaseSensitiveSearch($value)
+    {
+        $this->caseSensitiveSearch = $value;
+    }
+
     //--------------PRIVATE FUNCTIONS-----------------
 
     private function doInternalSearch(Collection $columns, array $searchColumns)
@@ -142,6 +153,7 @@ class CollectionEngine implements EngineInterface {
 
         $value = $this->search;
         $toSearch = array();
+        $caseSensitive = $this->caseSensitiveSearch;
 
         // Map the searchColumns to the real columns
         $ii = 0;
@@ -154,7 +166,7 @@ class CollectionEngine implements EngineInterface {
             $ii++;
         }
 
-        $this->workingCollection = $this->workingCollection->filter(function($row) use ($value, $toSearch)
+        $this->workingCollection = $this->workingCollection->filter(function($row) use ($value, $toSearch, $caseSensitive)
         {
             for($i = 0; $i < count($row); $i++)
             {
@@ -163,7 +175,15 @@ class CollectionEngine implements EngineInterface {
 
                 if($this->stripSearch)
                 {
-                    if(str_contains(strtolower(strip_tags($row[$i])),strtolower($value)))
+                    $search = strip_tags($row[$i]);
+                }
+                else
+                {
+                    $search = $row[$i];
+                }
+                if($caseSensitive)
+                {
+                    if(str_contains($row[$i],$value))
                         return true;
                 }
                 else

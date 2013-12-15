@@ -60,6 +60,11 @@ class QueryEngine implements EngineInterface {
      */
     private $searchWithAlias = false;
 
+    /**
+     * @var bool Determines if the search should be case sensitive or not
+     */
+    private $caseSensitiveSearch = false;
+
     function __construct($builder)
     {
         if($builder instanceof Relation)
@@ -138,6 +143,11 @@ class QueryEngine implements EngineInterface {
         return $collection;
     }
 
+    public function setCaseSensitiveSearch($value)
+    {
+        $this->caseSensitiveSearch = $value;
+    }
+
     //--------PRIVATE FUNCTIONS
 
     /**
@@ -170,10 +180,26 @@ class QueryEngine implements EngineInterface {
         if(empty($this->search))
             return $builder;
 
+        if($this->caseSensitiveSearch)
+        {
+            $like = "LIKE";
+        }
+        else
+        {
+            $like = "ILIKE";
+        }
         $search = $this->search;
-        $builder = $builder->where(function($query) use ($columns, $search) {
+        $builder = $builder->where(function($query) use ($columns, $search, $like) {
             foreach ($columns as $c) {
-                $query->orWhere($c,'like','%'.$search.'%');
+                //column to CAST following the pattern column:newType:[maxlength]
+                if(strrpos($c, ':')){
+                    $c = explode(':', $c);
+                    if(isset($c[2]))
+                        $c[1] .= "($c[2])";
+                    $query->orWhereRaw("cast($c[0] as $c[1]) ".$like." ?", array("%$search%"));
+                }
+                else
+                    $query->orWhere($c,$like,'%'.$search.'%');
             }
         });
         return $builder;

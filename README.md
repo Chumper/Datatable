@@ -225,6 +225,17 @@ You can provide as many names as you like
 Will enable the table to allow search only in the given columns.
 Please note that a collection behaves different to a builder object.
 
+Note: If you want to search on number columns with the query engine, then you can also pass a search column like this
+ ```
+    //mysql
+    ->searchColumns(array('id:char:255', 'first_name', 'last_name', 'address', 'email', 'age:char:255'))
+
+    //postgree
+    ->searchColumns(array('id:text', 'first_name', 'last_name', 'address', 'email', 'age:text'))
+ ```
+
+ This will cast the columns int the given types when searching on this columns
+
 **orderColumns(..$fields)**
 
 Will enable the table to allow ordering only in the given columns.
@@ -263,6 +274,12 @@ If you use the search functionality ( Collection only ) then you can advice
 all columns to strip any HTML and PHP tags before searching this column.
 
 This can be useful if you return a link to the model detail but still want to provide search ability in this column.
+
+**setCaseSensitiveSearch($boolean)**
+
+If you want to enable case sensitive search on your columns you should set this option.
+
+Please note: Case sensitive searching with the querybuilder only works if you have a CASE SENSITIVE (_cs) collation on your table: http://dev.mysql.com/doc/refman/5.0/en/case-sensitivity.html
 
 **setSearchWithAlias()**
 
@@ -377,6 +394,11 @@ In the datatable view (eg, 'my.datatable.template'):
         });
     @endif
 ```
+##Contributors
+
+* [jgoux](https://github.com/jgoux) for helping with searching on number columns in the database
+* [jijoel](https://github.com/jijoel) for helping with callback options and documentation
+
 ##Applications
 
 https://github.com/hillelcoren/invoice-ninja (by Hillel Coren)

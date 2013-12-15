@@ -221,6 +221,12 @@ class Api {
         return $this;
     }
 
+    public function setCaseSensitiveSearch($value)
+    {
+        $this->engine->setCaseSensitiveSearch($value);
+        return $this;
+    }
+
     //-------------PRIVATE FUNCTIONS-------------------
 
     /**
