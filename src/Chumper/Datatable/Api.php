@@ -221,9 +221,9 @@ class Api {
         return $this;
     }
 
-    public function setCaseSensitiveSearch($value)
+    public function setCaseSensitiveSearchForPostgree($value)
     {
-        $this->engine->setCaseSensitiveSearch($value);
+        $this->engine->setCaseSensitiveSearchForPostgree($value);
         return $this;
     }
 

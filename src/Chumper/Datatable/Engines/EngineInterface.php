@@ -19,6 +19,6 @@ interface EngineInterface {
     public function setSearchStrip();
     public function setOrderStrip();
     public function setSearchWithAlias();
-    public function setCaseSensitiveSearch($value);
+    public function setCaseSensitiveSearchForPostgree($value);
 
 }

@@ -46,7 +46,7 @@ class CollectionEngine implements EngineInterface {
     /**
      * @var bool Determines if the search should be case sensitive or not
      */
-    private $caseSensitiveSearch = false;
+    private $setCaseSensitiveSearchForPostgree = true;
 
     /**
      * @param Collection $collection
@@ -139,7 +139,7 @@ class CollectionEngine implements EngineInterface {
     }
 
 
-    public function setCaseSensitiveSearch($value)
+    public function setCaseSensitiveSearchForPostgree($value)
     {
         $this->caseSensitiveSearch = $value;
     }

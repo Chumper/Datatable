@@ -275,11 +275,11 @@ all columns to strip any HTML and PHP tags before searching this column.
 
 This can be useful if you return a link to the model detail but still want to provide search ability in this column.
 
-**setCaseSensitiveSearch($boolean)**
+**setCaseSensitiveSearchForPostgree($boolean)**
 
-If you want to enable case sensitive search on your columns you should set this option.
+If you want to enable case sensitive search on your columns you should set this option to false for a postgree database.
 
-Please note: Case sensitive searching with the querybuilder only works if you have a CASE SENSITIVE (_cs) collation on your table: http://dev.mysql.com/doc/refman/5.0/en/case-sensitivity.html
+Please note: Case sensitive searching with the querybuilder only works if you have a CASE SENSITIVE (_cs) collation on your mysql table.
 
 **setSearchWithAlias()**
 

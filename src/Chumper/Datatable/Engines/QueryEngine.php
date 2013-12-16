@@ -63,7 +63,7 @@ class QueryEngine implements EngineInterface {
     /**
      * @var bool Determines if the search should be case sensitive or not
      */
-    private $caseSensitiveSearch = false;
+    private $setCaseSensitiveSearchForPostgree = true;
 
     function __construct($builder)
     {
@@ -143,7 +143,7 @@ class QueryEngine implements EngineInterface {
         return $collection;
     }
 
-    public function setCaseSensitiveSearch($value)
+    public function setCaseSensitiveSearchForPostgree($value)
     {
         $this->caseSensitiveSearch = $value;
     }
