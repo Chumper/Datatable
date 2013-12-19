@@ -145,7 +145,7 @@ class QueryEngine implements EngineInterface {
 
     public function setCaseSensitiveSearchForPostgree($value)
     {
-        $this->caseSensitiveSearch = $value;
+        $this->setCaseSensitiveSearchForPostgree = $value;
     }
 
     //--------PRIVATE FUNCTIONS
@@ -180,7 +180,7 @@ class QueryEngine implements EngineInterface {
         if(empty($this->search))
             return $builder;
 
-        if($this->caseSensitiveSearch)
+        if($this->setCaseSensitiveSearchForPostgree)
         {
             $like = "LIKE";
         }

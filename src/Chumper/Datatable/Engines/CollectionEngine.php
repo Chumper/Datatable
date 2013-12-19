@@ -141,7 +141,7 @@ class CollectionEngine implements EngineInterface {
 
     public function setCaseSensitiveSearchForPostgree($value)
     {
-        $this->caseSensitiveSearch = $value;
+        $this->setCaseSensitiveSearchForPostgree = $value;
     }
 
     //--------------PRIVATE FUNCTIONS-----------------
@@ -153,7 +153,7 @@ class CollectionEngine implements EngineInterface {
 
         $value = $this->search;
         $toSearch = array();
-        $caseSensitive = $this->caseSensitiveSearch;
+        $caseSensitive = $this->setCaseSensitiveSearchForPostgree;
 
         // Map the searchColumns to the real columns
         $ii = 0;
