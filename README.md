@@ -43,6 +43,7 @@ Order by custom fields | + | -
 Search outside the shown data (e.g.) database | - | +
 
 For a detailed explanation please see the video below.
+http://www.youtube.com/watch?v=c9fao_5Jo3Y
 
 Please let me know any issues or features you want to have in the issues section.
 I would be really thankful if you can provide a test that points to the issue.
@@ -174,6 +175,8 @@ A query on the other side is not able to perform a search or orderBy correctly o
 
 Please also note that there is a significant difference betweeen the search and order functionality if you use query compared to collections.
 Please see the following video for more details.
+
+http://www.youtube.com/watch?v=c9fao_5Jo3Y
 
 ##Available functions
 
