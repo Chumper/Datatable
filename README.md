@@ -10,7 +10,7 @@ so i developed this package which in my opinion is superior.
 
 ##Known Issues
 
-* None so far
+* jQuery  needs to be loaded at the top of the page. Loading it at the bottom will cause the plugin to throw an error.
 
 ##TODO
 
