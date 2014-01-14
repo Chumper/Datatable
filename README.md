@@ -10,7 +10,7 @@ so i developed this package which in my opinion is superior.
 
 ##Known Issues
 
-* jQuery  needs to be loaded at the top of the page. Loading it at the bottom will cause the plugin to throw an error.
+* none at the moment
 
 ##TODO
 
@@ -135,6 +135,19 @@ The plugin will then query the same url for information. The shouldHandle method
     ->render();
 ```
 
+With seperate table and script:
+```php
+		$table = Datatable::table()
+        ->addColumn('Email2','Email', "Test")
+        ->noScript();
+
+        // to render the table:
+        $table->render()
+
+        // later in the view you can render the javascript:
+        $table->script();
+```
+
 This will generate a HTML table with two columns (id, lastname -> your translation) and will set the URL for the ajax request.
 
 >   Note: This package will **NOT** include the `datatable.js`, that is your work to do.
@@ -204,7 +217,7 @@ http://www.youtube.com/watch?v=c9fao_5Jo3Y
 
 This package is separated into two smaller parts:
 
-1.  Datatable::table()
+1. Datatable::table()
 2. Datatable::collection()
 3. Datatable::query()
 
