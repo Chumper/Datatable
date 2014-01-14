@@ -10,7 +10,7 @@ so i developed this package which in my opinion is superior.
 
 ##Known Issues
 
-* None so far
+* jQuery  needs to be loaded at the top of the page. Loading it at the bottom will cause the plugin to throw an error.
 
 ##TODO
 
@@ -226,7 +226,7 @@ This will set the internal engine to a Eloquent query...
 E.g.:
 
 	$users = DB::table('users');
-	Datatable::collection($users)->...
+	Datatable::query($users)->...
 
 The query engine is much faster than the collection engine but also lacks some functionality,
 for further information look at the table above.
