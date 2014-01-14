@@ -1,12 +1,13 @@
 <?php
 
 use Chumper\Datatable\Columns\FunctionColumn;
-use Chumper\Datatable\Columns\TextColumn;
+use Chumper\Datatable\Engines\BaseEngine;
 use Chumper\Datatable\Engines\CollectionEngine;
-use Chumper\Datatable\Engines\EngineInterface;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Response;
 
-class CollectionEngineTest extends PHPUnit_Framework_TestCase {
+class CollectionEngineTest extends \Illuminate\Foundation\Testing\TestCase {
 
     /**
      * @var CollectionEngine
@@ -50,7 +51,7 @@ class CollectionEngineTest extends PHPUnit_Framework_TestCase {
             )
         );
 
-        $engine->order('id', EngineInterface::ORDER_DESC);
+        $engine->order('id', BaseEngine::ORDER_DESC);
 
         $this->assertEquals($should2, $engine->getArray());
 
@@ -58,21 +59,25 @@ class CollectionEngineTest extends PHPUnit_Framework_TestCase {
 
     public function testSearch()
     {
-        $engine = new CollectionEngine(new Collection($this->getTestArray()));
+        // Facade expection
+        Input::shouldReceive('all')->times(3)->andReturn(new Collection());
 
+        $engine = new CollectionEngine(new Collection($this->getTestArray()));
+        $engine->addColumn($this->getTestColumns());
+        $engine->searchColumns('id');
         $engine->search('eoo');
 
-        $should = array(
-            array(
-                'eoo'
-            )
-        );
+        $should = '{"aaData":[["eoo"]],"sEcho":0,"iTotalRecords":2,"iTotalDisplayRecords":1}';
+        $actual = $engine->make()->getContent();
 
-        $this->assertEquals($should, $engine->make($this->getTestColumns(), array('id'))->toArray());
-
+        $this->assertEquals($should,$actual);
         //------------------TEST 2-----------------
         // search in outputed data
         $engine = new CollectionEngine(new Collection(array(array('foo', 'foo2', 'foo3'),array('bar', 'bar2', 'bar3'))));
+        $engine->addColumn(new FunctionColumn('bla', function($row){return $row[0]." - ".$row[1];}));
+        $engine->addColumn(new FunctionColumn('1', function($row){return $row[2];}));
+        $engine->addColumn(new FunctionColumn('bla3', function($row){return $row[0]." - ".$row[2];}));
+        $engine->searchColumns("bla",1);
 
         $engine->search('foo2');
 
@@ -84,17 +89,17 @@ class CollectionEngineTest extends PHPUnit_Framework_TestCase {
             )
         );
 
-        $this->assertEquals($should, $engine->make(new Collection(array(
-            new FunctionColumn('bla', function($row){return $row[0]." - ".$row[1];}),
-            new FunctionColumn('1', function($row){return $row[2];}),
-            new FunctionColumn('bla3', function($row){return $row[0]." - ".$row[2];})
-        )), array('bla', 1))->toArray());
+        $response = json_decode($engine->make()->getContent());
+        $this->assertEquals($should, $response->aaData);
 
         //------------------TEST 3-----------------
         // search in initial data
         // TODO: Search in initial data columns?
 
         $engine = new CollectionEngine(new Collection(array(array('foo', 'foo2', 'foo3'),array('bar', 'bar2', 'bar3'))));
+        $engine->addColumn(new FunctionColumn('bla3', function($row){return $row[0]." - ".$row[2];}));
+        $engine->addColumn(new FunctionColumn('1', function($row){return $row[1];}));
+        $engine->searchColumns("bla3",1);
 
         $engine->search('foo2');
 
@@ -105,10 +110,8 @@ class CollectionEngineTest extends PHPUnit_Framework_TestCase {
             )
         );
 
-        $this->assertEquals($should, $engine->make(new Collection(array(
-            new FunctionColumn('bla3', function($row){return $row[0]." - ".$row[2];}),
-            new FunctionColumn('1', function($row){return $row[1];})
-        )), array('bla3', 1))->toArray());
+        $response = json_decode($engine->make()->getContent());
+        $this->assertEquals($should, $response->aaData);
     }
 
     public function testSkip()
@@ -142,36 +145,51 @@ class CollectionEngineTest extends PHPUnit_Framework_TestCase {
     public function testComplex()
     {
         $engine = new CollectionEngine(new Collection($this->getRealArray()));
-
+        $this->addRealColumns($engine);
+        $engine->searchColumns('foo','bar');
         $engine->search('t');
-        $test = $engine->make(new Collection($this->getRealColumns()),array('foo','bar'))->toArray();
 
-        $this->assertTrue($this->arrayHasKeyValue('0','Nils',$test));
-        $this->assertTrue($this->arrayHasKeyValue('0','Taylor',$test));
+        $test = json_decode($engine->make()->getContent());
+        $test = $test->aaData;
+
+        $this->assertTrue($this->arrayHasKeyValue('0','Nils',(array) $test));
+        $this->assertTrue($this->arrayHasKeyValue('0','Taylor',(array) $test));
 
         //Test2
         $engine = new CollectionEngine(new Collection($this->getRealArray()));
-
+        $this->addRealColumns($engine);
+        $engine->searchColumns('foo','bar');
         $engine->search('plasch');
-        $test = $engine->make(new Collection($this->getRealColumns()),array('foo','bar'))->toArray();
 
-        $this->assertTrue($this->arrayHasKeyValue('0','Nils',$test));
+        $test = json_decode($engine->make()->getContent());
+        $test = $test->aaData;
+
+        $this->assertTrue($this->arrayHasKeyValue('0','Nils',(array) $test));
+        $this->assertFalse($this->arrayHasKeyValue('0','Taylor',(array) $test));
 
         //test3
         $engine = new CollectionEngine(new Collection($this->getRealArray()));
-
+        $this->addRealColumns($engine);
+        $engine->searchColumns('foo','bar');
         $engine->search('tay');
-        $test = $engine->make(new Collection($this->getRealColumns()),array('foo','bar'))->toArray();
 
-        $this->assertTrue($this->arrayHasKeyValue('0','Taylor',$test));
+        $test = json_decode($engine->make()->getContent());
+        $test = $test->aaData;
+
+        $this->assertFalse($this->arrayHasKeyValue('0','Nils',(array) $test));
+        $this->assertTrue($this->arrayHasKeyValue('0','Taylor',(array) $test));
 
         //test4
         $engine = new CollectionEngine(new Collection($this->getRealArray()));
+        $this->addRealColumns($engine);
+        $engine->searchColumns('foo','bar');
+        $engine->search('O');
 
-        $engine->search('0');
-        $test = $engine->make(new Collection($this->getRealColumns()),array('foo','bar'))->toArray();
+        $test = json_decode($engine->make()->getContent());
+        $test = $test->aaData;
 
-        $this->assertTrue($this->arrayHasKeyValue('0','Taylor',$test));
+        $this->assertFalse($this->arrayHasKeyValue('0','Nils',(array) $test));
+        $this->assertTrue($this->arrayHasKeyValue('0','Taylor',(array) $test));
 
     }
 
@@ -205,21 +223,15 @@ class CollectionEngineTest extends PHPUnit_Framework_TestCase {
         );
     }
 
-    private function getRealColumns()
+    private function addRealColumns($engine)
     {
-        return array(
-            new FunctionColumn('foo', function($m){return $m['name'];}),
-            new FunctionColumn('bar', function($m){return $m['email'];}),
-        );
+        $engine->addColumn(new FunctionColumn('foo', function($m){return $m['name'];}));
+        $engine->addColumn(new FunctionColumn('bar', function($m){return $m['email'];}));
     }
 
     private function getTestColumns()
     {
-        return new Collection(
-            array(
-                new FunctionColumn('id', function($row){return $row['id'];}),
-            )
-        );
+        return new FunctionColumn('id', function($row){return $row['id'];});
     }
 
     private function arrayHasKeyValue($key,$value,$array)

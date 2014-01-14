@@ -1,4 +1,4 @@
-<table class="table table-bordered {{ $class = str_random(8) }}">
+<table class="table table-bordered {{ $class }}">
     <colgroup>
         @for ($i = 0; $i < count($columns); $i++)
         <col class="con{{ $i }}" />
@@ -21,22 +21,7 @@
     @endforeach
     </tbody>
 </table>
-<script type="text/javascript">
-    jQuery(document).ready(function(){
-        // dynamic table
-        jQuery('.{{ $class }}').dataTable({
-            "sPaginationType": "full_numbers",
-            "bProcessing": false,
-            @foreach ($options as $k => $o)
-            {{ json_encode($k) }}: {{ json_encode($o) }},
-            @endforeach
-            @foreach ($callbacks as $k => $o)
-            {{ json_encode($k) }}: {{ $o }},
-            @endforeach
-            //"fnDrawCallback": function(oSettings) {
-            //    jQuery.uniform.update();
-            //}
-        });
-        // custom values are available via $values array
-    });
-</script>
+
+@if (!$noScript)
+    @include('datatable::javascript', array('class' => $class, 'options' => $options, 'callbacks' =>  $callbacks))
+@endif

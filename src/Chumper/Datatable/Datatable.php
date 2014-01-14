@@ -5,6 +5,9 @@ use Chumper\Datatable\Engines\QueryEngine;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
+use Input;
+use Request;
+use View;
 
 /**
  * Class Datatable
@@ -14,35 +17,20 @@ class Datatable {
 
     /**
      * @param $query
-     * @return Api
+     * @return QueryEngine
      */
     public static function query($query)
     {
-        return new Api(new QueryEngine($query));
+        return new QueryEngine($query);
     }
 
     /**
      * @param $collection
-     * @return Api
+     * @return CollectionEngine
      */
     public static function collection($collection)
     {
-        return new Api(new CollectionEngine($collection));
-    }
-
-    /**
-     * @param $data Collection|Builder|\Illuminate\Database\Query\Builder
-     * @throws Exception
-     * @return Api
-     */
-    public static function from($data)
-    {
-        if($data instanceof Collection)
-            return new Api(new CollectionEngine($data));
-        else if($data instanceof \Illuminate\Database\Query\Builder OR $data instanceof Builder)
-            return new Api(new QueryEngine($data));
-
-        throw new Exception('The data you provided is not supported: '.get_class($data));
+        return new CollectionEngine($collection);
     }
 
     /**
@@ -51,6 +39,19 @@ class Datatable {
     public static function table()
     {
         return new Table;
+    }
+
+    /**
+     * @return bool True if the plugin should handle this request, false otherwise
+     */
+    public static function shouldHandle()
+    {
+        $echo = Input::get('sEcho',null);
+        if(Request::ajax() && !is_null($echo) && is_numeric($echo))
+        {
+            return true;
+        }
+        return false;
     }
 
 }

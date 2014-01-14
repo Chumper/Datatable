@@ -4,7 +4,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
 
-class QueryEngine implements EngineInterface {
+class QueryEngine extends BaseEngine {
 
     /**
      * @var Builder
@@ -16,9 +16,9 @@ class QueryEngine implements EngineInterface {
     public $originalBuilder;
 
     /**
-     * @var String search term
+     * @var array single column searches
      */
-    public $search;
+    public $columnSearches = array();
 
     /**
      * @var Collection the returning collection
@@ -26,47 +26,23 @@ class QueryEngine implements EngineInterface {
     private $resultCollection;
 
     /**
-     * @var int The column to sort after
-     */
-    private $orderColumn = -1;
-
-    /**
-     * @var mixed Determines the order the result should be sorted after
-     */
-    private $orderOrder;
-
-    /**
      * @var Collection the resulting collection
      */
     private $collection = null;
 
     /**
-     * @var int Determines if the result should be skipped
+     * @var array Different options
      */
-    private $skip = 0;
-
-    /**
-     * @var int Determines if the result should be taken
-     */
-    private $take = 0;
-
-    /**
-     * @var int Determines the count of the items
-     */
-    private $counter = 0;
-
-    /**
-     * @var boolean Determines if the alias should be allowed in the search
-     */
-    private $searchWithAlias = false;
-
-    /**
-     * @var bool Determines if the search should be case sensitive or not
-     */
-    private $setCaseSensitiveSearchForPostgree = true;
+    private $options = array(
+        'searchOperator'    =>  'LIKE',
+        'searchWithAlias'   =>  false,
+        'orderOrder'        =>  null,
+        'counter'           =>  0,
+    );
 
     function __construct($builder)
     {
+        parent::__construct();
         if($builder instanceof Relation)
         {
             $this->builder = $builder->getBaseQuery();
@@ -79,15 +55,20 @@ class QueryEngine implements EngineInterface {
         }
     }
 
-    public function order($column, $oder = EngineInterface::ORDER_ASC)
+    public function order($column, $oder = BaseEngine::ORDER_ASC)
     {
         $this->orderColumn = $column;
-        $this->orderOrder = $oder;
+        $this->orderDirection = $oder;
     }
 
     public function search($value)
     {
         $this->search = $value;
+    }
+
+    public function searchOnColumn($columnName, $value)
+    {
+        $this->columnSearches[$columnName] = $value;
     }
 
     public function skip($value)
@@ -97,12 +78,12 @@ class QueryEngine implements EngineInterface {
 
     public function take($value)
     {
-        $this->take = $value;
+        $this->limit = $value;
     }
 
     public function count()
     {
-        return $this->counter;
+        return $this->options['counter'];
     }
 
     public function totalCount()
@@ -120,7 +101,21 @@ class QueryEngine implements EngineInterface {
         $this->builder = $this->originalBuilder;
     }
 
-    public function make(Collection $columns, array $searchColumns = array())
+
+    public function setSearchOperator($value = "LIKE")
+    {
+        $this->options['searchOperator'] = $value;
+    }
+
+    public function setSearchWithAlias()
+    {
+        $this->options['searchWithAlias'] = true;
+        return $this;
+    }
+
+    //--------PRIVATE FUNCTIONS
+
+    protected function internalMake(Collection $columns, array $searchColumns = array())
     {
         $builder = clone $this->builder;
         $countBuilder = clone $this->builder;
@@ -128,13 +123,13 @@ class QueryEngine implements EngineInterface {
         $builder = $this->doInternalSearch($builder, $searchColumns);
         $countBuilder = $this->doInternalSearch($countBuilder, $searchColumns);
 
-        if($this->searchWithAlias)
+        if($this->options['searchWithAlias'])
         {
-            $this->counter = count($countBuilder->get());
+            $this->options['counter'] = count($countBuilder->get());
         }
         else
         {
-            $this->counter = $countBuilder->count();
+            $this->options['counter'] = $countBuilder->count();
         }
 
         $builder = $this->doInternalOrder($builder, $columns);
@@ -142,13 +137,6 @@ class QueryEngine implements EngineInterface {
 
         return $collection;
     }
-
-    public function setCaseSensitiveSearchForPostgree($value)
-    {
-        $this->setCaseSensitiveSearchForPostgree = $value;
-    }
-
-    //--------PRIVATE FUNCTIONS
 
     /**
      * @param $builder
@@ -162,9 +150,9 @@ class QueryEngine implements EngineInterface {
             {
                 $builder = $builder->skip($this->skip);
             }
-            if($this->take > 0)
+            if($this->limit > 0)
             {
-                $builder = $builder->take($this->take);
+                $builder = $builder->take($this->limit);
             }
             //dd($this->builder->toSql());
             $this->collection = $builder->get();
@@ -177,17 +165,19 @@ class QueryEngine implements EngineInterface {
 
     private function doInternalSearch($builder, $columns)
     {
-        if(empty($this->search))
-            return $builder;
+        if (!empty($this->search)) {
+            $this->buildSearchQuery($builder, $columns);
+        }
 
-        if($this->setCaseSensitiveSearchForPostgree)
-        {
-            $like = "LIKE";
+        if (!empty($this->columnSearches)) {
+            $this->buildSingleColumnSearches($builder);
         }
-        else
-        {
-            $like = "ILIKE";
-        }
+
+        return $builder;
+    }
+    private function buildSearchQuery($builder, $columns)
+    {
+        $like = $this->options['searchOperator'];
         $search = $this->search;
         $builder = $builder->where(function($query) use ($columns, $search, $like) {
             foreach ($columns as $c) {
@@ -203,6 +193,13 @@ class QueryEngine implements EngineInterface {
             }
         });
         return $builder;
+    }
+
+    private function buildSingleColumnSearches($builder)
+    {
+        foreach ($this->columnSearches as $columnName => $searchValue) {
+            $builder->where($columnName, $this->options['searchOperator'], '%' . $searchValue . '%');
+        }
     }
 
     private function compile($builder, $columns)
@@ -225,28 +222,13 @@ class QueryEngine implements EngineInterface {
         $i = 0;
         foreach($columns as $col)
         {
-            if($i == $this->orderColumn)
+            if($i === $this->orderColumn)
             {
-                $builder = $builder->orderBy($col->getName(), $this->orderOrder);
+                $builder = $builder->orderBy($col->getName(), $this->orderDirection);
                 return $builder;
             }
             $i++;
         }
         return $builder;
-    }
-
-    public function setSearchStrip()
-    {
-        // can not be implemented with the Query engine!
-    }
-
-    public function setOrderStrip()
-    {
-        // can not be implemented with the Query engine!
-    }
-
-    public function setSearchWithAlias()
-    {
-        $this->searchWithAlias = true;
     }
 }

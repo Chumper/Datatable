@@ -1,20 +1,21 @@
-<?php namespace Chumper\Datatable;
+<?php namespace Chumper\Datatable\Engines;
 
 use Chumper\Datatable\Columns\DateColumn;
 use Chumper\Datatable\Columns\FunctionColumn;
 use Chumper\Datatable\Columns\TextColumn;
-use Chumper\Datatable\Engines\EngineInterface;
 use Exception;
-use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Response;
 
 /**
- * Class Api
- * @package Chumper\Datatable
+ * Class BaseEngine
+ * @package Chumper\Datatable\Engines
  */
-class Api {
+abstract class BaseEngine {
+
+    const ORDER_ASC = 'asc';
+    const ORDER_DESC = 'desc';
 
     /**
      * @var
@@ -25,11 +26,6 @@ class Api {
      * @var \Illuminate\Support\Collection
      */
     private $columns;
-
-    /**
-     * @var Engines\EngineInterface
-     */
-    private $engine;
 
     /**
      * @var array
@@ -47,12 +43,36 @@ class Api {
     private $orderColumns = array();
 
     /**
-     * @param EngineInterface $engine
+     * @var int
      */
-    function __construct(EngineInterface $engine)
+    protected $skip = 0;
+
+    /**
+     * @var null
+     */
+    protected $limit = null;
+
+    /**
+     * @var null
+     */
+    protected $search = null;
+
+    /**
+     * @var null
+     */
+    protected $orderColumn = null;
+
+    /**
+     * @var string
+     */
+    protected $orderDirection = BaseEngine::ORDER_ASC;
+
+
+
+    function __construct()
     {
         $this->columns = new Collection();
-        $this->engine = $engine;
+        $this->className = str_random(8);
         return $this;
     }
 
@@ -141,7 +161,7 @@ class Api {
             }
             else
             {
-               $this->columns->put($property, new FunctionColumn($property, function($model) use($property){return is_array($model)?$model[$property]:$model->$property;}));
+                $this->columns->put($property, new FunctionColumn($property, function($model) use($property){return is_array($model)?$model[$property]:$model->$property;}));
             }
             $this->showColumns[] = $property;
         }
@@ -158,10 +178,10 @@ class Api {
         $this->prepareSearchColumns();
 
         $output = array(
-            "aaData" => $this->engine->make($this->columns, $this->searchColumns)->toArray(),
+            "aaData" => $this->internalMake($this->columns, $this->searchColumns)->toArray(),
             "sEcho" => intval($this->sEcho),
-            "iTotalRecords" => $this->engine->totalCount(),
-            "iTotalDisplayRecords" => $this->engine->count(),
+            "iTotalRecords" => $this->totalCount(),
+            "iTotalDisplayRecords" => $this->count(),
         );
 
         return Response::json($output);
@@ -203,30 +223,6 @@ class Api {
         return $this;
     }
 
-    public function stripSearchColumns()
-    {
-        $this->engine->setSearchStrip();
-        return $this;
-    }
-
-    public function stripOrderColumns()
-    {
-        $this->engine->setOrderStrip();
-        return $this;
-    }
-
-    public function setSearchWithAlias()
-    {
-        $this->engine->setSearchWithAlias();
-        return $this;
-    }
-
-    public function setCaseSensitiveSearchForPostgree($value)
-    {
-        $this->engine->setCaseSensitiveSearchForPostgree($value);
-        return $this;
-    }
-
     //-------------PRIVATE FUNCTIONS-------------------
 
     /**
@@ -235,7 +231,7 @@ class Api {
     private function handleiDisplayStart($value)
     {
         //skip
-        $this->engine->skip($value);
+        $this->skip($value);
     }
 
     /**
@@ -245,7 +241,7 @@ class Api {
     {
         //limit nicht am query, sondern den ganzen
         //holen und dann dynamisch in der Collection taken und skippen
-        $this->engine->take($value);
+        $this->take($value);
     }
 
     /**
@@ -262,7 +258,7 @@ class Api {
     private function handlesSearch($value)
     {
         //handle search on columns sSearch, bRegex
-        $this->engine->search($value);
+        $this->search($value);
     }
 
     /**
@@ -271,15 +267,15 @@ class Api {
     private function handleiSortCol_0($value)
     {
         if(Input::get('sSortDir_0') == 'desc')
-            $direction = EngineInterface::ORDER_DESC;
+            $direction = BaseEngine::ORDER_DESC;
         else
-            $direction = EngineInterface::ORDER_ASC;
+            $direction = BaseEngine::ORDER_ASC;
 
         //check if order is allowed
         if(empty($this->orderColumns))
         {
-           $this->engine->order($value, $direction);
-           return;
+            $this->order($value, $direction);
+            return;
         }
 
         $i = 0;
@@ -287,11 +283,26 @@ class Api {
         {
             if($i == $value && in_array($name, $this->orderColumns))
             {
-                $this->engine->order($value, $direction);
+                $this->order($value, $direction);
                 return;
             }
             $i++;
         }
+    }
+
+    /**
+     * @param int $columnIndex
+     * @param string $searchValue
+     *
+     * @return void
+     */
+    private function handleSingleColumnSearch($columnIndex, $searchValue)
+    {
+        if (!isset($this->searchColumns[$columnIndex])) return;
+        if (empty($searchValue)) return;
+
+        $columnName = $this->searchColumns[$columnIndex];
+        $this->searchOnColumn($columnName, $searchValue);
     }
 
     /**
@@ -301,9 +312,29 @@ class Api {
     {
         //Handle all inputs magically
         foreach (Input::all() as $key => $input) {
+
+            // handle single column search
+            if ($this->isParameterForSingleColumnSearch($key))
+            {
+                $columnIndex = str_replace('sSearch_','',$key);
+                $this->handleSingleColumnSearch($columnIndex, $input);
+                continue;
+            }
+
             if(method_exists($this, $function = 'handle'.$key))
                 $this->$function($input);
         }
+    }
+
+    /**
+     * @param $parameterName
+     *
+     * @return bool
+     */
+    private function isParameterForSingleColumnSearch($parameterName)
+    {
+        static $parameterNamePrefix = 'sSearch_';
+        return str_contains($parameterName, $parameterNamePrefix);
     }
 
     private function prepareSearchColumns()
@@ -311,4 +342,16 @@ class Api {
         if(count($this->searchColumns) == 0 || empty($this->searchColumns))
             $this->searchColumns = $this->showColumns;
     }
-}
+
+    abstract protected function take($value);
+    abstract protected function skip($value);
+    abstract protected function totalCount();
+    abstract protected function count();
+    abstract protected function searchOnColumn($columnName, $value);
+    abstract protected function order($column, $order = BaseEngine::ORDER_ASC);
+    abstract protected function search($value);
+    abstract protected function internalMake(Collection $columns, array $searchColumns = array());
+
+
+
+} 

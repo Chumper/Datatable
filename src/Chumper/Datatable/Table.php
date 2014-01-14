@@ -1,6 +1,7 @@
 <?php namespace Chumper\Datatable;
 
 use Exception;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\View;
 
 /**
@@ -34,6 +35,22 @@ class Table {
      * @var array
      */
     private $data = array();
+
+    /**
+     * @var boolean Determines if the template should echo the javascript
+     */
+    private $noScript = false;
+
+    /**
+     * @var String The name of the class the table will have later
+     */
+    protected $className;
+
+    function __construct()
+    {
+        $this->className = str_random(8);
+    }
+
 
     /**
      * @return $this
@@ -193,12 +210,47 @@ class Table {
         if(is_null($view))
             $view = 'datatable::template';
 
+        if(!isset($this->options['sAjaxSource']))
+        {
+            $this->setUrl(Request::url());
+        }
+
         return View::make($view,array(
             'options'   => $this->options,
             'callbacks' => $this->callbacks,
             'values'    => $this->customValues,
             'data'      => $this->data,
             'columns'   => $this->columns,
+            'noScript'  => $this->noScript,
+            'class'     => $this->className,
         ));
+    }
+
+    /**
+     * Instructs the table not to echo the javascript
+     *
+     * @return $this
+     */
+    public function noScript()
+    {
+        $this->noScript = true;
+        return $this;
+    }
+
+    public function script($view = null)
+    {
+        if(is_null($view))
+            $view = 'datatable::javascript';
+
+        return View::make($view,array(
+            'options'   =>  $this->options,
+            'callbacks' =>  $this->callbacks,
+            'class'     =>  $this->className,
+        ));
+    }
+
+    public function getClass()
+    {
+        return $this->className;
     }
 }

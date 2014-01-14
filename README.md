@@ -14,7 +14,8 @@ so i developed this package which in my opinion is superior.
 
 ##TODO
 
-* make the two engines behave exactly the same.
+* fix incoming bugs
+* code documentaion
 
 ##Features
 
@@ -35,8 +36,8 @@ There are some differences between the collection part and the query part of thi
 The differences are:
 
 |  Difference  | Collection | Query |
-| --- |:----------:| :----:|
-|Speed| - | +
+| ---          |:----------:| :----:|
+|Speed         | -          | +     |
 Custom fields | + | +
 Search in custom fields | + | -
 Order by custom fields | + | -
@@ -52,7 +53,7 @@ I would be really thankful if you can provide a test that points to the issue.
 
 This package is available on http://packagist.org, just add it to your composer.json
 	
-	"chumper/datatable": "dev-master"
+	"chumper/datatable": "2.*"
 
 It also has a ServiceProvider for usage in Laravel4. Add these lines to app.php:
 
@@ -68,6 +69,10 @@ You can then access it under the `Datatable` alias.
 
 
 ##Basic Usage
+
+There are two ways you can use the plugin, within one route or within two routes:
+
+###Two routes
 
 * Create two routes: One to deliver the view to the user, the other for datatable data, eg:
 
@@ -103,6 +108,23 @@ You can then access it under the `Datatable` alias.
 ```
 
 You should now have a working datatable on your page.
+
+###One route
+
+In your route you should use the Datatable::shouldHandle method which will check wheter the plugin should handle the request or not.
+
+```php
+    if(Datatable::shouldHandle())
+    {
+        return Datatable::collection(User::all(array('id','name')))
+            ->showColumns('id', 'name')
+            ->searchColumns('name')
+            ->orderColumns('id','name')
+            ->make();
+    }
+```
+
+The plugin will then query the same url for information. The shouldHandle method just checks for an ajax request and if sEcho is set.
 
 ##HTML Example
 
@@ -183,18 +205,12 @@ http://www.youtube.com/watch?v=c9fao_5Jo3Y
 This package is separated into two smaller parts:
 
 1.  Datatable::table()
-2.  Datatable::from()
-    1. Datatable::collection()
-    2. Datatable::query()
+2. Datatable::collection()
+3. Datatable::query()
 
-The second one is for the server side, the first one is a helper to generate the needed table and javascript calls.
+The second and third one is for the server side, the first one is a helper to generate the needed table and javascript calls.
 
 ###Collection & Query
-
-**from($mixed)**
-
-Will set the internal engine to the best fitting one based on the input.
-If you want to set one explicitly just select one of the methods below.
 
 **collection($collection)**
 
@@ -258,6 +274,7 @@ E.g.:
 ```
 You can also just add a predefined Column, like a DateColumn, a FunctionColumn, or a TextColumn
 E.g.:
+
 ```php
 	$column = new TextColumn('foo', 'bar'); // Will always return the text bar
 	//$column = new FunctionColumn('foo', function($model){return $model->bar}); // Will return the bar column
@@ -269,37 +286,7 @@ E.g.:
     ->make();
 ```
 
-PLease look into the specific Columns for further information.
-
-**stripSearchColumns()**
-
-If you use the search functionality ( Collection only ) then you can advice
-all columns to strip any HTML and PHP tags before searching this column.
-
-This can be useful if you return a link to the model detail but still want to provide search ability in this column.
-
-**setCaseSensitiveSearchForPostgree($boolean)**
-
-If you want to enable case sensitive search on your columns you should set this option to false for a postgree database.
-
-Please note: Case sensitive searching with the querybuilder only works if you have a CASE SENSITIVE (_cs) collation on your mysql table.
-
-**setSearchWithAlias()**
-
-If you want to use an alias column on the query engine and you don't get the correct results back while searching then you should try this flag.
-E.g.:
-```php
-		Datatable::from(DB::table("users")->select('firstname', "users.email as email2")->join('partners','users.partner_id','=','partners.id'))
-        ->showColumns('firstname','email2')
-        ->setSearchWithAlias()
-        ->searchColumns("email2")
-```
-
-In SQL it is not allowed to have an alias in the where part (used for searching) and therefore the results will not counted correctly.
-
-With this flag you enable aliases in the search part (email2 in searchColumns).
-
-Please be aware that this flag will slow down your application, since we are getting the results back twice to count them manually.
+Please look into the specific Columns for further information.
 
 **make()**
 
@@ -320,7 +307,63 @@ This will return an array with the columns that will be shown, mainly used for t
 
 Will get a column by its name, mainly used for testing and debugging, not really useful for you.
 
+###Specific QueryEngine methods
+
+**setSearchWithAlias()**
+
+If you want to use an alias column on the query engine and you don't get the correct results back while searching then you should try this flag.
+E.g.:
+```php
+		Datatable::from(DB::table("users")->select('firstname', "users.email as email2")->join('partners','users.partner_id','=','partners.id'))
+        ->showColumns('firstname','email2')
+        ->setSearchWithAlias()
+        ->searchColumns("email2")
+```
+
+In SQL it is not allowed to have an alias in the where part (used for searching) and therefore the results will not counted correctly.
+
+With this flag you enable aliases in the search part (email2 in searchColumns).
+
+Please be aware that this flag will slow down your application, since we are getting the results back twice to count them manually.
+
+
+**setSearchOperator($value = "LIKE")**
+
+With this method you can set the operator on searches like "ILIKE" on PostgreSQL for case insensitivity.
+
+###Specific CollectionEngine methods
+
+**setSearchStrip() & setOrderStrip()**
+
+If you use the search functionality then you can advice
+all columns to strip any HTML and PHP tags before searching this column.
+
+This can be useful if you return a link to the model detail but still want to provide search ability in this column.
+
 ###Table
+
+**noScript()**
+
+With setting this property the Table will not render the javascript part.
+
+You can render it manually with
+
+**script($view = null)**
+
+Will render the javascript if no view is given or the default one and will pass the class name, the options and the callbacks.
+
+Example:
+```php
+		$table = Datatable::table()
+        ->addColumn('Email2','Email', "Test")
+        ->noScript();
+
+        // to render the table:
+        $table->render()
+
+        // later in the view you can render the javascript:
+        $table->script();
+```
 
 **setUrl($url)**
 
@@ -401,6 +444,13 @@ In the datatable view (eg, 'my.datatable.template'):
 
 * [jgoux](https://github.com/jgoux) for helping with searching on number columns in the database
 * [jijoel](https://github.com/jijoel) for helping with callback options and documentation
+
+##Changelog
+
+* 2.0.0:
+	* Seperated Query and Collection Engine
+	* Added single column search
+	* Code cleanup
 
 ##Applications
 

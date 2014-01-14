@@ -1,6 +1,7 @@
 <?php
 
 use Chumper\Datatable\Columns\FunctionColumn;
+use Chumper\Datatable\Engines\BaseEngine;
 use Chumper\Datatable\Engines\EngineInterface;
 use Chumper\Datatable\Engines\QueryEngine;
 use Illuminate\Support\Collection;
@@ -26,58 +27,82 @@ class QueryEngineTest extends PHPUnit_Framework_TestCase {
 
     public function testOrder()
     {
-        $this->builder->shouldReceive('orderBy')->with('id', EngineInterface::ORDER_ASC);
+        $this->builder->shouldReceive('orderBy')->with('id', BaseEngine::ORDER_ASC);
         $this->c->order('id');
 
         //--
 
-        $this->builder->shouldReceive('orderBy')->with('id', EngineInterface::ORDER_DESC);
-        $this->c->order('id', EngineInterface::ORDER_DESC);
+        $this->builder->shouldReceive('orderBy')->with('id', BaseEngine::ORDER_DESC);
+        $this->c->order('id', BaseEngine::ORDER_DESC);
     }
 
     public function testSearch()
     {
         $this->builder->shouldReceive('where')->withAnyArgs()->andReturn($this->builder);
         $this->builder->shouldReceive('get')->once()->andReturn(new Collection($this->getRealArray()));
-        $this->builder->shouldReceive('count')->once()->andReturn(10);
+        $this->builder->shouldReceive('count')->twice()->andReturn(10);
         $this->builder->shouldReceive('orderBy')->withAnyArgs()->andReturn($this->builder);
 
+        $this->c = new QueryEngine($this->builder);
+
+        $this->addRealColumns($this->c);
+        $this->c->searchColumns('foo');
         $this->c->search('test');
-        $collection = $this->c->make(new Collection($this->getRealColumns()), array('foo'));
+
+        $test = json_decode($this->c->make()->getContent());
+        $test = $test->aaData;
     }
 
     public function testSkip()
     {
-        $this->builder->shouldReceive('skip')->once()->with(10)->andReturn($this->builder);
+        $this->builder->shouldReceive('skip')->once()->with(1)->andReturn($this->builder);
         $this->builder->shouldReceive('get')->once()->andReturn(new Collection($this->getRealArray()));
-        $this->builder->shouldReceive('count')->once()->andReturn(10);
+        $this->builder->shouldReceive('count')->twice()->andReturn(10);
         $this->builder->shouldReceive('orderBy')->withAnyArgs()->andReturn($this->builder);
 
-        $this->c->skip(10);
-        $this->c->make(new Collection($this->getRealColumns()), array('foo'));
+        $this->c = new QueryEngine($this->builder);
+
+        $this->addRealColumns($this->c);
+        $this->c->skip(1);
+        $this->c->searchColumns('foo');
+
+        $test = json_decode($this->c->make()->getContent());
+        $test = $test->aaData;
     }
 
     public function testTake()
     {
-        $this->builder->shouldReceive('take')->once()->with(10)->andReturn($this->builder);
+        $this->builder->shouldReceive('take')->once()->with(1)->andReturn($this->builder);
         $this->builder->shouldReceive('get')->once()->andReturn(new Collection($this->getRealArray()));
-        $this->builder->shouldReceive('count')->once()->andReturn(10);
+        $this->builder->shouldReceive('count')->twice()->andReturn(10);
         $this->builder->shouldReceive('orderBy')->withAnyArgs()->andReturn($this->builder);
 
-        $this->c->take(10);
-        $this->c->make(new Collection($this->getRealColumns()), array('foo'));
+        $this->c = new QueryEngine($this->builder);
+
+        $this->addRealColumns($this->c);
+        $this->c->take(1);
+        $this->c->searchColumns('foo');
+
+        $test = json_decode($this->c->make()->getContent());
+        $test = $test->aaData;
     }
 
     public function testComplex()
     {
-        $engine = new QueryEngine($this->builder);
+
 
         $this->builder->shouldReceive('get')->andReturn(new Collection($this->getRealArray()));
         $this->builder->shouldReceive('where')->withAnyArgs()->andReturn($this->builder);
-        $this->builder->shouldReceive('count')->times(4)->andReturn(10);
+        $this->builder->shouldReceive('count')->times(8)->andReturn(10);
 
+        $engine = new QueryEngine($this->builder);
+
+        $this->addRealColumns($engine);
+        $engine->searchColumns('foo','bar');
         $engine->search('t');
-        $test = $engine->make(new Collection($this->getRealColumns()),array())->toArray();
+
+        $test = json_decode($engine->make()->getContent());
+        $test = $test->aaData;
 
         $this->assertTrue($this->arrayHasKeyValue('0','Nils',$test));
         $this->assertTrue($this->arrayHasKeyValue('0','Taylor',$test));
@@ -85,28 +110,41 @@ class QueryEngineTest extends PHPUnit_Framework_TestCase {
         //Test2
         $engine = new QueryEngine($this->builder);
 
+        $this->addRealColumns($engine);
+        $engine->searchColumns('foo','bar');
         $engine->search('plasch');
-        $test = $engine->make(new Collection($this->getRealColumns()))->toArray();
+
+        $test = json_decode($engine->make()->getContent());
+        $test = $test->aaData;
 
         $this->assertTrue($this->arrayHasKeyValue('0','Nils',$test));
+        $this->assertTrue($this->arrayHasKeyValue('0','Taylor',$test));
 
         //test3
         $engine = new QueryEngine($this->builder);
 
+        $this->addRealColumns($engine);
+        $engine->searchColumns('foo','bar');
         $engine->search('tay');
-        $test = $engine->make(new Collection($this->getRealColumns()))->toArray();
 
+        $test = json_decode($engine->make()->getContent());
+        $test = $test->aaData;
+
+        $this->assertTrue($this->arrayHasKeyValue('0','Nils',$test));
         $this->assertTrue($this->arrayHasKeyValue('0','Taylor',$test));
 
         //test4
         $engine = new QueryEngine($this->builder);
 
+        $this->addRealColumns($engine);
+        $engine->searchColumns('foo','bar');
         $engine->search('0');
-        $test = $engine->make(new Collection($this->getRealColumns()))->toArray();
 
+        $test = json_decode($engine->make()->getContent());
+        $test = $test->aaData;
+
+        $this->assertTrue($this->arrayHasKeyValue('0','Nils',$test));
         $this->assertTrue($this->arrayHasKeyValue('0','Taylor',$test));
-
-
 
     }
 
@@ -129,12 +167,10 @@ class QueryEngineTest extends PHPUnit_Framework_TestCase {
         );
     }
 
-    private function getRealColumns()
+    private function addRealColumns($engine)
     {
-        return array(
-            new FunctionColumn('foo', function($m){return $m['name'];}),
-            new FunctionColumn('bar', function($m){return $m['email'];}),
-        );
+        $engine->addColumn(new FunctionColumn('foo', function($m){return $m['name'];}));
+        $engine->addColumn(new FunctionColumn('bar', function($m){return $m['email'];}));
     }
 
     private function arrayHasKeyValue($key,$value,$array)

@@ -1,8 +1,7 @@
 <?php
 
-//TODO setData should accept a collection instead of an array of arrays
-
 use Chumper\Datatable\Table;
+use Illuminate\Support\Facades\Request;
 
 class TableTest extends PHPUnit_Framework_TestCase {
 
@@ -101,15 +100,20 @@ class TableTest extends PHPUnit_Framework_TestCase {
 
     public function testRender()
     {
+        Request::shouldReceive('url')->once()->andReturn('fooBar');
+
         $this->view->shouldReceive('make')->once()
             ->with('datatable::template', array(
-                'options'   => array(),
+                'options'   => array(
+                    'sAjaxSource' => 'fooBar',
+                    'bServerSide' => true
+                ),
                 'callbacks' => array(),
                 'values'    => array(),
                 'data'      => array(),
-                'columns'   => array(
-                    'foo'
-                ),
+                'columns'   => array('foo'),
+                'noScript'  => false,
+                'class'     => $this->table->getClass(),
 
             ))->andReturn(true);
 

@@ -10,19 +10,8 @@ use Illuminate\Support\Collection;
  * Class CollectionEngine
  * @package Chumper\Datatable\Engines
  */
-class CollectionEngine implements EngineInterface {
+class CollectionEngine extends BaseEngine {
 
-    /**
-     * @var int
-     */
-    public $skip = 0;
-    /**
-     * @var int
-     */
-    public $limit = null;
-    public $orderColumn = null;
-    public $orderDirection = EngineInterface::ORDER_ASC;
-    public $search = null;
     /**
      * @var \Illuminate\Support\Collection
      */
@@ -34,25 +23,20 @@ class CollectionEngine implements EngineInterface {
     private $collection;
 
     /**
-     * @var boolean
+     * @var array Different options
      */
-    private $stripSearch = false;
-
-    /**
-     * @var boolean
-     */
-    private $stripOrder = false;
-
-    /**
-     * @var bool Determines if the search should be case sensitive or not
-     */
-    private $setCaseSensitiveSearchForPostgree = true;
+    private $options = array(
+        'stripOrder'        =>  false,
+        'stripSearch'       =>  false,
+        'caseSensitive'     =>  false,
+    );
 
     /**
      * @param Collection $collection
      */
     function __construct(Collection $collection)
     {
+        parent::__construct();
         $this->collection = $collection;
         $this->workingCollection = $collection;
     }
@@ -61,7 +45,7 @@ class CollectionEngine implements EngineInterface {
      * @param $column
      * @param $order
      */
-    public function order($column, $order = EngineInterface::ORDER_ASC)
+    public function order($column, $order = BaseEngine::ORDER_ASC)
     {
         $this->orderColumn = $column;
         $this->orderDirection = $order;
@@ -73,6 +57,15 @@ class CollectionEngine implements EngineInterface {
     public function search($value)
     {
         $this->search = $value;
+    }
+
+    /**
+    * @param string $columnName
+    * @param mixed $value
+    */
+    public function searchOnColumn($columnName, $value)
+    {
+        // is not yet implemented in this engine
     }
 
     /**
@@ -129,7 +122,21 @@ class CollectionEngine implements EngineInterface {
         $this->workingCollection = $this->collection;
     }
 
-    public function make(Collection $columns, array $searchColumns = array())
+    public function stripSearch()
+    {
+        $this->options['stripSearch'] = true;
+        return $this;
+    }
+
+    public function stripOrder()
+    {
+        $this->options['stripOrder'] = true;
+        return $this;
+    }
+
+    //--------------PRIVATE FUNCTIONS-----------------
+
+    protected function internalMake(Collection $columns, array $searchColumns = array())
     {
         $this->compileArray($columns);
         $this->doInternalSearch($columns, $searchColumns);
@@ -138,22 +145,15 @@ class CollectionEngine implements EngineInterface {
         return $this->workingCollection->slice($this->skip,$this->limit);
     }
 
-
-    public function setCaseSensitiveSearchForPostgree($value)
-    {
-        $this->setCaseSensitiveSearchForPostgree = $value;
-    }
-
-    //--------------PRIVATE FUNCTIONS-----------------
-
     private function doInternalSearch(Collection $columns, array $searchColumns)
     {
         if(is_null($this->search) or empty($this->search))
             return;
 
         $value = $this->search;
+        $caseSensitive = $this->options['caseSensitive'];
+
         $toSearch = array();
-        $caseSensitive = $this->setCaseSensitiveSearchForPostgree;
 
         // Map the searchColumns to the real columns
         $ii = 0;
@@ -173,7 +173,7 @@ class CollectionEngine implements EngineInterface {
                 if(!in_array($i, $toSearch))
                     continue;
 
-                if($this->stripSearch)
+                if($this->options['stripSearch'])
                 {
                     $search = strip_tags($row[$i]);
                 }
@@ -183,12 +183,12 @@ class CollectionEngine implements EngineInterface {
                 }
                 if($caseSensitive)
                 {
-                    if(str_contains($row[$i],$value))
+                    if(str_contains($search,$value))
                         return true;
                 }
                 else
                 {
-                    if(str_contains(strtolower($row[$i]),strtolower($value)))
+                    if(str_contains(strtolower($search),strtolower($value)))
                         return true;
                 }
             }
@@ -201,7 +201,7 @@ class CollectionEngine implements EngineInterface {
             return;
 
         $column = $this->orderColumn;
-        $stripOrder = $this->stripOrder;
+        $stripOrder = $this->options['stripOrder'];
         $this->workingCollection->sortBy(function($row) use ($column,$stripOrder) {
 
             if($stripOrder)
@@ -214,7 +214,7 @@ class CollectionEngine implements EngineInterface {
             }
         });
 
-        if($this->orderDirection == EngineInterface::ORDER_DESC)
+        if($this->orderDirection == BaseEngine::ORDER_DESC)
             $this->workingCollection = $this->workingCollection->reverse();
     }
 
@@ -232,16 +232,12 @@ class CollectionEngine implements EngineInterface {
 
     public function setSearchStrip()
     {
-        $this->stripSearch = true;
+        $this->options['stripSearch'] = true;
     }
 
     public function setOrderStrip()
     {
-        $this->stripOrder = true;
+        $this->options['stripOrder'] = true;
     }
 
-    public function setSearchWithAlias()
-    {
-        // can not be implemented with the Collection engine!
-    }
 }
