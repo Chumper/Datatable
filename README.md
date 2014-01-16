@@ -10,7 +10,8 @@ so i developed this package which in my opinion is superior.
 
 ##Known Issues
 
-* none at the moment
+* setStripSearch and setStripOrder won't return the datatable object
+* SingleColumn search is only integrated into the Query Engine yet
 
 ##TODO
 
