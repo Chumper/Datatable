@@ -2,9 +2,9 @@
 
 use Chumper\Datatable\Columns\TextColumn;
 use Chumper\Datatable\Engines\CollectionEngine;
-use Illuminate\Foundation\Testing\TestCase;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Input;
+use Orchestra\Testbench\TestCase;
 
 class BaseEngineTest extends TestCase {
 

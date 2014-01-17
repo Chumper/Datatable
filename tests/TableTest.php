@@ -6,11 +6,6 @@ use Illuminate\Support\Facades\Request;
 class TableTest extends PHPUnit_Framework_TestCase {
 
     /**
-     * @var \Mockery\Mock
-     */
-    private $view;
-
-    /**
      * @var Table
      */
     private $table;
@@ -19,15 +14,6 @@ class TableTest extends PHPUnit_Framework_TestCase {
     {
         parent::setUp();
         $this->table = new Table();
-
-        //View Mock
-        $app = Mockery::mock('AppMock');
-        $app->shouldReceive('instance')->once()->andReturn($app);
-
-        Illuminate\Support\Facades\Facade::setFacadeApplication($app);
-
-        $this->view = Mockery::mock('ViewMock');
-        Illuminate\Support\Facades\View::swap($this->view);
     }
 
     /**
@@ -102,7 +88,7 @@ class TableTest extends PHPUnit_Framework_TestCase {
     {
         Request::shouldReceive('url')->once()->andReturn('fooBar');
 
-        $this->view->shouldReceive('make')->once()
+        View::shouldReceive('make')->once()
             ->with('datatable::template', array(
                 'options'   => array(
                     'sAjaxSource' => 'fooBar',

@@ -28,12 +28,25 @@ class QueryEngineTest extends PHPUnit_Framework_TestCase {
     public function testOrder()
     {
         $this->builder->shouldReceive('orderBy')->with('id', BaseEngine::ORDER_ASC);
-        $this->c->order('id');
+
+        Input::merge(
+            array(
+                'iSortCol_0' => 0,
+                'sSortDir_0' => 'asc'
+            )
+        );
 
         //--
 
         $this->builder->shouldReceive('orderBy')->with('id', BaseEngine::ORDER_DESC);
-        $this->c->order('id', BaseEngine::ORDER_DESC);
+
+        Input::merge(
+            array(
+                'iSortCol_0' => 0,
+                'sSortDir_0' => 'desc'
+            )
+        );
+
     }
 
     public function testSearch()
@@ -47,7 +60,12 @@ class QueryEngineTest extends PHPUnit_Framework_TestCase {
 
         $this->addRealColumns($this->c);
         $this->c->searchColumns('foo');
-        $this->c->search('test');
+
+        Input::merge(
+            array(
+                'sSearch' => 'test'
+            )
+        );
 
         $test = json_decode($this->c->make()->getContent());
         $test = $test->aaData;
@@ -63,7 +81,14 @@ class QueryEngineTest extends PHPUnit_Framework_TestCase {
         $this->c = new QueryEngine($this->builder);
 
         $this->addRealColumns($this->c);
-        $this->c->skip(1);
+
+        Input::merge(
+            array(
+                'iDisplayStart' => 1,
+                'sSearch' => null
+            )
+        );
+
         $this->c->searchColumns('foo');
 
         $test = json_decode($this->c->make()->getContent());
@@ -80,7 +105,15 @@ class QueryEngineTest extends PHPUnit_Framework_TestCase {
         $this->c = new QueryEngine($this->builder);
 
         $this->addRealColumns($this->c);
-        $this->c->take(1);
+
+        Input::merge(
+            array(
+                'iDisplayLength' => 1,
+                'sSearch' => null,
+                'iDisplayStart' => null
+            )
+        );
+
         $this->c->searchColumns('foo');
 
         $test = json_decode($this->c->make()->getContent());
@@ -99,7 +132,12 @@ class QueryEngineTest extends PHPUnit_Framework_TestCase {
 
         $this->addRealColumns($engine);
         $engine->searchColumns('foo','bar');
-        $engine->search('t');
+
+        Input::replace(
+            array(
+                'sSearch' => 't',
+            )
+        );
 
         $test = json_decode($engine->make()->getContent());
         $test = $test->aaData;
@@ -112,7 +150,12 @@ class QueryEngineTest extends PHPUnit_Framework_TestCase {
 
         $this->addRealColumns($engine);
         $engine->searchColumns('foo','bar');
-        $engine->search('plasch');
+
+        Input::replace(
+            array(
+                'sSearch' => 'plasch',
+            )
+        );
 
         $test = json_decode($engine->make()->getContent());
         $test = $test->aaData;
@@ -125,7 +168,12 @@ class QueryEngineTest extends PHPUnit_Framework_TestCase {
 
         $this->addRealColumns($engine);
         $engine->searchColumns('foo','bar');
-        $engine->search('tay');
+
+        Input::replace(
+            array(
+                'sSearch' => 'tay',
+            )
+        );
 
         $test = json_decode($engine->make()->getContent());
         $test = $test->aaData;
@@ -138,7 +186,12 @@ class QueryEngineTest extends PHPUnit_Framework_TestCase {
 
         $this->addRealColumns($engine);
         $engine->searchColumns('foo','bar');
-        $engine->search('0');
+
+        Input::replace(
+            array(
+                'sSearch' => '0',
+            )
+        );
 
         $test = json_decode($engine->make()->getContent());
         $test = $test->aaData;

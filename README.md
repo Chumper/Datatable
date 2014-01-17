@@ -10,7 +10,6 @@ so i developed this package which in my opinion is superior.
 
 ##Known Issues
 
-* setStripSearch and setStripOrder won't return the datatable object
 * SingleColumn search is only integrated into the Query Engine yet
 
 ##TODO
@@ -353,6 +352,10 @@ If you use the search functionality then you can advice
 all columns to strip any HTML and PHP tags before searching this column.
 
 This can be useful if you return a link to the model detail but still want to provide search ability in this column.
+
+**setCaseSensitive($boolean = 'false')**
+
+Set the search method to case sensitive or not, default is false
 
 ###Table
 

@@ -42,49 +42,6 @@ class CollectionEngine extends BaseEngine {
     }
 
     /**
-     * @param $column
-     * @param $order
-     */
-    public function order($column, $order = BaseEngine::ORDER_ASC)
-    {
-        $this->orderColumn = $column;
-        $this->orderDirection = $order;
-    }
-
-    /**
-     * @param $value
-     */
-    public function search($value)
-    {
-        $this->search = $value;
-    }
-
-    /**
-    * @param string $columnName
-    * @param mixed $value
-    */
-    public function searchOnColumn($columnName, $value)
-    {
-        // is not yet implemented in this engine
-    }
-
-    /**
-     * @param $value
-     */
-    public function skip($value)
-    {
-        $this->skip = $value;
-    }
-
-    /**
-     * @param $value
-     */
-    public function take($value)
-    {
-        $this->limit = $value;
-    }
-
-    /**
      * @return int
      */
     public function count()
@@ -105,6 +62,8 @@ class CollectionEngine extends BaseEngine {
      */
     public function getArray()
     {
+        $this->handleInputs();
+        $this->compileArray($this->columns);
         $this->doInternalSearch(new Collection(), array());
         $this->doInternalOrder();
 
@@ -131,6 +90,24 @@ class CollectionEngine extends BaseEngine {
     public function stripOrder()
     {
         $this->options['stripOrder'] = true;
+        return $this;
+    }
+
+    public function setSearchStrip()
+    {
+        $this->options['stripSearch'] = true;
+        return $this;
+    }
+
+    public function setOrderStrip()
+    {
+        $this->options['stripOrder'] = true;
+        return $this;
+    }
+
+    public function setCaseSensitive($value)
+    {
+        $this->options['caseSensitive'] = $value;
         return $this;
     }
 
@@ -229,15 +206,4 @@ class CollectionEngine extends BaseEngine {
             return $entry;
         });
     }
-
-    public function setSearchStrip()
-    {
-        $this->options['stripSearch'] = true;
-    }
-
-    public function setOrderStrip()
-    {
-        $this->options['stripOrder'] = true;
-    }
-
 }

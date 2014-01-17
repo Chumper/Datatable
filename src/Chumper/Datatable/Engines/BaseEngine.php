@@ -18,6 +18,11 @@ abstract class BaseEngine {
     const ORDER_DESC = 'desc';
 
     /**
+     * @var array
+     */
+    protected $columnSearches = array();
+
+    /**
      * @var
      */
     private $sEcho;
@@ -25,7 +30,7 @@ abstract class BaseEngine {
     /**
      * @var \Illuminate\Support\Collection
      */
-    private $columns;
+    protected $columns;
 
     /**
      * @var array
@@ -308,7 +313,7 @@ abstract class BaseEngine {
     /**
      *
      */
-    private function handleInputs()
+    protected function handleInputs()
     {
         //Handle all inputs magically
         foreach (Input::all() as $key => $input) {
@@ -343,15 +348,50 @@ abstract class BaseEngine {
             $this->searchColumns = $this->showColumns;
     }
 
-    abstract protected function take($value);
-    abstract protected function skip($value);
+    /**
+     * @param $column
+     * @param $order
+     */
+    private function order($column, $order = BaseEngine::ORDER_ASC)
+    {
+        $this->orderColumn = $column;
+        $this->orderDirection = $order;
+    }
+
+    /**
+     * @param $value
+     */
+    private function search($value)
+    {
+        $this->search = $value;
+    }
+
+    /**
+     * @param string $columnName
+     * @param mixed $value
+     */
+    private function searchOnColumn($columnName, $value)
+    {
+        $this->columnSearches[$columnName] = $value;
+    }
+
+    /**
+     * @param $value
+     */
+    private function skip($value)
+    {
+        $this->skip = $value;
+    }
+
+    /**
+     * @param $value
+     */
+    private function take($value)
+    {
+        $this->limit = $value;
+    }
+
     abstract protected function totalCount();
     abstract protected function count();
-    abstract protected function searchOnColumn($columnName, $value);
-    abstract protected function order($column, $order = BaseEngine::ORDER_ASC);
-    abstract protected function search($value);
     abstract protected function internalMake(Collection $columns, array $searchColumns = array());
-
-
-
 } 

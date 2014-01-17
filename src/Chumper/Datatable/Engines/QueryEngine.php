@@ -55,32 +55,6 @@ class QueryEngine extends BaseEngine {
         }
     }
 
-    public function order($column, $oder = BaseEngine::ORDER_ASC)
-    {
-        $this->orderColumn = $column;
-        $this->orderDirection = $oder;
-    }
-
-    public function search($value)
-    {
-        $this->search = $value;
-    }
-
-    public function searchOnColumn($columnName, $value)
-    {
-        $this->columnSearches[$columnName] = $value;
-    }
-
-    public function skip($value)
-    {
-        $this->skip = $value;
-    }
-
-    public function take($value)
-    {
-        $this->limit = $value;
-    }
-
     public function count()
     {
         return $this->options['counter'];
@@ -219,15 +193,18 @@ class QueryEngine extends BaseEngine {
 
     private function doInternalOrder($builder, $columns)
     {
-        $i = 0;
-        foreach($columns as $col)
+        if(!$this->orderColumn == null)
         {
-            if($i === $this->orderColumn)
+            $i = 0;
+            foreach($columns as $col)
             {
-                $builder = $builder->orderBy($col->getName(), $this->orderDirection);
-                return $builder;
+                if($i === (int) $this->orderColumn)
+                {
+                    $builder = $builder->orderBy($col->getName(), $this->orderDirection);
+                    return $builder;
+                }
+                $i++;
             }
-            $i++;
         }
         return $builder;
     }
