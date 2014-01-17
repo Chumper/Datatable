@@ -14,6 +14,7 @@ so i developed this package which in my opinion is superior.
 
 ##TODO
 
+* integrate Single column search into collection engine
 * fix incoming bugs
 * code documentaion
 
