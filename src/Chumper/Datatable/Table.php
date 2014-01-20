@@ -253,4 +253,10 @@ class Table {
     {
         return $this->className;
     }
+
+    public function setClass($class)
+    {
+        $this->className = $class;
+        return $this;
+    }
 }
