@@ -199,9 +199,21 @@ class CollectionEngine extends BaseEngine {
     {
         $this->workingCollection = $this->collection->map(function($row) use ($columns) {
             $entry = array();
+
+            // add class and id if needed
+            if(!is_null($this->rowClass) && is_callable($this->rowClass))
+            {
+                $entry['DT_RowClass'] = call_user_func($this->rowClass,$row);
+            }
+            if(!is_null($this->rowId) && is_callable($this->rowId))
+            {
+                $entry['DT_RowId'] = call_user_func($this->rowId,$row);
+            }
+            $i=0;
             foreach ($columns as $col)
             {
-                $entry[] =  $col->run($row);
+                $entry[$i] =  $col->run($row);
+                $i++;
             }
             return $entry;
         });

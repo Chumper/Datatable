@@ -1,5 +1,6 @@
 <?php namespace Chumper\Datatable\Engines;
 
+use Assetic\Extension\Twig\AsseticFilterFunction;
 use Chumper\Datatable\Columns\DateColumn;
 use Chumper\Datatable\Columns\FunctionColumn;
 use Chumper\Datatable\Columns\TextColumn;
@@ -16,6 +17,16 @@ abstract class BaseEngine {
 
     const ORDER_ASC = 'asc';
     const ORDER_DESC = 'desc';
+
+    /**
+     * @var mixed
+     */
+    protected $rowClass = null;
+
+    /**
+     * @var mixed
+     */
+    protected $rowId = null;
 
     /**
      * @var array
@@ -226,6 +237,22 @@ abstract class BaseEngine {
             $this->orderColumns[] = $property;
         }
         return $this;
+    }
+
+    /**
+     * @param $function Set a function for a dynamic row class
+     */
+    public function setRowClass($function)
+    {
+        $this->rowClass = $function;
+    }
+
+    /**
+     * @param $function Set a function for a dynamic row id
+     */
+    public function setRowId($function)
+    {
+        $this->rowId = $function;
     }
 
     //-------------PRIVATE FUNCTIONS-------------------
