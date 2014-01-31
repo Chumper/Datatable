@@ -241,18 +241,22 @@ abstract class BaseEngine {
 
     /**
      * @param $function Set a function for a dynamic row class
+     * @return $this
      */
     public function setRowClass($function)
     {
         $this->rowClass = $function;
+        return $this;
     }
 
     /**
      * @param $function Set a function for a dynamic row id
+     * @return $this
      */
     public function setRowId($function)
     {
         $this->rowId = $function;
+        return $this;
     }
 
     //-------------PRIVATE FUNCTIONS-------------------
