@@ -79,6 +79,7 @@ class QueryEngine extends BaseEngine {
     public function setSearchOperator($value = "LIKE")
     {
         $this->options['searchOperator'] = $value;
+        return $this;
     }
 
     public function setSearchWithAlias()
