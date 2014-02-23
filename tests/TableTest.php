@@ -97,7 +97,7 @@ class TableTest extends PHPUnit_Framework_TestCase {
                 'callbacks' => array(),
                 'values'    => array(),
                 'data'      => array(),
-                'columns'   => array('foo'),
+                'columns'   => array(1=>'foo'),
                 'noScript'  => false,
                 'class'     => $this->table->getClass(),
 
@@ -106,7 +106,6 @@ class TableTest extends PHPUnit_Framework_TestCase {
         $table1 = $this->table->addColumn('foo')->render();
 
         $this->assertTrue($table1);
-
     }
 
     public function testSetData()

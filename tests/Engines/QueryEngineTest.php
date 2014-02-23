@@ -132,6 +132,7 @@ class QueryEngineTest extends PHPUnit_Framework_TestCase {
 
         $this->addRealColumns($engine);
         $engine->searchColumns('foo','bar');
+        $engine->setAliasMapping();
 
         Input::replace(
             array(
@@ -142,14 +143,15 @@ class QueryEngineTest extends PHPUnit_Framework_TestCase {
         $test = json_decode($engine->make()->getContent());
         $test = $test->aaData;
 
-        $this->assertTrue($this->arrayHasKeyValue('0','Nils',$test));
-        $this->assertTrue($this->arrayHasKeyValue('0','Taylor',$test));
+        $this->assertTrue($this->arrayHasKeyValue('foo','Nils',$test));
+        $this->assertTrue($this->arrayHasKeyValue('foo','Taylor',$test));
 
         //Test2
         $engine = new QueryEngine($this->builder);
 
         $this->addRealColumns($engine);
         $engine->searchColumns('foo','bar');
+        $engine->setAliasMapping();
 
         Input::replace(
             array(
@@ -160,14 +162,15 @@ class QueryEngineTest extends PHPUnit_Framework_TestCase {
         $test = json_decode($engine->make()->getContent());
         $test = $test->aaData;
 
-        $this->assertTrue($this->arrayHasKeyValue('0','Nils',$test));
-        $this->assertTrue($this->arrayHasKeyValue('0','Taylor',$test));
+        $this->assertTrue($this->arrayHasKeyValue('foo','Nils',$test));
+        $this->assertTrue($this->arrayHasKeyValue('foo','Taylor',$test));
 
         //test3
         $engine = new QueryEngine($this->builder);
 
         $this->addRealColumns($engine);
         $engine->searchColumns('foo','bar');
+        $engine->setAliasMapping();
 
         Input::replace(
             array(
@@ -178,14 +181,15 @@ class QueryEngineTest extends PHPUnit_Framework_TestCase {
         $test = json_decode($engine->make()->getContent());
         $test = $test->aaData;
 
-        $this->assertTrue($this->arrayHasKeyValue('0','Nils',$test));
-        $this->assertTrue($this->arrayHasKeyValue('0','Taylor',$test));
+        $this->assertTrue($this->arrayHasKeyValue('foo','Nils',$test));
+        $this->assertTrue($this->arrayHasKeyValue('foo','Taylor',$test));
 
         //test4
         $engine = new QueryEngine($this->builder);
 
         $this->addRealColumns($engine);
         $engine->searchColumns('foo','bar');
+        $engine->setAliasMapping();
 
         Input::replace(
             array(
@@ -196,9 +200,8 @@ class QueryEngineTest extends PHPUnit_Framework_TestCase {
         $test = json_decode($engine->make()->getContent());
         $test = $test->aaData;
 
-        $this->assertTrue($this->arrayHasKeyValue('0','Nils',$test));
-        $this->assertTrue($this->arrayHasKeyValue('0','Taylor',$test));
-
+        $this->assertTrue($this->arrayHasKeyValue('foo','Nils',$test));
+        $this->assertTrue($this->arrayHasKeyValue('foo','Taylor',$test));
     }
 
     protected function tearDown()

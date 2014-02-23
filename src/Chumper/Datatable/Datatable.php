@@ -2,12 +2,8 @@
 
 use Chumper\Datatable\Engines\CollectionEngine;
 use Chumper\Datatable\Engines\QueryEngine;
-use Exception;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Collection;
 use Input;
 use Request;
-use View;
 
 /**
  * Class Datatable
@@ -15,11 +11,13 @@ use View;
  */
 class Datatable {
 
+    private $columnNames = array();
+
     /**
      * @param $query
      * @return QueryEngine
      */
-    public static function query($query)
+    public function query($query)
     {
         return new QueryEngine($query);
     }
@@ -28,7 +26,7 @@ class Datatable {
      * @param $collection
      * @return CollectionEngine
      */
-    public static function collection($collection)
+    public function collection($collection)
     {
         return new CollectionEngine($collection);
     }
@@ -53,5 +51,7 @@ class Datatable {
         }
         return false;
     }
+
+
 
 }

@@ -1,5 +1,6 @@
 <?php namespace Chumper\Datatable\Engines;
 
+use Chumper\Datatable\Datatable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
@@ -73,12 +74,14 @@ class QueryEngine extends BaseEngine {
     public function reset()
     {
         $this->builder = $this->originalBuilder;
+        return $this;
     }
 
 
     public function setSearchOperator($value = "LIKE")
     {
         $this->options['searchOperator'] = $value;
+        return $this;
     }
 
     public function setSearchWithAlias()
@@ -194,7 +197,14 @@ class QueryEngine extends BaseEngine {
             $i = 0;
             foreach ($columns as $col)
             {
-                $entry[$i] =  $col->run($row);
+                if($this->aliasMapping)
+                {
+                    $entry[$col->getName()] =  $col->run($row);
+                }
+                else
+                {
+                    $entry[$i] =  $col->run($row);
+                }
                 $i++;
             }
             return $entry;
@@ -204,7 +214,7 @@ class QueryEngine extends BaseEngine {
 
     private function doInternalOrder($builder, $columns)
     {
-        if(!$this->orderColumn == null)
+        if(!is_null($this->orderColumn))
         {
             $i = 0;
             foreach($columns as $col)

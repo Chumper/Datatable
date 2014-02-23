@@ -46,6 +46,16 @@ class Table {
      */
     protected $className;
 
+    /**
+     * @var boolean indicates if the mapping was already added to the options
+     */
+    private $createdMapping = true;
+
+    /**
+     * @var array name of mapped columns
+     */
+    private $aliasColumns = array();
+
     function __construct()
     {
         $this->className = str_random(8);
@@ -61,13 +71,21 @@ class Table {
         {
             if(is_array($title))
             {
-                foreach ($title as $arrayTitle)
+                foreach ($title as $mapping => $arrayTitle)
                 {
                     $this->columns[] = $arrayTitle;
+                    $this->aliasColumns[] = $mapping;
+                    if(is_string($mapping))
+                    {
+                        $this->createdMapping = false;
+                    }
                 }
             }
             else
+            {
                 $this->columns[] = $title;
+                $this->aliasColumns[] = count($this->aliasColumns)+1;
+            }
         }
         return $this;
     }
@@ -88,7 +106,7 @@ class Table {
     {
         if(func_num_args() == 2)
         {
-            $this->options[func_get_arg(0)] = func_get_arg(1);
+           $this->options[func_get_arg(0)] =func_get_arg(1);
         }
         else if(func_num_args() == 1 && is_array(func_get_arg(0)))
         {
@@ -215,12 +233,18 @@ class Table {
             $this->setUrl(Request::url());
         }
 
+        // create mapping for frontend
+        if(!$this->createdMapping)
+        {
+            $this->createMapping();
+        }
+
         return View::make($view,array(
             'options'   => $this->options,
             'callbacks' => $this->callbacks,
             'values'    => $this->customValues,
             'data'      => $this->data,
-            'columns'   => $this->columns,
+            'columns'   => array_combine($this->aliasColumns,$this->columns),
             'noScript'  => $this->noScript,
             'class'     => $this->className,
         ));
@@ -242,6 +266,12 @@ class Table {
         if(is_null($view))
             $view = 'datatable::javascript';
 
+        // create mapping for frontend
+        if(!$this->createdMapping)
+        {
+            $this->createMapping();
+        }
+
         return View::make($view,array(
             'options'   =>  $this->options,
             'callbacks' =>  $this->callbacks,
@@ -258,5 +288,40 @@ class Table {
     {
         $this->className = $class;
         return $this;
+    }
+
+    public function setAliasMapping($value)
+    {
+        $this->createdMapping = !$value;
+        return $this;
+    }
+
+    //--------------------PRIVATE FUNCTIONS
+
+    private function createMapping()
+    {
+        // set options for better handling
+        // merge with existing options
+        if(!array_key_exists('aoColumns', $this->options))
+        {
+            $this->options['aoColumns'] = array();
+        }
+        $matching = array();
+        $i = 0;
+        foreach($this->aliasColumns as $name)
+        {
+            if(array_key_exists($i,$this->options['aoColumns']))
+            {
+                $this->options['aoColumns'][$i] = array_merge_recursive($this->options['aoColumns'][$i],array('mData' => $name));
+            }
+            else
+            {
+                $this->options['aoColumns'][$i] = array('mData' => $name);
+            }
+            $i++;
+        }
+        $this->createdMapping = true;
+        //dd($matching);
+        return $matching;
     }
 }

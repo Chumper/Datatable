@@ -10,11 +10,10 @@ so i developed this package which in my opinion is superior.
 
 ##Known Issues
 
-* SingleColumn search is only integrated into the Query Engine yet
+* none i know of so far
 
 ##TODO
 
-* integrate Single column search into collection engine
 * fix incoming bugs
 * code documentaion
 
@@ -302,6 +301,32 @@ E.g.:
 
 Please look into the specific Columns for further information.
 
+**setAliasMapping()**
+
+Will advise the Datatable to return the data mapped with the column name.
+So instead of
+```javascript
+	{
+		"aaData":[
+			[3,"name","2014-02-02 23:28:14"]
+		],
+		"sEcho":9,
+		"iTotalRecords":2,
+		"iTotalDisplayRecords":1
+	}
+```
+you will get something like this as response
+```javascript
+{
+	"aaData":[
+		{"id":2,"name":"Datatable","created_at":"Sun, Feb 2, 2014 7:17 PM"}
+	],
+	"sEcho":2,
+	"iTotalRecords":2,
+	"iTotalDisplayRecords":1
+}
+```
+
 **make()**
 
 This will handle the input data of the request and provides the result set.
@@ -371,6 +396,7 @@ You can render it manually with
 Will render the javascript if no view is given or the default one and will pass the class name, the options and the callbacks.
 
 Example:
+
 ```php
 		$table = Datatable::table()
         ->addColumn('Email2','Email', "Test")
@@ -408,6 +434,23 @@ Will set a single callback function or an array of callbacks for the jquery call
 
 Will add a column to the table, where the name will be rendered on the table head.
 So you can provide the string that should be shown.
+
+if you want to use the alias mapping feature of the server side table then you need to add an array like this
+
+```php
+Datatable::table()
+    ->addColumn(array(
+        'id'            => 'ID',
+        'name'          => 'Name',
+        'created_at'    => 'Erstellt'
+        ))
+	->render();
+```
+Please note that passing an assosiative array to the addColumn function will automatically enable the alias function on the table
+
+**setAliasMapping(boolean)**
+
+Here you can explicitly set if the table should be aliased or not.
 
 **countColumns()**
 

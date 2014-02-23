@@ -83,6 +83,10 @@ abstract class BaseEngine {
      */
     protected $orderDirection = BaseEngine::ORDER_ASC;
 
+    /**
+     * @var boolean If the return should be alias mapped
+     */
+    protected $aliasMapping = false;
 
 
     function __construct()
@@ -199,7 +203,6 @@ abstract class BaseEngine {
             "iTotalRecords" => $this->totalCount(),
             "iTotalDisplayRecords" => $this->count(),
         );
-
         return Response::json($output);
     }
 
@@ -256,6 +259,12 @@ abstract class BaseEngine {
     public function setRowId($function)
     {
         $this->rowId = $function;
+        return $this;
+    }
+
+    public function setAliasMapping()
+    {
+        $this->aliasMapping = true;
         return $this;
     }
 
@@ -420,6 +429,19 @@ abstract class BaseEngine {
     private function take($value)
     {
         $this->limit = $value;
+    }
+
+    protected function getNameByIndex($index)
+    {
+        $i = 0;
+        foreach($this->columns as $name => $col)
+        {
+            if($index == $i)
+            {
+                return $name;
+            }
+            $i++;
+        }
     }
 
     abstract protected function totalCount();

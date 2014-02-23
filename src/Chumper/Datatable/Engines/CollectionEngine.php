@@ -79,6 +79,7 @@ class CollectionEngine extends BaseEngine {
     public function reset()
     {
         $this->workingCollection = $this->collection;
+        return $this;
     }
 
     public function stripSearch()
@@ -143,20 +144,27 @@ class CollectionEngine extends BaseEngine {
             $ii++;
         }
 
-        $this->workingCollection = $this->workingCollection->filter(function($row) use ($value, $toSearch, $caseSensitive)
+        $self = $this;
+        $this->workingCollection = $this->workingCollection->filter(function($row) use ($value, $toSearch, $caseSensitive, $self)
         {
             for($i = 0; $i < count($row); $i++)
             {
                 if(!in_array($i, $toSearch))
                     continue;
 
+                $column = $i;
+                if($self->aliasMapping)
+                {
+                    $column = $self->getNameByIndex($i);
+                }
+
                 if($this->options['stripSearch'])
                 {
-                    $search = strip_tags($row[$i]);
+                    $search = strip_tags($row[$column]);
                 }
                 else
                 {
-                    $search = $row[$i];
+                    $search = $row[$column];
                 }
                 if($caseSensitive)
                 {
@@ -179,8 +187,13 @@ class CollectionEngine extends BaseEngine {
 
         $column = $this->orderColumn;
         $stripOrder = $this->options['stripOrder'];
-        $this->workingCollection->sortBy(function($row) use ($column,$stripOrder) {
+        $self = $this;
+        $this->workingCollection->sortBy(function($row) use ($column,$stripOrder,$self) {
 
+            if($self->aliasMapping)
+            {
+                $column = $self->getNameByIndex($column);
+            }
             if($stripOrder)
             {
                 return strip_tags($row[$column]);
@@ -212,7 +225,15 @@ class CollectionEngine extends BaseEngine {
             $i=0;
             foreach ($columns as $col)
             {
-                $entry[$i] =  $col->run($row);
+                if($this->aliasMapping)
+                {
+                    $entry[$col->getName()] =  $col->run($row);
+                }
+                else
+                {
+                    $entry[$i] =  $col->run($row);
+                }
+
                 $i++;
             }
             return $entry;
