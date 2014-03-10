@@ -34,7 +34,7 @@ class Datatable {
     /**
      * @return Table
      */
-    public static function table()
+    public function table()
     {
         return new Table;
     }
@@ -42,7 +42,7 @@ class Datatable {
     /**
      * @return bool True if the plugin should handle this request, false otherwise
      */
-    public static function shouldHandle()
+    public function shouldHandle()
     {
         $echo = Input::get('sEcho',null);
         if(Request::ajax() && !is_null($echo) && is_numeric($echo))
@@ -51,7 +51,4 @@ class Datatable {
         }
         return false;
     }
-
-
-
 }

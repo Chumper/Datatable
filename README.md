@@ -370,6 +370,10 @@ Please be aware that this flag will slow down your application, since we are get
 
 With this method you can set the operator on searches like "ILIKE" on PostgreSQL for case insensitivity.
 
+**setExactWordSearch**
+
+Will advice the engines only to search for the exact given search string.
+
 ###Specific CollectionEngine methods
 
 **setSearchStrip() & setOrderStrip()**

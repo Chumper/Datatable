@@ -168,13 +168,29 @@ class CollectionEngine extends BaseEngine {
                 }
                 if($caseSensitive)
                 {
-                    if(str_contains($search,$value))
-                        return true;
+                    if($self->exactWordSearch)
+                    {
+                        if($value === $search)
+                            return true;
+                    }
+                    else
+                    {
+                        if(str_contains($search,$value))
+                            return true;
+                    }
                 }
                 else
                 {
-                    if(str_contains(strtolower($search),strtolower($value)))
-                        return true;
+                    if($self->exactWordSearch)
+                    {
+                        if(strtolower($value) === strtolower($search))
+                            return true;
+                    }
+                    else
+                    {
+                        if(str_contains(strtolower($search),strtolower($value)))
+                            return true;
+                    }
                 }
             }
         });
@@ -210,22 +226,23 @@ class CollectionEngine extends BaseEngine {
 
     private function compileArray($columns)
     {
-        $this->workingCollection = $this->collection->map(function($row) use ($columns) {
+        $self = $this;
+        $this->workingCollection = $this->collection->map(function($row) use ($columns, $self) {
             $entry = array();
 
             // add class and id if needed
-            if(!is_null($this->rowClass) && is_callable($this->rowClass))
+            if(!is_null($self->rowClass) && is_callable($self->rowClass))
             {
-                $entry['DT_RowClass'] = call_user_func($this->rowClass,$row);
+                $entry['DT_RowClass'] = call_user_func($self->rowClass,$row);
             }
-            if(!is_null($this->rowId) && is_callable($this->rowId))
+            if(!is_null($self->rowId) && is_callable($self->rowId))
             {
-                $entry['DT_RowId'] = call_user_func($this->rowId,$row);
+                $entry['DT_RowId'] = call_user_func($self->rowId,$row);
             }
             $i=0;
             foreach ($columns as $col)
             {
-                if($this->aliasMapping)
+                if($self->aliasMapping)
                 {
                     $entry[$col->getName()] =  $col->run($row);
                 }

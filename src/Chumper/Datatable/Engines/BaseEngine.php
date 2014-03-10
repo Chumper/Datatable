@@ -88,6 +88,11 @@ abstract class BaseEngine {
      */
     protected $aliasMapping = false;
 
+    /**
+     * @var bool If the search should be done with exact matching
+     */
+    protected $exactWordSearch = false;
+
 
     function __construct()
     {
@@ -268,6 +273,11 @@ abstract class BaseEngine {
         return $this;
     }
 
+    public function setExactWordSearch()
+    {
+        $this->exactWordSearch = true;
+        return $this;
+    }
     //-------------PRIVATE FUNCTIONS-------------------
 
     /**

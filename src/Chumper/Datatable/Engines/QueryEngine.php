@@ -156,17 +156,18 @@ class QueryEngine extends BaseEngine {
     {
         $like = $this->options['searchOperator'];
         $search = $this->search;
-        $builder = $builder->where(function($query) use ($columns, $search, $like) {
+        $exact = $this->exactWordSearch;
+        $builder = $builder->where(function($query) use ($columns, $search, $like, $exact) {
             foreach ($columns as $c) {
                 //column to CAST following the pattern column:newType:[maxlength]
                 if(strrpos($c, ':')){
                     $c = explode(':', $c);
                     if(isset($c[2]))
                         $c[1] .= "($c[2])";
-                    $query->orWhereRaw("cast($c[0] as $c[1]) ".$like." ?", array("%$search%"));
+                    $query->orWhereRaw("cast($c[0] as $c[1]) ".$like." ?", array($exact ? "$search" : "%$search%"));
                 }
                 else
-                    $query->orWhere($c,$like,'%'.$search.'%');
+                    $query->orWhere($c,$like,$exact ? $search : '%'.$search.'%');
             }
         });
         return $builder;
@@ -183,21 +184,22 @@ class QueryEngine extends BaseEngine {
     {
         $this->resultCollection = $this->getCollection($builder);
 
-        $this->resultCollection = $this->resultCollection->map(function($row) use ($columns) {
+        $self = $this;
+        $this->resultCollection = $this->resultCollection->map(function($row) use ($columns,$self) {
             $entry = array();
             // add class and id if needed
-            if(!is_null($this->rowClass) && is_callable($this->rowClass))
+            if(!is_null($self->rowClass) && is_callable($self->rowClass))
             {
-                $entry['DT_RowClass'] = call_user_func($this->rowClass,$row);
+                $entry['DT_RowClass'] = call_user_func($self->rowClass,$row);
             }
-            if(!is_null($this->rowId) && is_callable($this->rowId))
+            if(!is_null($self->rowId) && is_callable($self->rowId))
             {
-                $entry['DT_RowId'] = call_user_func($this->rowId,$row);
+                $entry['DT_RowId'] = call_user_func($self->rowId,$row);
             }
             $i = 0;
             foreach ($columns as $col)
             {
-                if($this->aliasMapping)
+                if($self->aliasMapping)
                 {
                     $entry[$col->getName()] =  $col->run($row);
                 }

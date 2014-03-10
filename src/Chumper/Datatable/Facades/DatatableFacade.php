@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Facade;
 
-class Datatable extends Facade {
+class DatatableFacade extends Facade {
 
     /**
      * Get the registered name of the component.
