@@ -8,6 +8,20 @@ so i developed this package which in my opinion is superior.
 
 ![Image](https://raw.github.com/Chumper/Datatable/master/datatable.jpg)
 
+##Important
+
+If you upgrade to version v2.2 please make sure you adjust your app.php with the new alias:
+
+```php
+    // aliases array:
+
+    //old
+    //'Datatable' => 'Chumper\Datatable\Facades\Datatable',
+
+    //new
+    'Datatable' => 'Chumper\Datatable\Facades\DatatableFacade',
+```
+
 ##Known Issues
 
 * none i know of so far
@@ -62,7 +76,7 @@ It also has a ServiceProvider for usage in Laravel4. Add these lines to app.php:
 	'Chumper\Datatable\DatatableServiceProvider',
 
     // aliases array:
-    'Datatable' => 'Chumper\Datatable\Facades\Datatable',
+    'Datatable' => 'Chumper\Datatable\Facades\DatatableFacade',
 ```
 
 You can then access it under the `Datatable` alias.
