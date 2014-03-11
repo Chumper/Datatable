@@ -188,18 +188,18 @@ class QueryEngine extends BaseEngine {
         $this->resultCollection = $this->resultCollection->map(function($row) use ($columns,$self) {
             $entry = array();
             // add class and id if needed
-            if(!is_null($self->rowClass) && is_callable($self->rowClass))
+            if(!is_null($self->getRowClass()) && is_callable($self->getRowClass()))
             {
-                $entry['DT_RowClass'] = call_user_func($self->rowClass,$row);
+                $entry['DT_RowClass'] = call_user_func($self->getRowClass(),$row);
             }
-            if(!is_null($self->rowId) && is_callable($self->rowId))
+            if(!is_null($self->getRowId()) && is_callable($self->getRowId()))
             {
-                $entry['DT_RowId'] = call_user_func($self->rowId,$row);
+                $entry['DT_RowId'] = call_user_func($self->getRowId(),$row);
             }
             $i = 0;
             foreach ($columns as $col)
             {
-                if($self->aliasMapping)
+                if($self->getAliasMapping())
                 {
                     $entry[$col->getName()] =  $col->run($row);
                 }

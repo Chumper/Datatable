@@ -278,6 +278,21 @@ abstract class BaseEngine {
         $this->exactWordSearch = true;
         return $this;
     }
+
+    public function getRowClass()
+    {
+        return $this->rowClass;
+    }
+
+    public function getRowId()
+    {
+        return $this->rowId;
+    }
+
+    public function getAliasMapping()
+    {
+        return $this->aliasMapping;
+    }
     //-------------PRIVATE FUNCTIONS-------------------
 
     /**
@@ -315,6 +330,7 @@ abstract class BaseEngine {
         //handle search on columns sSearch, bRegex
         $this->search($value);
     }
+
 
     /**
      * @param $value
@@ -441,7 +457,7 @@ abstract class BaseEngine {
         $this->limit = $value;
     }
 
-    protected function getNameByIndex($index)
+    public function getNameByIndex($index)
     {
         $i = 0;
         foreach($this->columns as $name => $col)
@@ -452,6 +468,11 @@ abstract class BaseEngine {
             }
             $i++;
         }
+    }
+
+    public function getExactWordSearch()
+    {
+        return $this->exactWordSearch;
     }
 
     abstract protected function totalCount();

@@ -112,6 +112,10 @@ class CollectionEngine extends BaseEngine {
         return $this;
     }
 
+    public function getOption($value)
+    {
+        return $this->options[$value];
+    }
     //--------------PRIVATE FUNCTIONS-----------------
 
     protected function internalMake(Collection $columns, array $searchColumns = array())
@@ -153,12 +157,12 @@ class CollectionEngine extends BaseEngine {
                     continue;
 
                 $column = $i;
-                if($self->aliasMapping)
+                if($self->getAliasMapping())
                 {
                     $column = $self->getNameByIndex($i);
                 }
 
-                if($this->options['stripSearch'])
+                if($self->getOption('stripSearch'))
                 {
                     $search = strip_tags($row[$column]);
                 }
@@ -181,7 +185,7 @@ class CollectionEngine extends BaseEngine {
                 }
                 else
                 {
-                    if($self->exactWordSearch)
+                    if($self->getExactWordSearch())
                     {
                         if(strtolower($value) === strtolower($search))
                             return true;
@@ -206,7 +210,7 @@ class CollectionEngine extends BaseEngine {
         $self = $this;
         $this->workingCollection->sortBy(function($row) use ($column,$stripOrder,$self) {
 
-            if($self->aliasMapping)
+            if($self->getAliasMapping())
             {
                 $column = $self->getNameByIndex($column);
             }
@@ -231,18 +235,18 @@ class CollectionEngine extends BaseEngine {
             $entry = array();
 
             // add class and id if needed
-            if(!is_null($self->rowClass) && is_callable($self->rowClass))
+            if(!is_null($self->getRowClass()) && is_callable($self->getRowClass()))
             {
-                $entry['DT_RowClass'] = call_user_func($self->rowClass,$row);
+                $entry['DT_RowClass'] = call_user_func($self->getRowClass(),$row);
             }
-            if(!is_null($self->rowId) && is_callable($self->rowId))
+            if(!is_null($self->getRowId()) && is_callable($self->getRowId()))
             {
-                $entry['DT_RowId'] = call_user_func($self->rowId,$row);
+                $entry['DT_RowId'] = call_user_func($self->getRowId(),$row);
             }
             $i=0;
             foreach ($columns as $col)
             {
-                if($self->aliasMapping)
+                if($self->getAliasMapping())
                 {
                     $entry[$col->getName()] =  $col->run($row);
                 }

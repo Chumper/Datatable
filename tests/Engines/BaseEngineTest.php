@@ -41,7 +41,7 @@ class BaseEngineTest extends TestCase {
             $this->engine->getColumn('foo2')
         );
 
-        $this->assertEquals(array(1 => 'foo2', 0 => 'foo'), $this->api->getOrder());
+        $this->assertEquals(array(1 => 'foo2', 0 => 'foo'), $this->engine->getOrder());
 
         $this->engine->addColumn();
     }
