@@ -1,6 +1,6 @@
 <?php namespace Chumper\Datatable;
 
-use Exception;
+use Exception, Config;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\View;
 
@@ -13,7 +13,13 @@ class Table {
     /**
      * @var array
      */
+    private $config = array();
+
+    /**
+     * @var array
+     */
     private $columns = array();
+
     /**
      * @var array
      */
@@ -26,7 +32,7 @@ class Table {
 
     /**
      * Values to be sent to custom templates
-     * 
+     *
      * @var array
      */
     private $customValues = array();
@@ -42,9 +48,24 @@ class Table {
     private $noScript = false;
 
     /**
+     * @var String The name of the id the table will have later
+     */
+    protected $idName;
+
+    /**
      * @var String The name of the class the table will have later
      */
     protected $className;
+
+    /**
+     * @var String The view used to render the table
+     */
+    protected $table_view;
+
+    /**
+     * @var String The view used to render the javascript
+     */
+    protected $script_view;
 
     /**
      * @var boolean indicates if the mapping was already added to the options
@@ -58,7 +79,16 @@ class Table {
 
     function __construct()
     {
-        $this->className = str_random(8);
+        $this->config = Config::get('datatable::table');
+
+        $this->setId( $this->config['id'] );
+        $this->setClass( $this->config['class'] );
+        $this->setOptions( $this->config['options'] );
+        $this->setCallbacks( $this->config['callbacks'] );
+
+        $this->noScript = $this->config['noScript'];
+        $this->table_view = $this->config['table_view'];
+        $this->script_view = $this->config['script_view'];
     }
 
 
@@ -96,6 +126,15 @@ class Table {
     public function countColumns()
     {
         return count($this->columns);
+    }
+
+    /**
+     * @return $this
+     */
+    public function removeOption($key)
+    {
+        if(isset($this->options[$key])) unset($this->options[$key]);
+        return $this;
     }
 
     /**
@@ -225,8 +264,8 @@ class Table {
      */
     public function render($view = null)
     {
-        if(is_null($view))
-            $view = 'datatable::template';
+        if( ! is_null($view))
+            $this->table_view = $view;
 
         if(!isset($this->options['sAjaxSource']))
         {
@@ -239,13 +278,14 @@ class Table {
             $this->createMapping();
         }
 
-        return View::make($view,array(
+        return View::make($this->table_view,array(
             'options'   => $this->options,
             'callbacks' => $this->callbacks,
             'values'    => $this->customValues,
             'data'      => $this->data,
             'columns'   => array_combine($this->aliasColumns,$this->columns),
             'noScript'  => $this->noScript,
+            'id'        => $this->idName,
             'class'     => $this->className,
         ));
     }
@@ -263,8 +303,8 @@ class Table {
 
     public function script($view = null)
     {
-        if(is_null($view))
-            $view = 'datatable::javascript';
+        if( ! is_null($view))
+            $this->script_view = $view;
 
         // create mapping for frontend
         if(!$this->createdMapping)
@@ -272,11 +312,22 @@ class Table {
             $this->createMapping();
         }
 
-        return View::make($view,array(
+        return View::make($this->script_view,array(
             'options'   =>  $this->options,
             'callbacks' =>  $this->callbacks,
-            'class'     =>  $this->className,
+            'id'        =>  $this->idName,
         ));
+    }
+
+    public function getId()
+    {
+        return $this->idName;
+    }
+
+    public function setId($id = '')
+    {
+        $this->idName = empty($id)? str_random(8) : $id;
+        return $this;
     }
 
     public function getClass()
