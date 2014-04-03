@@ -167,7 +167,7 @@ This will generate a HTML table with two columns (id, lastname -> your translati
 >   Note: This package will **NOT** include the `datatable.js`, that is your work to do.
 >   The reason is that for example i use Basset and everybody wants to do it their way...
 
-If you want to provide your own template fpr the table just provide the path to the view in laravel style.
+If you want to provide your own template for the table just provide the path to the view in laravel style.
 
 ```php
 	Datatable::table()
