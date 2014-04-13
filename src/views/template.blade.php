@@ -1,4 +1,4 @@
-<table class="table table-bordered {{ $class }}">
+<table id="{{ $id }}" class="{{ $class }}">
     <colgroup>
         @for ($i = 0; $i < count($columns); $i++)
         <col class="con{{ $i }}" />
@@ -23,5 +23,5 @@
 </table>
 
 @if (!$noScript)
-    @include('datatable::javascript', array('class' => $class, 'options' => $options, 'callbacks' =>  $callbacks))
+    @include('datatable::javascript', array('id' => $id, 'options' => $options, 'callbacks' =>  $callbacks))
 @endif

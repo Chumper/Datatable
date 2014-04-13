@@ -1,10 +1,10 @@
 <?php namespace Chumper\Datatable\Engines;
 
+use Exception, Config;
 use Assetic\Extension\Twig\AsseticFilterFunction;
 use Chumper\Datatable\Columns\DateColumn;
 use Chumper\Datatable\Columns\FunctionColumn;
 use Chumper\Datatable\Columns\TextColumn;
-use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Response;
@@ -17,6 +17,11 @@ abstract class BaseEngine {
 
     const ORDER_ASC = 'asc';
     const ORDER_DESC = 'desc';
+
+    /**
+     * @var array
+     */
+    protected $config = array();
 
     /**
      * @var mixed
@@ -97,7 +102,8 @@ abstract class BaseEngine {
     function __construct()
     {
         $this->columns = new Collection();
-        $this->className = str_random(8);
+        $this->config = Config::get('datatable::engine');
+        $this->setExactWordSearch( $this->config['exactWordSearch'] );
         return $this;
     }
 
@@ -267,15 +273,15 @@ abstract class BaseEngine {
         return $this;
     }
 
-    public function setAliasMapping()
+    public function setAliasMapping($value = true)
     {
-        $this->aliasMapping = true;
+        $this->aliasMapping = $value;
         return $this;
     }
 
-    public function setExactWordSearch()
+    public function setExactWordSearch($value = true)
     {
-        $this->exactWordSearch = true;
+        $this->exactWordSearch = $value;
         return $this;
     }
 
@@ -478,4 +484,4 @@ abstract class BaseEngine {
     abstract protected function totalCount();
     abstract protected function count();
     abstract protected function internalMake(Collection $columns, array $searchColumns = array());
-} 
+}

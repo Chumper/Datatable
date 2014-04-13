@@ -66,13 +66,13 @@ I would be really thankful if you can provide a test that points to the issue.
 ##Installation
 
 This package is available on http://packagist.org, just add it to your composer.json
-	
+
 	"chumper/datatable": "2.*"
 
 It also has a ServiceProvider for usage in Laravel4. Add these lines to app.php:
 
 ```php
-    // providers array:	
+    // providers array:
 	'Chumper\Datatable\DatatableServiceProvider',
 
     // aliases array:
@@ -80,6 +80,12 @@ It also has a ServiceProvider for usage in Laravel4. Add these lines to app.php:
 ```
 
 You can then access it under the `Datatable` alias.
+
+To override the default configuration options you can publish the config file.
+
+    php artisan config:publish chumper/datatable
+
+You may now edit these options at app/config/packages/chumper/datatable/config.php.
 
 
 ##Basic Usage
@@ -103,7 +109,7 @@ There are two ways you can use the plugin, within one route or within two routes
     <script type="text/javascript" src="/assets/js/jquery.dataTables.min.js"></script>
 
     {{ Datatable::table()
-    ->addColumn('id','Name')       // these are the column headings to be shown  
+    ->addColumn('id','Name')       // these are the column headings to be shown
     ->setUrl(route('api.users'))   // this is the route where data will be retrieved
     ->render() }}
 ```
@@ -437,7 +443,7 @@ Will set a single option or an array of options for the jquery call.
 
 **setCallbacks($name, $value) OR setCallbacks($array)**
 
-Will set a single callback function or an array of callbacks for the jquery call. DataTables callback functions are described at https://datatables.net/usage/callbacks. For example, 
+Will set a single callback function or an array of callbacks for the jquery call. DataTables callback functions are described at https://datatables.net/usage/callbacks. For example,
 
 ```php
     ->setCallbacks(
