@@ -1,6 +1,6 @@
 <?php namespace Chumper\Datatable\Engines;
 
-use Exception, Config;
+use Exception, \Config;
 use Assetic\Extension\Twig\AsseticFilterFunction;
 use Chumper\Datatable\Columns\DateColumn;
 use Chumper\Datatable\Columns\FunctionColumn;
@@ -37,6 +37,12 @@ abstract class BaseEngine {
      * @var array
      */
     protected $columnSearches = array();
+
+    /**
+     * @var array
+     * support for DB::raw fields on where
+     */
+    protected $fieldSearches = array();
 
     /**
      * @var
@@ -444,7 +450,8 @@ abstract class BaseEngine {
      */
     protected function searchOnColumn($columnName, $value)
     {
-        $this->columnSearches[$columnName] = $value;
+        $this->fieldSearches[] = $columnName;
+        $this->columnSearches[] = $value;
     }
 
     /**

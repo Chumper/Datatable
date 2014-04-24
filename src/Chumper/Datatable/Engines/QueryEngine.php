@@ -175,8 +175,8 @@ class QueryEngine extends BaseEngine {
 
     private function buildSingleColumnSearches($builder)
     {
-        foreach ($this->columnSearches as $columnName => $searchValue) {
-            $builder->where($columnName, $this->options['searchOperator'], '%' . $searchValue . '%');
+        foreach ($this->columnSearches as $index => $searchValue) {
+            $builder->where($this->fieldSearches[$index], $this->options['searchOperator'], '%' . $searchValue . '%');
         }
     }
 
