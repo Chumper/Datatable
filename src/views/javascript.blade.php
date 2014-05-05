@@ -1,7 +1,7 @@
 <script type="text/javascript">
     jQuery(document).ready(function(){
         // dynamic table
-        jQuery('#{{ $id }}').dataTable({
+        oTable = jQuery('#{{ $id }}').dataTable({
 
         @foreach ($options as $k => $o)
             {{ json_encode($k) }}: {{ json_encode($o) }},
