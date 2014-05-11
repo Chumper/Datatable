@@ -1,6 +1,6 @@
 <?php namespace Chumper\Datatable\Engines;
 
-use Exception, \Config;
+use Exception;
 use Assetic\Extension\Twig\AsseticFilterFunction;
 use Chumper\Datatable\Columns\DateColumn;
 use Chumper\Datatable\Columns\FunctionColumn;
@@ -8,6 +8,8 @@ use Chumper\Datatable\Columns\TextColumn;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Config;
+
 
 /**
  * Class BaseEngine
@@ -86,6 +88,11 @@ abstract class BaseEngine {
 
     /**
      * @var null
+     * Will be an array if order is set
+     * array(
+     *  0 => column
+     *  1 => name:cast:length
+     * )
      */
     protected $orderColumn = null;
 
@@ -233,11 +240,8 @@ abstract class BaseEngine {
             $cols = func_get_args();
         }
 
-        $this->searchColumns = array();
+        $this->searchColumns = $cols;
 
-        foreach ($cols as $property) {
-            $this->searchColumns[] = $property;
-        }
         return $this;
     }
 
@@ -251,11 +255,7 @@ abstract class BaseEngine {
             $cols = func_get_args();
         }
 
-        $this->orderColumns = array();
-
-        foreach ($cols as $property) {
-            $this->orderColumns[] = $property;
-        }
+        $this->orderColumns = $cols;
         return $this;
     }
 
@@ -357,16 +357,30 @@ abstract class BaseEngine {
         //check if order is allowed
         if(empty($this->orderColumns))
         {
-            $this->order($value, $direction);
+            $this->order(array(0 => $value, 1 => $this->getNameByIndex($value)), $direction);
             return;
+        }
+
+        //prepare order array
+        $cleanNames = array();
+        foreach($this->orderColumns as $c)
+        {
+            if(strpos($c,':') !== FALSE)
+            {
+                $cleanNames[] = substr($c, 0, strpos($c,':'));
+            }
+            else
+            {
+                $cleanNames[] = $c;
+            }
         }
 
         $i = 0;
         foreach($this->columns as $name => $column)
         {
-            if($i == $value && in_array($name, $this->orderColumns))
+            if($i == $value && in_array($name, $cleanNames))
             {
-                $this->order($value, $direction);
+                $this->order(array(0 => $value, 1 => $this->orderColumns[array_search($name,$cleanNames)]), $direction);
                 return;
             }
             $i++;
@@ -381,6 +395,7 @@ abstract class BaseEngine {
      */
     protected function handleSingleColumnSearch($columnIndex, $searchValue)
     {
+        //dd($columnIndex, $searchValue, $this->searchColumns);
         if (!isset($this->searchColumns[$columnIndex])) return;
         if (empty($searchValue)) return;
 
