@@ -10,7 +10,7 @@ so i developed this package which in my opinion is superior.
 
 ##Important
 
-If you upgrade to version v2.2 please make sure you adjust your app.php with the new alias:
+If you upgrade from version 2.1.* or below please make sure you adjust your app.php with the new alias:
 
 ```php
     // aliases array:
