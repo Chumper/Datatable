@@ -546,7 +546,7 @@ In the datatable view (eg, 'my.datatable.template'):
 ##Extras
 Some extras features, using the Datatables api.
 
-**Using TableTools
+### - TableTools
 
 To use TableTools you will need to add some files in your project (https://datatables.net/extensions/tabletools/), if you want some help download the datatable's package and inside the extension folder go to /tabletools and study the examples. After, all the files include, don't forget to pass the parameters like this:
 
