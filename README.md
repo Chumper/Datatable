@@ -188,7 +188,7 @@ If you want to provide your own template for the table just provide the path to 
     ->showColumns('id')
     ->addColumn('name',function($model)
         {
-            return $model->getPresenter()->yourProperty
+            return $model->getPresenter()->yourProperty;
         }
     )->make();
 ```
