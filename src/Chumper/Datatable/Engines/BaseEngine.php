@@ -397,7 +397,7 @@ abstract class BaseEngine {
     {
         //dd($columnIndex, $searchValue, $this->searchColumns);
         if (!isset($this->searchColumns[$columnIndex])) return;
-        if (empty($searchValue)) return;
+        if (empty($searchValue) && $searchValue !== '0') return;
 
         $columnName = $this->searchColumns[$columnIndex];
         $this->searchOnColumn($columnName, $searchValue);
