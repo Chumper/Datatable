@@ -13,6 +13,22 @@ class TableTest extends PHPUnit_Framework_TestCase {
     protected function setUp()
     {
         parent::setUp();
+
+        Config::shouldReceive('get')->zeroOrMoreTimes()->with("datatable::table")->andReturn(
+            array(
+                'class' => 'table table-bordered',
+                'id' => '',
+                'options' => array(
+                    "sPaginationType" => "full_numbers",
+                    "bProcessing" => false
+                ),
+                'callbacks' => array(),
+                'noScript' => false,
+                'table_view' => 'datatable::template',
+                'script_view' => 'datatable::javascript',
+            )
+        );
+
         $this->table = new Table();
     }
 
@@ -92,7 +108,9 @@ class TableTest extends PHPUnit_Framework_TestCase {
             ->with('datatable::template', array(
                 'options'   => array(
                     'sAjaxSource' => 'fooBar',
-                    'bServerSide' => true
+                    'bServerSide' => true,
+                    'sPaginationType'=>'full_numbers',
+                    'bProcessing'=>false
                 ),
                 'callbacks' => array(),
                 'values'    => array(),
@@ -100,6 +118,7 @@ class TableTest extends PHPUnit_Framework_TestCase {
                 'columns'   => array(1=>'foo'),
                 'noScript'  => false,
                 'class'     => $this->table->getClass(),
+                'id'        => $this->table->getId(),
 
             ))->andReturn(true);
 

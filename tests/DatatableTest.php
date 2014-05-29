@@ -2,6 +2,7 @@
 
 use Chumper\Datatable\Datatable;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Config;
 
 class DatatableTest extends PHPUnit_Framework_TestCase {
 
@@ -12,6 +13,27 @@ class DatatableTest extends PHPUnit_Framework_TestCase {
 
     protected function setUp()
     {
+        // set up config
+        Config::shouldReceive('get')->zeroOrMoreTimes()->with("datatable::engine")->andReturn(
+            array(
+                'exactWordSearch' => false,
+            )
+        );
+        Config::shouldReceive('get')->zeroOrMoreTimes()->with("datatable::table")->andReturn(
+            array(
+                'class' => 'table table-bordered',
+                'id' => '',
+                'options' => array(
+                    "sPaginationType" => "full_numbers",
+                    "bProcessing" => false
+                ),
+                'callbacks' => array(),
+                'noScript' => false,
+                'table_view' => 'datatable::template',
+                'script_view' => 'datatable::javascript',
+            )
+        );
+
         $this->dt = new Datatable;
         $this->mock = Mockery::mock('Illuminate\Database\Query\Builder');
     }

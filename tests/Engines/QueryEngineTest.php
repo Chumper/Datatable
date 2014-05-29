@@ -20,6 +20,13 @@ class QueryEngineTest extends PHPUnit_Framework_TestCase {
 
     public function setUp()
     {
+
+        Config::shouldReceive('get')->zeroOrMoreTimes()->with("datatable::engine")->andReturn(
+            array(
+                'exactWordSearch' => false,
+            )
+        );
+
         $this->builder = Mockery::mock('Illuminate\Database\Query\Builder');
 
         $this->c = new QueryEngine($this->builder);

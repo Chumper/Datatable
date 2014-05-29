@@ -1,10 +1,10 @@
 <?php
 
-use Chumper\Datatable\Columns\TextColumn;
 use Chumper\Datatable\Engines\CollectionEngine;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Input;
 use Orchestra\Testbench\TestCase;
+use Illuminate\Support\Facades\Config;
 
 class BaseEngineTest extends TestCase {
 
@@ -17,6 +17,13 @@ class BaseEngineTest extends TestCase {
 
     public function setUp()
     {
+        // set up config
+        Config::shouldReceive('get')->zeroOrMoreTimes()->with("datatable::engine")->andReturn(
+            array(
+                'exactWordSearch' => false,
+                )
+        );
+
         $this->collection = new Collection();
         $this->engine = new CollectionEngine($this->collection);
     }
@@ -41,7 +48,7 @@ class BaseEngineTest extends TestCase {
             $this->engine->getColumn('foo2')
         );
 
-        $this->assertEquals(array(1 => 'foo2', 0 => 'foo'), $this->api->getOrder());
+        $this->assertEquals(array(1 => 'foo2', 0 => 'foo'), $this->engine->getOrder());
 
         $this->engine->addColumn();
     }

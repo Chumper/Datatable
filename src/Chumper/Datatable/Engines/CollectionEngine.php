@@ -112,6 +112,10 @@ class CollectionEngine extends BaseEngine {
         return $this;
     }
 
+    public function getOption($value)
+    {
+        return $this->options[$value];
+    }
     //--------------PRIVATE FUNCTIONS-----------------
 
     protected function internalMake(Collection $columns, array $searchColumns = array())
@@ -125,7 +129,7 @@ class CollectionEngine extends BaseEngine {
 
     private function doInternalSearch(Collection $columns, array $searchColumns)
     {
-        if(is_null($this->search) or empty($this->search))
+        if((is_null($this->search) || empty($this->search)) && empty($this->fieldSearches))
             return;
 
         $value = $this->search;
@@ -137,9 +141,17 @@ class CollectionEngine extends BaseEngine {
         $ii = 0;
         foreach($columns as $i => $col)
         {
-            if(in_array($columns->get($i)->getName(), $searchColumns))
+            if(in_array($columns->get($i)->getName(), $searchColumns) || in_array($columns->get($i)->getName(), $this->fieldSearches))
             {
-                $toSearch[] = $ii;
+                // map values to columns, where there is no value use the global value
+                if(($field = array_search($columns->get($i)->getName(), $this->fieldSearches)) !== FALSE)
+                {
+                    $toSearch[$ii] = $this->columnSearches[$field];
+                }
+                else
+                {
+                    $toSearch[$ii] = $value;
+                }
             }
             $ii++;
         }
@@ -149,16 +161,17 @@ class CollectionEngine extends BaseEngine {
         {
             for($i = 0; $i < count($row); $i++)
             {
-                if(!in_array($i, $toSearch))
+                //$toSearch[$i] = value
+                if(!array_key_exists($i, $toSearch))
                     continue;
 
                 $column = $i;
-                if($self->aliasMapping)
+                if($self->getAliasMapping())
                 {
                     $column = $self->getNameByIndex($i);
                 }
 
-                if($this->options['stripSearch'])
+                if($self->getOption('stripSearch'))
                 {
                     $search = strip_tags($row[$column]);
                 }
@@ -170,25 +183,25 @@ class CollectionEngine extends BaseEngine {
                 {
                     if($self->exactWordSearch)
                     {
-                        if($value === $search)
+                        if($toSearch[$i] === $search)
                             return true;
                     }
                     else
                     {
-                        if(str_contains($search,$value))
+                        if(str_contains($search,$toSearch[$i]))
                             return true;
                     }
                 }
                 else
                 {
-                    if($self->exactWordSearch)
+                    if($self->getExactWordSearch())
                     {
-                        if(strtolower($value) === strtolower($search))
+                        if(mb_strtolower($toSearch[$i]) === mb_strtolower($search))
                             return true;
                     }
                     else
                     {
-                        if(str_contains(strtolower($search),strtolower($value)))
+                        if(str_contains(mb_strtolower($search),mb_strtolower($toSearch[$i])))
                             return true;
                     }
                 }
@@ -201,12 +214,12 @@ class CollectionEngine extends BaseEngine {
         if(is_null($this->orderColumn))
             return;
 
-        $column = $this->orderColumn;
+        $column = $this->orderColumn[0];
         $stripOrder = $this->options['stripOrder'];
         $self = $this;
         $this->workingCollection->sortBy(function($row) use ($column,$stripOrder,$self) {
 
-            if($self->aliasMapping)
+            if($self->getAliasMapping())
             {
                 $column = $self->getNameByIndex($column);
             }
@@ -231,18 +244,18 @@ class CollectionEngine extends BaseEngine {
             $entry = array();
 
             // add class and id if needed
-            if(!is_null($self->rowClass) && is_callable($self->rowClass))
+            if(!is_null($self->getRowClass()) && is_callable($self->getRowClass()))
             {
-                $entry['DT_RowClass'] = call_user_func($self->rowClass,$row);
+                $entry['DT_RowClass'] = call_user_func($self->getRowClass(),$row);
             }
-            if(!is_null($self->rowId) && is_callable($self->rowId))
+            if(!is_null($self->getRowId()) && is_callable($self->getRowId()))
             {
-                $entry['DT_RowId'] = call_user_func($self->rowId,$row);
+                $entry['DT_RowId'] = call_user_func($self->getRowId(),$row);
             }
             $i=0;
             foreach ($columns as $col)
             {
-                if($self->aliasMapping)
+                if($self->getAliasMapping())
                 {
                     $entry[$col->getName()] =  $col->run($row);
                 }

@@ -175,8 +175,8 @@ class QueryEngine extends BaseEngine {
 
     private function buildSingleColumnSearches($builder)
     {
-        foreach ($this->columnSearches as $columnName => $searchValue) {
-            $builder->where($columnName, $this->options['searchOperator'], '%' . $searchValue . '%');
+        foreach ($this->columnSearches as $index => $searchValue) {
+            $builder->where($this->fieldSearches[$index], $this->options['searchOperator'], '%' . $searchValue . '%');
         }
     }
 
@@ -188,18 +188,18 @@ class QueryEngine extends BaseEngine {
         $this->resultCollection = $this->resultCollection->map(function($row) use ($columns,$self) {
             $entry = array();
             // add class and id if needed
-            if(!is_null($self->rowClass) && is_callable($self->rowClass))
+            if(!is_null($self->getRowClass()) && is_callable($self->getRowClass()))
             {
-                $entry['DT_RowClass'] = call_user_func($self->rowClass,$row);
+                $entry['DT_RowClass'] = call_user_func($self->getRowClass(),$row);
             }
-            if(!is_null($self->rowId) && is_callable($self->rowId))
+            if(!is_null($self->getRowId()) && is_callable($self->getRowId()))
             {
-                $entry['DT_RowId'] = call_user_func($self->rowId,$row);
+                $entry['DT_RowId'] = call_user_func($self->getRowId(),$row);
             }
             $i = 0;
             foreach ($columns as $col)
             {
-                if($self->aliasMapping)
+                if($self->getAliasMapping())
                 {
                     $entry[$col->getName()] =  $col->run($row);
                 }
@@ -216,14 +216,23 @@ class QueryEngine extends BaseEngine {
 
     private function doInternalOrder($builder, $columns)
     {
+        //var_dump($this->orderColumn);
         if(!is_null($this->orderColumn))
         {
             $i = 0;
             foreach($columns as $col)
             {
-                if($i === (int) $this->orderColumn)
+
+                if($i === (int) $this->orderColumn[0])
                 {
-                    $builder = $builder->orderBy($col->getName(), $this->orderDirection);
+                    if(strrpos($this->orderColumn[1], ':')){
+                        $c = explode(':', $this->orderColumn[1]);
+                        if(isset($c[2]))
+                            $c[1] .= "($c[2])";
+                        $builder = $builder->orderByRaw("cast($c[0] as $c[1]) ".$this->orderDirection);
+                    }
+                    else
+                        $builder = $builder->orderBy($col->getName(), $this->orderDirection);
                     return $builder;
                 }
                 $i++;
