@@ -164,6 +164,24 @@ class Table {
      * @return $this
      * @throws \Exception
      */
+    public function setOrder($order = array())
+    {
+        $_orders = array();
+        foreach ($order as $number => $sort)
+        {
+            $_orders[] .= '[ ' . $number . ', "' . $sort . '" ]';
+        }
+
+        $_build = '[' . implode(', ', $_orders) . ']';
+
+        $this->callbacks['aaSorting'] = $_build;
+        return $this;
+    }
+
+    /**
+     * @return $this
+     * @throws \Exception
+     */
     public function setCallbacks()
     {
         if(func_num_args() == 2)
