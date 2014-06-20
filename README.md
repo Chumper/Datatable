@@ -525,6 +525,18 @@ In the datatable view (eg, 'my.datatable.template'):
         });
     @endif
 ```
+
+**setOrder(array $order)**
+
+Defines the order that a datatable will be ordered by on first page load.
+```php
+{{ DataTable::table()
+    ->addColumn('ID', 'First Name', 'Last Name')
+    ->setUrl($ajaxRouteToTableData)
+    ->setOrder(array(2=>'asc', 1=>'asc')) // sort by last name then first name
+    ->render('my.datatable.template') }}
+```
+
 ##Contributors
 
 * [jgoux](https://github.com/jgoux) for helping with searching on number columns in the database
