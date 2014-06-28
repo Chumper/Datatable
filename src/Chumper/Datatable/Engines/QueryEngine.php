@@ -173,11 +173,21 @@ class QueryEngine extends BaseEngine {
         return $builder;
     }
 
+    /**
+     * @param $builder
+     * Modified by sburkett to facilitate individual exact match searching on individual columns (rather than for all columns)
+     */
+     
     private function buildSingleColumnSearches($builder)
     {
-        foreach ($this->columnSearches as $index => $searchValue) {
-            $builder->where($this->fieldSearches[$index], $this->options['searchOperator'], '%' . $searchValue . '%');
+      foreach ($this->columnSearches as $index => $searchValue) {
+        if(@$this->columnSearchExact[ $this->fieldSearches[$index] ] == 1) {
+          $builder->where($this->fieldSearches[$index], '=', $searchValue );
+        } else {
+          $builder->where($this->fieldSearches[$index], $this->options['searchOperator'], '%' . $searchValue . '%');
         }
+      }
+
     }
 
     private function compile($builder, $columns)
