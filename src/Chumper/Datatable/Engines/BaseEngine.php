@@ -212,7 +212,9 @@ abstract class BaseEngine {
             }
             else
             {
-                $this->columns->put($property, new FunctionColumn($property, function($model) use($property){return is_array($model)?$model[$property]:$model->$property;}));
+                $this->columns->put($property, new FunctionColumn($property, function($model) use($property){
+                    try{return is_array($model)?$model[$property]:$model->$property;}catch(Exception $e){return null;}    
+                }));
             }
             $this->showColumns[] = $property;
         }
