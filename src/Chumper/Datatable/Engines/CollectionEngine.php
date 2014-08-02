@@ -262,6 +262,10 @@ class CollectionEngine extends BaseEngine {
             {
                 $entry['DT_RowId'] = call_user_func($self->getRowId(),$row);
             }
+            if(!is_null($self->getRowData()) && is_callable($self->getRowData()))
+            {
+                $entry['DT_RowData'] = call_user_func($self->getRowData(),$row);
+            }
             $i=0;
             foreach ($columns as $col)
             {

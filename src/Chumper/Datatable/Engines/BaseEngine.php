@@ -38,6 +38,11 @@ abstract class BaseEngine {
     /**
      * @var array
      */
+    protected $rowData = null;
+
+    /**
+     * @var array
+     */
     protected $columnSearches = array();
 
     /**
@@ -288,6 +293,16 @@ abstract class BaseEngine {
         return $this;
     }
 
+    /**
+     * @param $function Set a function for dynamic html5 data attributes
+     * @return $this
+     */
+    public function setRowData($function)
+    {
+        $this->rowData = $function;
+        return $this;
+    }
+
     public function setAliasMapping($value = true)
     {
         $this->aliasMapping = $value;
@@ -320,6 +335,11 @@ abstract class BaseEngine {
     public function getRowId()
     {
         return $this->rowId;
+    }
+
+    public function getRowData()
+    {
+        return $this->rowData;
     }
 
     public function getAliasMapping()
