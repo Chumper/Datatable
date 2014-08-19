@@ -131,7 +131,7 @@ You should now have a working datatable on your page.
 
 ###One route
 
-In your route you should use the Datatable::shouldHandle method which will check wheter the plugin should handle the request or not.
+In your route you should use the Datatable::shouldHandle method which will check whether the plugin should handle the request or not.
 
 ```php
     if(Datatable::shouldHandle())
