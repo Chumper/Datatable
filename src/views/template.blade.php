@@ -23,5 +23,5 @@
 </table>
 
 @if (!$noScript)
-    @include('datatable::javascript', array('id' => $id, 'options' => $options, 'callbacks' =>  $callbacks))
+    @include(Config::get('datatable::table.script_view'), array('id' => $id, 'options' => $options, 'callbacks' =>  $callbacks))
 @endif
