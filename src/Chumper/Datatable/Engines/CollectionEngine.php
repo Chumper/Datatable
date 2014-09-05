@@ -204,7 +204,7 @@ class CollectionEngine extends BaseEngine {
         if(is_null($this->orderColumn))
             return;
 
-        $column = $this->orderColumn;
+        $column = $this->orderColumn[0];
         $stripOrder = $this->options['stripOrder'];
         $self = $this;
         $this->workingCollection->sortBy(function($row) use ($column,$stripOrder,$self) {
