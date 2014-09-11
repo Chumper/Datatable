@@ -319,6 +319,31 @@ E.g.:
     ->make();
 ```
 
+You can also overwrite the results returned by the QueryMethod by using addColumn in combination with showColumns.
+You must name the column exactly like the database column that you're displaying using showColumns in order for this to work.
+
+```php
+	$column = new FunctionColumn('foo', function ($row) { return strtolower($row->foo); }
+	Datatable::query(DB::table('table')->lists('foo'))
+	         ->showColumns('foo')
+	         ->addColumn($column)
+	         ->orderColumns('foo')
+	         ->searchColumns('foo')
+	         ->make()
+```
+This will allow you to have sortable and searchable columns using the QueryEngine while also allowing you to modify the return value of that database column entry.
+
+Eg: linking an user_id column to it's page listing
+```php
+	$column = new FunctionColumn('user_id', function ($row) { return link_to('users/'.$row->user_id, $row->username) }
+	Datatable::query(DB::table('table')->lists('user_id', 'username'))
+	         ->showColumns('user_id')
+	         ->addColumn($column)
+	         ->orderColumns('user_id')
+	         ->searchColumns('user_id')
+```
+
+
 Please look into the specific Columns for further information.
 
 **setAliasMapping()**
