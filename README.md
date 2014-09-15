@@ -466,6 +466,23 @@ Will set the URL and options for fetching the content via ajax.
 
 Will set a single option or an array of options for the jquery call.
 
+You can pass as paramater something like this ('MyOption', 'ValueMyOption') or an Array with parameters, but some values in DataTable is a JSON so how can i pass a JSON in values? Use another array, like that:
+setOptions(array("MyOption"=> array('MyAnotherOption'=> 'MyAnotherValue', 'MyAnotherOption2'=> 'MyAnotherValue2')));
+
+```js
+
+//GENERATE
+
+jQuery(.Myclass).DataTable({
+    MyOption: {
+        MyAnotherOption: MyAnotherValue,
+        MyAnotherOption2: MyAnotherValue2,
+    }
+});
+```
+
+As a sugestion, take a look at this 2 files javascript.blade.php && template.blade.php in vendor/Chumper/datatable/src/views. You'll understand all the logic and see why it's important to pass the parameter like an array (json_encode and others stuffs).
+
 **setCallbacks($name, $value) OR setCallbacks($array)**
 
 Will set a single callback function or an array of callbacks for the jquery call. DataTables callback functions are described at https://datatables.net/usage/callbacks. For example,
@@ -551,6 +568,7 @@ In the datatable view (eg, 'my.datatable.template'):
     @endif
 ```
 
+
 **setOrder(array $order)**
 
 Defines the order that a datatable will be ordered by on first page load.
@@ -561,6 +579,31 @@ Defines the order that a datatable will be ordered by on first page load.
     ->setOrder(array(2=>'asc', 1=>'asc')) // sort by last name then first name
     ->render('my.datatable.template') }}
 ```
+##Extras
+Some extras features, using the Datatables api.
+
+### - TableTools
+
+To use TableTools you will need to add some files in your project (https://datatables.net/extensions/tabletools/), if you want some help download the datatable's package and inside the extension folder go to /tabletools and study the examples. After, all the files include, don't forget to pass the parameters like this:
+
+```js
+//In view:
+
+{{
+    Datatable::table()
+        ->addColumn('your columns here separated by comma')
+        ->setUrl('your URL for server side')
+        ->setOptions(array(
+                            'dom' =>"T<'clear'>lfrtip",
+                            'tabletools' => array(
+                                                    "aSwfPath" => "your/path/to/swf/copy_csv_cls_pdf.swf",
+                                                    "aButtons" => array("copy", "pdf", "xls")
+                                                )
+                    ))
+}}
+
+```
+If you want to get some properties like "which row did i click?", see the javascript.blade.php and the variable $values.
 
 ##Contributors
 
