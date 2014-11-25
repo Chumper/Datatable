@@ -6,7 +6,10 @@ This is a __laravel 4 package__ for the server and client side of datatables at 
 I developed this package because i was not happy with the only existing package at https://github.com/bllim/laravel4-datatables-package
 so i developed this package which in my opinion is superior.
 
-> This package is for datatable 1.9! It is NOT compatible with 1.10 - I need to set up a new branch for that but atm i am very short on time
+### Please note:
+
+This package is for datatable 1.9! It is NOT compatible with 1.10+!
+I am currently protoyping on a version 3.x which will only support datatable 1.10+
 
 ![Image](https://raw.githubusercontent.com/Chumper/Datatable/master/datatable.jpg)
 
