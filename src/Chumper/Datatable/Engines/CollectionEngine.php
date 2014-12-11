@@ -150,9 +150,11 @@ class CollectionEngine extends BaseEngine {
         $self = $this;
         $this->workingCollection = $this->workingCollection->filter(function($row) use ($value, $toSearch, $caseSensitive, $self)
         {
-            for($i = 0; $i < count($row); $i++)
+
+            for($i=0, $stack=array(), $nb=count($row); $i<$nb; $i++)
             {
-                if(!in_array($i, $toSearch))
+                //$toSearch[$i] = value
+                if(!array_key_exists($i, $toSearch))
                     continue;
 
                 $column = $i;
@@ -173,29 +175,35 @@ class CollectionEngine extends BaseEngine {
                 {
                     if($self->exactWordSearch)
                     {
-                        if($value === $search)
-                            return true;
+                        if($toSearch[$i] === $search)
+                            $stack[$i] = true;
                     }
                     else
                     {
-                        if(str_contains($search,$value))
-                            return true;
+                        if(str_contains($search,$toSearch[$i]))
+                            $stack[$i] = true;
                     }
                 }
                 else
                 {
                     if($self->getExactWordSearch())
                     {
-                        if(strtolower($value) === strtolower($search))
-                            return true;
+                        if(mb_strtolower($toSearch[$i]) === mb_strtolower($search))
+                            $stack[$i] = true;
                     }
                     else
                     {
-                        if(str_contains(strtolower($search),strtolower($value)))
-                            return true;
+                        if(str_contains(mb_strtolower($search),mb_strtolower($toSearch[$i])))
+                            $stack[$i] = true;
                     }
                 }
             }
+
+            $result = array_diff_key(array_filter($toSearch), $stack);
+
+            if(empty($result))
+                return true;
+
         });
     }
 
