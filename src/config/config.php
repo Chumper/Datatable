@@ -132,7 +132,12 @@ return array(
         */
 
         'exactWordSearch' => false,
-
+        /*
+        |--------------------------------------------------------------------------
+        | Limit display when iDisplayLength invaild
+        |--------------------------------------------------------------------------
+        */
+        'defaultDisplayLength' => 10,
     )
 
 
