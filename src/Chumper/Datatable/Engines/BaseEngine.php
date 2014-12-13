@@ -123,12 +123,16 @@ abstract class BaseEngine {
      */
     protected $exactWordSearch = false;
 
-
+    /**
+     * @var bool If you need to display all records.
+     */
+    protected $enableDisplayAll = false;
     function __construct()
     {
         $this->columns = new Collection();
         $this->config = Config::get('datatable::engine');
         $this->setExactWordSearch( $this->config['exactWordSearch'] );
+        $this->setEnableDisplayAll( $this->config['enableDisplayAll'] );
         return $this;
     }
 
@@ -308,13 +312,18 @@ abstract class BaseEngine {
         $this->aliasMapping = $value;
         return $this;
     }
-
+    
     public function setExactWordSearch($value = true)
     {
         $this->exactWordSearch = $value;
         return $this;
     }
     
+    public function setEnableDisplayAll($value = true)
+    {
+        $this->enableDisplayAll = $value;
+        return $this;
+    }
     /**
      * @param $columnNames Sets up a lookup table for which columns should use exact matching -sburkett
      * @return $this
@@ -346,6 +355,11 @@ abstract class BaseEngine {
     {
         return $this->aliasMapping;
     }
+    
+    public function getEnableDisplayAll()
+    {
+        return $this->enableDisplayAll;
+    }
     //-------------protected functionS-------------------
 
     /**
@@ -365,11 +379,17 @@ abstract class BaseEngine {
         //limit nicht am query, sondern den ganzen
         //holen und dann dynamisch in der Collection taken und skippen
         // fix dispaly all when iDisplayLength choosed unlimit.
-        if(is_numeric($value) && $value > -1){
-            $this->take($value);
-        }else{
-            $this->take($this->config['defaultDisplayLength']);
+        if(is_numeric($value)){
+            if($value > -1){
+                $this->take($value);
+                return;// jmp
+            }else if($value == -1 && $this->enableDisplayAll){
+                // Display All.
+                return;// jmp
+            }
         }
+        // iDisplayLength invalid!
+        $this->take($this->config['defaultDisplayLength']);
     }
 
     /**
