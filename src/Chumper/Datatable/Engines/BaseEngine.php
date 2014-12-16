@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Config;
 
-
 /**
  * Class BaseEngine
  * @package Chumper\Datatable\Engines
@@ -131,8 +130,8 @@ abstract class BaseEngine {
     {
         $this->columns = new Collection();
         $this->config = Config::get('datatable::engine');
-        $this->setExactWordSearch( $this->config['exactWordSearch'] );
-        $this->setEnableDisplayAll( $this->config['enableDisplayAll'] );
+        $this->setExactWordSearch( isset($this->config['exactWordSearch'])? $this->config['exactWordSearch'] : false );
+        $this->setEnableDisplayAll( isset($this->config['enableDisplayAll'])? $this->config['enableDisplayAll'] : false  );
         return $this;
     }
 
@@ -389,7 +388,7 @@ abstract class BaseEngine {
             }
         }
         // iDisplayLength invalid!
-        $this->take($this->config['defaultDisplayLength']);
+        $this->take(isset($this->config['defaultDisplayLength'])? $this->config['defaultDisplayLength'] : 10);
     }
 
     /**
