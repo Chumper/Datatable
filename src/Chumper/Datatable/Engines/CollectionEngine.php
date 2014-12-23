@@ -23,6 +23,17 @@ class CollectionEngine extends BaseEngine {
     private $collection;
 
     /**
+     * @var string
+     */
+    const OR_CONDITION = 'OR';
+
+    /**
+     * @var string
+     */
+    const AND_CONDITION = 'AND';
+
+
+    /**
      * @var array Different options
      */
     private $options = array(
@@ -88,9 +99,9 @@ class CollectionEngine extends BaseEngine {
         return $this;
     }
 
-    public function stripOrder($callback = true)
+    public function stripOrder()
     {
-        $this->options['stripOrder'] = $callback;
+        $this->options['stripOrder'] = true;
         return $this;
     }
 
@@ -100,9 +111,10 @@ class CollectionEngine extends BaseEngine {
         return $this;
     }
 
-    public function setOrderStrip($callback = true)
+    public function setOrderStrip()
     {
-        return $this->stripOrder($callback);
+        $this->options['stripOrder'] = true;
+        return $this;
     }
 
     public function setCaseSensitive($value)
@@ -128,7 +140,7 @@ class CollectionEngine extends BaseEngine {
 
     private function doInternalSearch(Collection $columns, array $searchColumns)
     {
-        if(is_null($this->search) or empty($this->search))
+        if((is_null($this->search) || empty($this->search)) && empty($this->fieldSearches))
             return;
 
         $value = $this->search;
@@ -136,23 +148,37 @@ class CollectionEngine extends BaseEngine {
 
         $toSearch = array();
 
+        $searchType = self::AND_CONDITION;
+
         // Map the searchColumns to the real columns
         $ii = 0;
         foreach($columns as $i => $col)
         {
-            if(in_array($columns->get($i)->getName(), $searchColumns))
+            if(in_array($columns->get($i)->getName(), $searchColumns) || in_array($columns->get($i)->getName(), $this->fieldSearches))
             {
-                $toSearch[] = $ii;
+                // map values to columns, where there is no value use the global value
+                if(($field = array_search($columns->get($i)->getName(), $this->fieldSearches)) !== FALSE)
+                {
+                    $toSearch[$ii] = $this->columnSearches[$field];
+                }
+                else
+                {
+                    if($value)
+                        $searchType = self::OR_CONDITION;
+
+                    $toSearch[$ii] = $value;
+                }
             }
             $ii++;
         }
 
         $self = $this;
-        $this->workingCollection = $this->workingCollection->filter(function($row) use ($value, $toSearch, $caseSensitive, $self)
+        $this->workingCollection = $this->workingCollection->filter(function($row) use ($value, $toSearch, $caseSensitive, $self, $searchType)
         {
-            for($i = 0; $i < count($row); $i++)
+
+            for($i=0, $stack=array(), $nb=count($row); $i<$nb; $i++)
             {
-                if(!in_array($i, $toSearch))
+                if(!array_key_exists($i, $toSearch))
                     continue;
 
                 $column = $i;
@@ -173,28 +199,41 @@ class CollectionEngine extends BaseEngine {
                 {
                     if($self->exactWordSearch)
                     {
-                        if($value === $search)
-                            return true;
+                        if($toSearch[$i] === $search)
+                            $stack[$i] = true;
                     }
                     else
                     {
-                        if(str_contains($search,$value))
-                            return true;
+                        if(str_contains($search,$toSearch[$i]))
+                            $stack[$i] = true;
                     }
                 }
                 else
                 {
                     if($self->getExactWordSearch())
                     {
-                        if(strtolower($value) === strtolower($search))
-                            return true;
+                        if(mb_strtolower($toSearch[$i]) === mb_strtolower($search))
+                            $stack[$i] = true;
                     }
                     else
                     {
-                        if(str_contains(strtolower($search),strtolower($value)))
-                            return true;
+                        if(str_contains(mb_strtolower($search),mb_strtolower($toSearch[$i])))
+                            $stack[$i] = true;
                     }
                 }
+            }
+
+            if($searchType == $self::AND_CONDITION)
+            {
+                $result = array_diff_key(array_filter($toSearch), $stack);
+
+                if(empty($result))
+                    return true;
+            }
+            else
+            {
+                if(!empty($stack))
+                    return true;
             }
         });
     }
@@ -215,17 +254,13 @@ class CollectionEngine extends BaseEngine {
             }
             if($stripOrder)
             {
-                if(is_callable($stripOrder)){
-                    return $stripOrder($row, $column);
-                }else{
-                    return strip_tags($row[$column]);
-                }
+                return strip_tags($row[$column]);
             }
             else
             {
                 return $row[$column];
             }
-        }, SORT_NATURAL);
+        });
 
         if($this->orderDirection == BaseEngine::ORDER_DESC)
             $this->workingCollection = $this->workingCollection->reverse();
@@ -245,10 +280,6 @@ class CollectionEngine extends BaseEngine {
             if(!is_null($self->getRowId()) && is_callable($self->getRowId()))
             {
                 $entry['DT_RowId'] = call_user_func($self->getRowId(),$row);
-            }
-            if(!is_null($self->getRowData()) && is_callable($self->getRowData()))
-            {
-                $entry['DT_RowData'] = call_user_func($self->getRowData(),$row);
             }
             $i=0;
             foreach ($columns as $col)
