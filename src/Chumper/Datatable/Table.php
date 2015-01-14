@@ -279,9 +279,10 @@ class Table {
 
     /**
      * @param null $view
+     * @param array $additional_template_variables
      * @return mixed
      */
-    public function render($view = null)
+    public function render($view = null, array $additional_template_variables = null)
     {
         if( ! is_null($view))
             $this->table_view = $view;
@@ -297,7 +298,7 @@ class Table {
             $this->createMapping();
         }
 
-        return View::make($this->table_view,array(
+        $template_variables = array (
             'options'   => $this->options,
             'callbacks' => $this->callbacks,
             'values'    => $this->customValues,
@@ -306,7 +307,13 @@ class Table {
             'noScript'  => $this->noScript,
             'id'        => $this->idName,
             'class'     => $this->className,
-        ));
+        );
+
+        if (is_array($additional_template_variables)) {
+            $template_variables += $additional_template_variables;
+        }
+
+        return View::make($this->table_view, $template_variables);
     }
 
     /**
