@@ -122,6 +122,7 @@ class Table {
     }
 
     /**
+     * Count the number of columns in the datatable.
      * @return int
      */
     public function countColumns()
@@ -130,6 +131,9 @@ class Table {
     }
 
     /**
+     * Remove an option item from the options array
+     *
+     * @param string $key the name of the key to remove from the options.
      * @return $this
      */
     public function removeOption($key)
@@ -139,6 +143,8 @@ class Table {
     }
 
     /**
+     * Set a single option or an array of options for the jquery call
+     *
      * @return $this
      * @throws \Exception
      */
@@ -327,6 +333,10 @@ class Table {
         return $this;
     }
 
+    /**
+     * @param null $view
+     * @return mixed
+     */
     public function script($view = null)
     {
         if( ! is_null($view))
@@ -345,29 +355,51 @@ class Table {
         ));
     }
 
+    /**
+     * @return String
+     */
     public function getId()
     {
         return $this->idName;
     }
 
+    /**
+     * @param string $id
+     * @return $this
+     */
     public function setId($id = '')
     {
         $this->idName = empty($id)? str_random(8) : $id;
         return $this;
     }
 
+    /**
+     * @return String
+     */
     public function getClass()
     {
         return $this->className;
     }
 
+    /**
+     * Set the name of the class that will be used by the datatable.
+     *
+     * @param $class the name of the class
+     * @return $this
+     */
     public function setClass($class)
     {
         $this->className = $class;
         return $this;
     }
 
-    public function setAliasMapping($value)
+    /**
+     * Advise the Datatable to return the data mapped with the column name.
+     *
+     * @param bool $value explicitly set if the table should be aliased or not
+     * @return $this
+     */
+    public function setAliasMapping($value = true)
     {
         $this->createdMapping = !$value;
         return $this;
@@ -375,6 +407,9 @@ class Table {
 
     //--------------------PRIVATE FUNCTIONS
 
+    /**
+     * @return array
+     */
     private function createMapping()
     {
         // set options for better handling
