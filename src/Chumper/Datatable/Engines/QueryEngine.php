@@ -153,11 +153,11 @@ class QueryEngine extends BaseEngine {
     private function doInternalSearch($builder, $columns)
     {
         if (!empty($this->search)) {
-            $this->buildSearchQuery($builder, $columns);
+            $builder = $this->buildSearchQuery($builder, $columns);
         }
 
         if (!empty($this->columnSearches)) {
-            $this->buildSingleColumnSearches($builder);
+            $builder = $this->buildSingleColumnSearches($builder);
         }
 
         return $builder;
