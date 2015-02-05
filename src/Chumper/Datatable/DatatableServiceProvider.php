@@ -12,11 +12,6 @@ class DatatableServiceProvider extends ServiceProvider {
 	 */
 	protected $defer = false;
 
-    public function boot()
-    {
-        $this->package('chumper/datatable');
-    }
-
     /**
 	 * Register the service provider.
 	 *
