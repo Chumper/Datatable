@@ -23,5 +23,5 @@
 </table>
 
 @if (!$noScript)
-    @include(Config::get('datatable::table.script_view'), array('id' => $id, 'options' => $options, 'callbacks' =>  $callbacks))
+    @include(Config::get('chumper_datatable.table.script_view'), array('id' => $id, 'options' => $options, 'callbacks' =>  $callbacks))
 @endif

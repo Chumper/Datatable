@@ -13,6 +13,18 @@ class DatatableServiceProvider extends ServiceProvider {
 	protected $defer = false;
 
     /**
+     * Bootstrap the application events.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+        $this->publishes([
+            __DIR__.'/../../config/config.php' => config_path('packages/chumper_datatable.php'),
+        ]);
+    }
+
+    /**
 	 * Register the service provider.
 	 *
 	 * @return void

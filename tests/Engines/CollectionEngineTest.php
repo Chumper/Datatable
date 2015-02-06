@@ -26,7 +26,7 @@ class CollectionEngineTest extends TestCase {
 
     public function setUp()
     {
-        Config::shouldReceive('get')->zeroOrMoreTimes()->with("datatable::engine")->andReturn(
+        Config::shouldReceive('get')->zeroOrMoreTimes()->with("chumper_datatable.engine")->andReturn(
             array(
                 'exactWordSearch' => false,
             )
@@ -34,7 +34,7 @@ class CollectionEngineTest extends TestCase {
 
         parent::setUp();
 
-        Config::shouldReceive('get')->zeroOrMoreTimes()->with("datatable::engine")->andReturn(
+        Config::shouldReceive('get')->zeroOrMoreTimes()->with("chumper_datatable.engine")->andReturn(
             array(
                 'exactWordSearch' => false,
             )

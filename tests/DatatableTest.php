@@ -14,12 +14,12 @@ class DatatableTest extends PHPUnit_Framework_TestCase {
     protected function setUp()
     {
         // set up config
-        Config::shouldReceive('get')->zeroOrMoreTimes()->with("datatable::engine")->andReturn(
+        Config::shouldReceive('get')->zeroOrMoreTimes()->with("chumper_datatable.engine")->andReturn(
             array(
                 'exactWordSearch' => false,
             )
         );
-        Config::shouldReceive('get')->zeroOrMoreTimes()->with("datatable::table")->andReturn(
+        Config::shouldReceive('get')->zeroOrMoreTimes()->with("chumper_datatable.table")->andReturn(
             array(
                 'class' => 'table table-bordered',
                 'id' => '',
