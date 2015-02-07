@@ -1,13 +1,15 @@
 <?php namespace Chumper\Datatable\Engines;
 
+use Exception;
 use Assetic\Extension\Twig\AsseticFilterFunction;
 use Chumper\Datatable\Columns\DateColumn;
 use Chumper\Datatable\Columns\FunctionColumn;
 use Chumper\Datatable\Columns\TextColumn;
-use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Config;
+
 
 /**
  * Class BaseEngine
@@ -17,6 +19,11 @@ abstract class BaseEngine {
 
     const ORDER_ASC = 'asc';
     const ORDER_DESC = 'desc';
+
+    /**
+     * @var array
+     */
+    protected $config = array();
 
     /**
      * @var mixed
@@ -31,12 +38,30 @@ abstract class BaseEngine {
     /**
      * @var array
      */
+    protected $rowData = null;
+
+    /**
+     * @var array
+     */
     protected $columnSearches = array();
+
+    /**
+     * @var array
+     * support for DB::raw fields on where
+     */
+    protected $fieldSearches = array();
+
+    /**
+     * @var array
+     * support for DB::raw fields on where
+     * sburkett - added for column-based exact matching                                                                                                            
+     */                                                                                                                                                            
+    protected $columnSearchExact = array(); 
 
     /**
      * @var
      */
-    private $sEcho;
+    protected  $sEcho;
 
     /**
      * @var \Illuminate\Support\Collection
@@ -46,17 +71,17 @@ abstract class BaseEngine {
     /**
      * @var array
      */
-    private $searchColumns = array();
+    protected  $searchColumns = array();
 
     /**
      * @var array
      */
-    private $showColumns = array();
+    protected $showColumns = array();
 
     /**
      * @var array
      */
-    private $orderColumns = array();
+    protected  $orderColumns = array();
 
     /**
      * @var int
@@ -75,6 +100,11 @@ abstract class BaseEngine {
 
     /**
      * @var null
+     * Will be an array if order is set
+     * array(
+     *  0 => column
+     *  1 => name:cast:length
+     * )
      */
     protected $orderColumn = null;
 
@@ -97,7 +127,8 @@ abstract class BaseEngine {
     function __construct()
     {
         $this->columns = new Collection();
-        $this->className = str_random(8);
+        $this->config = Config::get('chumper_datatable.engine');
+        $this->setExactWordSearch( $this->config['exactWordSearch'] );
         return $this;
     }
 
@@ -186,7 +217,9 @@ abstract class BaseEngine {
             }
             else
             {
-                $this->columns->put($property, new FunctionColumn($property, function($model) use($property){return is_array($model)?$model[$property]:$model->$property;}));
+                $this->columns->put($property, new FunctionColumn($property, function($model) use($property){
+                    try{return is_array($model)?$model[$property]:$model->$property;}catch(Exception $e){return null;}    
+                }));
             }
             $this->showColumns[] = $property;
         }
@@ -221,11 +254,8 @@ abstract class BaseEngine {
             $cols = func_get_args();
         }
 
-        $this->searchColumns = array();
+        $this->searchColumns = $cols;
 
-        foreach ($cols as $property) {
-            $this->searchColumns[] = $property;
-        }
         return $this;
     }
 
@@ -239,11 +269,7 @@ abstract class BaseEngine {
             $cols = func_get_args();
         }
 
-        $this->orderColumns = array();
-
-        foreach ($cols as $property) {
-            $this->orderColumns[] = $property;
-        }
+        $this->orderColumns = $cols;
         return $this;
     }
 
@@ -267,23 +293,65 @@ abstract class BaseEngine {
         return $this;
     }
 
-    public function setAliasMapping()
+    /**
+     * @param $function Set a function for dynamic html5 data attributes
+     * @return $this
+     */
+    public function setRowData($function)
     {
-        $this->aliasMapping = true;
+        $this->rowData = $function;
         return $this;
     }
 
-    public function setExactWordSearch()
+    public function setAliasMapping($value = true)
     {
-        $this->exactWordSearch = true;
+        $this->aliasMapping = $value;
         return $this;
     }
-    //-------------PRIVATE FUNCTIONS-------------------
+
+    public function setExactWordSearch($value = true)
+    {
+        $this->exactWordSearch = $value;
+        return $this;
+    }
+    
+    /**
+     * @param $columnNames Sets up a lookup table for which columns should use exact matching -sburkett
+     * @return $this
+     */
+    public function setExactMatchColumns($columnNames)
+    {
+      foreach($columnNames as $columnIndex)
+        $this->columnSearchExact[ $columnIndex ] = true;
+
+      return $this;
+    }
+
+    public function getRowClass()
+    {
+        return $this->rowClass;
+    }
+
+    public function getRowId()
+    {
+        return $this->rowId;
+    }
+
+    public function getRowData()
+    {
+        return $this->rowData;
+    }
+
+    public function getAliasMapping()
+    {
+        return $this->aliasMapping;
+    }
+    //-------------protected functionS-------------------
 
     /**
      * @param $value
      */
-    private function handleiDisplayStart($value)
+    protected function handleiDisplayStart($value)
     {
         //skip
         $this->skip($value);
@@ -292,7 +360,7 @@ abstract class BaseEngine {
     /**
      * @param $value
      */
-    private function handleiDisplayLength($value)
+    protected function handleiDisplayLength($value)
     {
         //limit nicht am query, sondern den ganzen
         //holen und dann dynamisch in der Collection taken und skippen
@@ -302,7 +370,7 @@ abstract class BaseEngine {
     /**
      * @param $value
      */
-    private function handlesEcho($value)
+    protected function handlesEcho($value)
     {
         $this->sEcho = $value;
     }
@@ -310,16 +378,17 @@ abstract class BaseEngine {
     /**
      * @param $value
      */
-    private function handlesSearch($value)
+    protected function handlesSearch($value)
     {
         //handle search on columns sSearch, bRegex
         $this->search($value);
     }
 
+
     /**
      * @param $value
      */
-    private function handleiSortCol_0($value)
+    protected function handleiSortCol_0($value)
     {
         if(Input::get('sSortDir_0') == 'desc')
             $direction = BaseEngine::ORDER_DESC;
@@ -329,16 +398,30 @@ abstract class BaseEngine {
         //check if order is allowed
         if(empty($this->orderColumns))
         {
-            $this->order($value, $direction);
+            $this->order(array(0 => $value, 1 => $this->getNameByIndex($value)), $direction);
             return;
+        }
+
+        //prepare order array
+        $cleanNames = array();
+        foreach($this->orderColumns as $c)
+        {
+            if(strpos($c,':') !== FALSE)
+            {
+                $cleanNames[] = substr($c, 0, strpos($c,':'));
+            }
+            else
+            {
+                $cleanNames[] = $c;
+            }
         }
 
         $i = 0;
         foreach($this->columns as $name => $column)
         {
-            if($i == $value && in_array($name, $this->orderColumns))
+            if($i == $value && in_array($name, $cleanNames))
             {
-                $this->order($value, $direction);
+                $this->order(array(0 => $value, 1 => $this->orderColumns[array_search($name,$cleanNames)]), $direction);
                 return;
             }
             $i++;
@@ -351,10 +434,11 @@ abstract class BaseEngine {
      *
      * @return void
      */
-    private function handleSingleColumnSearch($columnIndex, $searchValue)
+    protected function handleSingleColumnSearch($columnIndex, $searchValue)
     {
+        //dd($columnIndex, $searchValue, $this->searchColumns);
         if (!isset($this->searchColumns[$columnIndex])) return;
-        if (empty($searchValue)) return;
+        if (empty($searchValue) && $searchValue !== '0') return;
 
         $columnName = $this->searchColumns[$columnIndex];
         $this->searchOnColumn($columnName, $searchValue);
@@ -386,13 +470,13 @@ abstract class BaseEngine {
      *
      * @return bool
      */
-    private function isParameterForSingleColumnSearch($parameterName)
+    protected function isParameterForSingleColumnSearch($parameterName)
     {
         static $parameterNamePrefix = 'sSearch_';
         return str_contains($parameterName, $parameterNamePrefix);
     }
 
-    private function prepareSearchColumns()
+    protected function prepareSearchColumns()
     {
         if(count($this->searchColumns) == 0 || empty($this->searchColumns))
             $this->searchColumns = $this->showColumns;
@@ -402,7 +486,7 @@ abstract class BaseEngine {
      * @param $column
      * @param $order
      */
-    private function order($column, $order = BaseEngine::ORDER_ASC)
+    protected function order($column, $order = BaseEngine::ORDER_ASC)
     {
         $this->orderColumn = $column;
         $this->orderDirection = $order;
@@ -411,7 +495,7 @@ abstract class BaseEngine {
     /**
      * @param $value
      */
-    private function search($value)
+    protected function search($value)
     {
         $this->search = $value;
     }
@@ -420,15 +504,16 @@ abstract class BaseEngine {
      * @param string $columnName
      * @param mixed $value
      */
-    private function searchOnColumn($columnName, $value)
+    protected function searchOnColumn($columnName, $value)
     {
-        $this->columnSearches[$columnName] = $value;
+        $this->fieldSearches[] = $columnName;
+        $this->columnSearches[] = $value;
     }
 
     /**
      * @param $value
      */
-    private function skip($value)
+    protected function skip($value)
     {
         $this->skip = $value;
     }
@@ -436,12 +521,12 @@ abstract class BaseEngine {
     /**
      * @param $value
      */
-    private function take($value)
+    protected function take($value)
     {
         $this->limit = $value;
     }
 
-    protected function getNameByIndex($index)
+    public function getNameByIndex($index)
     {
         $i = 0;
         foreach($this->columns as $name => $col)
@@ -454,7 +539,12 @@ abstract class BaseEngine {
         }
     }
 
+    public function getExactWordSearch()
+    {
+        return $this->exactWordSearch;
+    }
+
     abstract protected function totalCount();
     abstract protected function count();
     abstract protected function internalMake(Collection $columns, array $searchColumns = array());
-} 
+}

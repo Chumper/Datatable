@@ -88,9 +88,9 @@ class CollectionEngine extends BaseEngine {
         return $this;
     }
 
-    public function stripOrder()
+    public function stripOrder($callback = true)
     {
-        $this->options['stripOrder'] = true;
+        $this->options['stripOrder'] = $callback;
         return $this;
     }
 
@@ -100,10 +100,9 @@ class CollectionEngine extends BaseEngine {
         return $this;
     }
 
-    public function setOrderStrip()
+    public function setOrderStrip($callback = true)
     {
-        $this->options['stripOrder'] = true;
-        return $this;
+        return $this->stripOrder($callback);
     }
 
     public function setCaseSensitive($value)
@@ -112,6 +111,10 @@ class CollectionEngine extends BaseEngine {
         return $this;
     }
 
+    public function getOption($value)
+    {
+        return $this->options[$value];
+    }
     //--------------PRIVATE FUNCTIONS-----------------
 
     protected function internalMake(Collection $columns, array $searchColumns = array())
@@ -153,12 +156,12 @@ class CollectionEngine extends BaseEngine {
                     continue;
 
                 $column = $i;
-                if($self->aliasMapping)
+                if($self->getAliasMapping())
                 {
                     $column = $self->getNameByIndex($i);
                 }
 
-                if($this->options['stripSearch'])
+                if($self->getOption('stripSearch'))
                 {
                     $search = strip_tags($row[$column]);
                 }
@@ -181,7 +184,7 @@ class CollectionEngine extends BaseEngine {
                 }
                 else
                 {
-                    if($self->exactWordSearch)
+                    if($self->getExactWordSearch())
                     {
                         if(strtolower($value) === strtolower($search))
                             return true;
@@ -201,24 +204,28 @@ class CollectionEngine extends BaseEngine {
         if(is_null($this->orderColumn))
             return;
 
-        $column = $this->orderColumn;
+        $column = $this->orderColumn[0];
         $stripOrder = $this->options['stripOrder'];
         $self = $this;
         $this->workingCollection->sortBy(function($row) use ($column,$stripOrder,$self) {
 
-            if($self->aliasMapping)
+            if($self->getAliasMapping())
             {
                 $column = $self->getNameByIndex($column);
             }
             if($stripOrder)
             {
-                return strip_tags($row[$column]);
+                if(is_callable($stripOrder)){
+                    return $stripOrder($row, $column);
+                }else{
+                    return strip_tags($row[$column]);
+                }
             }
             else
             {
                 return $row[$column];
             }
-        });
+        }, SORT_NATURAL);
 
         if($this->orderDirection == BaseEngine::ORDER_DESC)
             $this->workingCollection = $this->workingCollection->reverse();
@@ -231,18 +238,22 @@ class CollectionEngine extends BaseEngine {
             $entry = array();
 
             // add class and id if needed
-            if(!is_null($self->rowClass) && is_callable($self->rowClass))
+            if(!is_null($self->getRowClass()) && is_callable($self->getRowClass()))
             {
-                $entry['DT_RowClass'] = call_user_func($self->rowClass,$row);
+                $entry['DT_RowClass'] = call_user_func($self->getRowClass(),$row);
             }
-            if(!is_null($self->rowId) && is_callable($self->rowId))
+            if(!is_null($self->getRowId()) && is_callable($self->getRowId()))
             {
-                $entry['DT_RowId'] = call_user_func($self->rowId,$row);
+                $entry['DT_RowId'] = call_user_func($self->getRowId(),$row);
+            }
+            if(!is_null($self->getRowData()) && is_callable($self->getRowData()))
+            {
+                $entry['DT_RowData'] = call_user_func($self->getRowData(),$row);
             }
             $i=0;
             foreach ($columns as $col)
             {
-                if($self->aliasMapping)
+                if($self->getAliasMapping())
                 {
                     $entry[$col->getName()] =  $col->run($row);
                 }

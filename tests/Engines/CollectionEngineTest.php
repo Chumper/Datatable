@@ -5,6 +5,7 @@ use Chumper\Datatable\Engines\CollectionEngine;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Input;
 use Orchestra\Testbench\TestCase;
+use Illuminate\Support\Facades\Config;
 
 class CollectionEngineTest extends TestCase {
 
@@ -25,7 +26,19 @@ class CollectionEngineTest extends TestCase {
 
     public function setUp()
     {
+        Config::shouldReceive('get')->zeroOrMoreTimes()->with("chumper_datatable.engine")->andReturn(
+            array(
+                'exactWordSearch' => false,
+            )
+        );
+
         parent::setUp();
+
+        Config::shouldReceive('get')->zeroOrMoreTimes()->with("chumper_datatable.engine")->andReturn(
+            array(
+                'exactWordSearch' => false,
+            )
+        );
 
         $this->collection = Mockery::mock('Illuminate\Support\Collection');
         $this->c = new CollectionEngine($this->collection);
@@ -33,7 +46,6 @@ class CollectionEngineTest extends TestCase {
 
     public function testOrder()
     {
-
         $should = array(
             array(
                 'id' => 'eoo'
