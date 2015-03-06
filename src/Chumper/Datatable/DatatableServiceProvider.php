@@ -22,6 +22,8 @@ class DatatableServiceProvider extends ServiceProvider {
         $this->publishes([
             __DIR__.'/../../config/config.php' => config_path('packages/chumper_datatable.php'),
         ]);
+
+        $this->loadViewsFrom(__DIR__.'/../../', 'Chumper');
     }
 
     /**
