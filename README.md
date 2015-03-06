@@ -1,26 +1,12 @@
 Datatable
 =========
 
-This is a __laravel 4 package__ for the server and client side of datatables at http://datatables.net/
+This is a __laravel 5 package__ for the server and client side of datatables at http://datatables.net/
 
 I developed this package because i was not happy with the only existing package at https://github.com/bllim/laravel4-datatables-package
 so i developed this package which in my opinion is superior.
 
 ![Image](https://raw.githubusercontent.com/Chumper/Datatable/master/datatable.jpg)
-
-##Important
-
-If you upgrade from version 2.1.* or below please make sure you adjust your app.php with the new alias:
-
-```php
-    // aliases array:
-
-    //old
-    //'Datatable' => 'Chumper\Datatable\Facades\Datatable',
-
-    //new
-    'Datatable' => 'Chumper\Datatable\Facades\DatatableFacade',
-```
 
 ##Known Issues
 
@@ -66,27 +52,23 @@ I would be really thankful if you can provide a test that points to the issue.
 ##Installation
 
 This package is available on http://packagist.org, just add it to your composer.json
-
-	"chumper/datatable": "2.*"
-
-It also has a ServiceProvider for usage in Laravel4. Add these lines to app.php:
+```
+        "chumper/datatable": "dev-develop"
+```
+In Config/App.php: Add line Provider:
 
 ```php
-    // providers array:
-	'Chumper\Datatable\DatatableServiceProvider',
 
-    // aliases array:
+        'Chumper\Datatable\DatatableServiceProvider',
+```
+Add line Alias:
+```php
+
+    //new
     'Datatable' => 'Chumper\Datatable\Facades\DatatableFacade',
 ```
 
 You can then access it under the `Datatable` alias.
-
-To override the default configuration options you can publish the config file.
-
-    php artisan config:publish chumper/datatable
-
-You may now edit these options at app/config/packages/chumper/datatable/config.php.
-
 
 ##Basic Usage
 
