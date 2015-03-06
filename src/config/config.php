@@ -93,7 +93,7 @@ return array(
         |
         */
 
-        'table_view' => 'datatable::template',
+        'table_view' => 'chumper.datatable::template',
 
 
         /*
@@ -106,7 +106,7 @@ return array(
         |
         */
 
-        'script_view' => 'datatable::javascript',
+        'script_view' => 'chumper.datatable::javascript',
 
 
     ),
