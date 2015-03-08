@@ -65,6 +65,10 @@ class QueryEngine extends BaseEngine {
 
     public function totalCount()
     {
+        if ($this->options['distinctCountGroup'])
+        {
+            $this->originalBuilder->groups = null;
+        }
         return $this->originalBuilder->count();
     }
 
