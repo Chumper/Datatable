@@ -14,7 +14,7 @@ class TableTest extends PHPUnit_Framework_TestCase {
     {
         parent::setUp();
 
-        Config::shouldReceive('get')->zeroOrMoreTimes()->with("chumper_datatable.table")->andReturn(
+        Config::shouldReceive('get')->zeroOrMoreTimes()->with("chumper.datatable.table")->andReturn(
             array(
                 'class' => 'table table-bordered',
                 'id' => '',
