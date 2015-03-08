@@ -40,6 +40,7 @@ class QueryEngine extends BaseEngine {
         'orderOrder'        =>  null,
         'counter'           =>  0,
         'noGroupByOnCount'  =>  false,
+        'distinctCountGroup'=>  false,
     );
 
     function __construct($builder)
@@ -97,6 +98,21 @@ class QueryEngine extends BaseEngine {
         return $this;
     }
 
+    /**
+     * Change the COUNT(*) when there is a group by
+     *
+     * setDistinctIfGroup will change the count(*) query inside the query builder if it only finds one group by.
+     *
+     * Instead of counting all of the rows, the distinct rows in the group by will be counted instead.
+     *
+     * @return $this
+     */
+    public function setDistinctIfGroup()
+    {
+        $this->options['distinctCountGroup'] = true;
+        return $this;
+    }
+
     //--------PRIVATE FUNCTIONS
 
     protected function internalMake(Collection $columns, array $searchColumns = array())
@@ -107,7 +123,24 @@ class QueryEngine extends BaseEngine {
         $builder = $this->doInternalSearch($builder, $searchColumns);
         $countBuilder = $this->doInternalSearch($countBuilder, $searchColumns);
 
-        if($this->options['searchWithAlias'])
+        if ($this->options['distinctCountGroup'])
+        {
+            if (count($countBuilder->groups) == 1)
+            {
+                $countBuilder->select(\DB::raw('COUNT(DISTINCT `' . $countBuilder->groups[0] . '`) as total'));
+                $countBuilder->groups = null;
+
+
+                $results = $countBuilder->get('rows');
+                if (isset($results[0]))
+                {
+                    $result = array_change_key_case((array) $results[0]);
+
+                }
+                $this->options['counter'] = $result['total'];
+            }
+        }
+        elseif($this->options['searchWithAlias'] and !isset($this->options['counter']))
         {
             $this->options['counter'] = count($countBuilder->get());
         }
