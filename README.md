@@ -592,7 +592,7 @@ Defines the order that a datatable will be ordered by on first page load.
 ##Extras
 Some extras features, using the Datatables api.
 
-### - TableTools
+### TableTools
 
 To use TableTools you will need to add some files in your project (https://datatables.net/extensions/tabletools/), if you want some help download the datatable's package and inside the extension folder go to /tabletools and study the examples. After, all the files include, don't forget to pass the parameters like this:
 
@@ -603,13 +603,15 @@ To use TableTools you will need to add some files in your project (https://datat
     Datatable::table()
         ->addColumn('your columns here separated by comma')
         ->setUrl('your URL for server side')
-        ->setOptions(array(
-                            'dom' =>"T<'clear'>lfrtip",
-                            'tabletools' => array(
-                                                    "aSwfPath" => "your/path/to/swf/copy_csv_cls_pdf.swf",
-                                                    "aButtons" => array("copy", "pdf", "xls")
-                                                )
-                    ))
+        ->setOptions(
+            array(
+                'dom' =>"T<'clear'>lfrtip",
+                'tableTools' => array(
+                    "sSwfPath" => "your/path/to/swf/copy_csv_cls_pdf.swf",
+                    "aButtons" => array("copy", "pdf", "xls")
+                )
+            )
+        )
 }}
 
 ```
