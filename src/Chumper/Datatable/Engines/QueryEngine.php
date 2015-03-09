@@ -65,7 +65,7 @@ class QueryEngine extends BaseEngine {
 
     public function totalCount()
     {
-        if ($this->options['distinctCountGroup'])
+        if ($this->options['distinctCountGroup'] && count($this->originalBuilder->groups) == 1)
         {
             $this->originalBuilder->groups = null;
         }
@@ -127,24 +127,20 @@ class QueryEngine extends BaseEngine {
         $builder = $this->doInternalSearch($builder, $searchColumns);
         $countBuilder = $this->doInternalSearch($countBuilder, $searchColumns);
 
-        if ($this->options['distinctCountGroup'])
+        if ($this->options['distinctCountGroup'] && count($countBuilder->groups) == 1)
         {
-            if (count($countBuilder->groups) == 1)
+            $countBuilder->select(\DB::raw('COUNT(DISTINCT `' . $countBuilder->groups[0] . '`) as total'));
+            $countBuilder->groups = null;
+
+            $results = $countBuilder->get('rows');
+            if (isset($results[0]))
             {
-                $countBuilder->select(\DB::raw('COUNT(DISTINCT `' . $countBuilder->groups[0] . '`) as total'));
-                $countBuilder->groups = null;
+                $result = array_change_key_case((array) $results[0]);
 
-
-                $results = $countBuilder->get('rows');
-                if (isset($results[0]))
-                {
-                    $result = array_change_key_case((array) $results[0]);
-
-                }
-                $this->options['counter'] = $result['total'];
             }
+            $this->options['counter'] = $result['total'];
         }
-        elseif($this->options['searchWithAlias'] and !isset($this->options['counter']))
+        elseif($this->options['searchWithAlias'])
         {
             $this->options['counter'] = count($countBuilder->get());
         }
