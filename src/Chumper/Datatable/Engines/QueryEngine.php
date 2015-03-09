@@ -111,9 +111,9 @@ class QueryEngine extends BaseEngine {
      *
      * @return $this
      */
-    public function setDistinctIfGroup()
+    public function setDistinctCountGroup($value = true)
     {
-        $this->options['distinctCountGroup'] = true;
+        $this->options['distinctCountGroup'] = $value;
         return $this;
     }
 

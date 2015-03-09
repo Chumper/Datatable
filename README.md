@@ -415,6 +415,11 @@ With this flag you enable aliases in the search part (email2 in searchColumns).
 
 Please be aware that this flag will slow down your application, since we are getting the results back twice to count them manually.
 
+**setDistinctCountGroup($value = true)**
+
+If you are using `GROUP BY`'s inside the query that you are passing into the Datatable, then you may receive incorrect
+totals from your SQL engine. Setting setDistinctCountGroup (__which most likely only works on MySQL__) will ensure that
+the totals are based on your GROUP BY.
 
 **setSearchOperator($value = "LIKE")**
 
