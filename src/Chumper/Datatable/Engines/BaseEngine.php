@@ -412,9 +412,9 @@ abstract class BaseEngine {
     /**
      * @param $value
      */
-    protected function handleiSortCol_0($value)
+    protected function handleiSortCol($value, $index)
     {
-        if(Input::get('sSortDir_0') == 'desc')
+        if(Input::get('sSortDir_'.$index) == 'desc')
             $direction = BaseEngine::ORDER_DESC;
         else
             $direction = BaseEngine::ORDER_ASC;
@@ -484,8 +484,14 @@ abstract class BaseEngine {
                 continue;
             }
 
-            if(method_exists($this, $function = 'handle'.$key))
-                $this->$function($input);
+            if (strpos($key, 'iSortCol') !== false) {
+                list($paramName, $paramIndex) = explode('_', $key);
+                $this->handleiSortCol($input, $paramIndex);
+            } else {
+                if(method_exists($this, $function = 'handle'.$key))
+                    $this->$function($input);
+            }
+
         }
     }
 
