@@ -69,7 +69,12 @@ class QueryEngine extends BaseEngine {
         {
             $this->originalBuilder->groups = null;
         }
-        return $this->originalBuilder->count();
+        if($this->options['searchWithAlias']) {
+            $cnt = count($this->originalBuilder->get());
+        } else {
+            $cnt = $this->originalBuilder->count();
+        }
+        return $cnt;
     }
 
     public function getArray()
