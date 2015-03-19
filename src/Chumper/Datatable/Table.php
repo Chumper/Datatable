@@ -78,6 +78,11 @@ class Table {
      */
     private $aliasColumns = array();
 
+    /**
+     * @var String Options rendered as java literal
+     */
+    private $optionString;
+
     function __construct()
     {
         $this->config = Config::get('datatable::table');
@@ -139,6 +144,7 @@ class Table {
     public function removeOption($key)
     {
         if(isset($this->options[$key])) unset($this->options[$key]);
+        unset($this->optionString);
         return $this;
     }
 
@@ -162,7 +168,10 @@ class Table {
             }
         }
         else
+        {
             throw new Exception('Invalid number of options provided for the method "setOptions"');
+        }
+        unset($this->optionString);
         return $this;
     }
 
@@ -248,6 +257,7 @@ class Table {
     {
         $this->options['sAjaxSource'] = $url;
         $this->options['bServerSide'] = true;
+        unset($this->optionString);
         return $this;
     }
 
@@ -257,6 +267,15 @@ class Table {
     public function getOptions()
     {
         return $this->options;
+    }
+
+    public function getOptionString()
+    {
+        if(!isset($this->optionString))
+        {
+            $this->renderOptions();
+        }
+        return $this->optionString;
     }
 
     /**
@@ -313,6 +332,7 @@ class Table {
             'noScript'  => $this->noScript,
             'id'        => $this->idName,
             'class'     => $this->className,
+            'options_string' => $this->getOptionString()
         );
 
         if (is_array($additional_template_variables)) {
@@ -432,8 +452,63 @@ class Table {
             }
             $i++;
         }
+        $this->renderOptions();
         $this->createdMapping = true;
         //dd($matching);
         return $matching;
+    }
+
+    private function renderOptions($opts = null)
+    {
+        $items = $opts ? $opts : $this->options;
+        if($this->isArray($items))
+        {
+            $items = array_map($this->renderOptions, $items);
+            $result = '['.implode(",\n", $items).']';
+        }
+        else if(is_array($items))
+        {
+            $elements = [];
+            foreach($items as $key => $value)
+            {
+                  $elements[] = ('"'. $key .'": ' . $this->renderOptions($value));
+            }
+
+            // if root level - add in callbacks
+            if(is_null($opts) && is_array($this->callbacks))
+            {
+                foreach($this->callbacks as $key => $value)
+                {
+                    $elements[] = ('"'.$key.'": ' . $value);
+                }
+            }
+
+            $result = '{'.implode(",\n", $elements).'}';
+        }
+        else if(strpos(trim($items), "function") === 0)
+        {
+            $result = $items;
+        }
+        else
+        {
+            $result = json_encode($items);
+        }
+        if($opts === null)
+        {
+            $this->optionString = $result;
+        }
+        return $result;
+    }
+
+    private function isArray($item)
+    {
+        if(is_array($item))
+        {
+            $idx = 0;
+            foreach ($item as $key => $value) 
+            {
+                if($key != $idx++) return false;
+            }
+        }
     }
 }
