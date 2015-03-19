@@ -460,7 +460,7 @@ class Table {
 
     private function renderOptions($opts = null)
     {
-        $items = $opts ? $opts : $this->options;
+        $items = !is_null($opts) ? $opts : $this->options;
         if($this->isArray($items))
         {
             $items = array_map($this->renderOptions, $items);
