@@ -11,7 +11,7 @@
 {!! $o !!}@else
 {!! json_encode($o) !!}@endif
 @else
-@if (is_array($o) && ($obj = false) == false)@include(Config::get('datatable::table.options_view'), array('options' => $o))@else
+@if (is_array($o) && ($obj = false) == false)@include(Config::get('chumper.datatable.table.options_view'), array('options' => $o))@else
 {!! json_encode($o) !!}@endif 
 @endif
 @endforeach
