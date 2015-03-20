@@ -24,6 +24,11 @@ class Table {
     /**
      * @var array
      */
+    private $hiddenColumns = array();
+
+    /**
+     * @var array
+     */
     private $options = array();
 
     /**
@@ -121,6 +126,25 @@ class Table {
             {
                 $this->columns[] = $title;
                 $this->aliasColumns[] = count($this->aliasColumns)+1;
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function hideColumn()
+    {
+        foreach(func_get_args() as $title)
+        {
+            if(in_array($title, $this->columns))
+            {
+                $this->hiddenColumns[] = array_search($title, $this->columns);
+            }
+            else if(in_array($title, $this->aliasColumns))
+            {
+                $this->hiddenColumns[] = array_search($title,$this->aliasColumns);
             }
         }
         return $this;
@@ -332,7 +356,8 @@ class Table {
             'noScript'  => $this->noScript,
             'id'        => $this->idName,
             'class'     => $this->className,
-            'options_string' => $this->getOptionString()
+            'options_string' => $this->getOptionString(),
+            'hidden' => $this->hiddenColumns
         );
 
         if (is_array($additional_template_variables)) {
@@ -372,6 +397,8 @@ class Table {
             'options'   =>  $this->options,
             'callbacks' =>  $this->callbacks,
             'id'        =>  $this->idName,
+            'options_string' => $this->getOptionString(),
+            'hidden' => $this->hiddenColumns
         ));
     }
 
@@ -463,7 +490,8 @@ class Table {
         $items = !is_null($opts) ? $opts : $this->options;
         if($this->isArray($items))
         {
-            $items = array_map($this->renderOptions, $items);
+            $self = $this;
+            $items = array_map(function($x) use($self) { return $self->renderOptions($x); }, $items);
             $result = '['.implode(",\n", $items).']';
         }
         else if(is_array($items))
@@ -489,6 +517,11 @@ class Table {
         {
             $result = $items;
         }
+        // javascript literal code - print it - minus the uri scheme - unquoted
+        else if(strpos(trim($items), "javascript:") === 0)
+        {
+            $result = substr(trim($items),strlen("javascript:"));
+        }
         else
         {
             $result = json_encode($items);
@@ -509,6 +542,8 @@ class Table {
             {
                 if($key != $idx++) return false;
             }
+            return true;
         }
+        return false;
     }
 }
