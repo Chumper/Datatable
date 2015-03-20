@@ -118,7 +118,7 @@ return array(
           |
         */
         
-        'options_view' => Config::get('layout-master::views.layouts.options')
+        'options_view' => 'datatable::options'
     ),
 
 
