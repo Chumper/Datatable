@@ -109,6 +109,16 @@ return array(
         'script_view' => 'datatable::javascript',
 
 
+        /*
+          |--------------------------------------------------------------------------
+          | Option view
+          |--------------------------------------------------------------------------
+          |
+          | Template used to render the options recursive
+          |
+        */
+        
+        'options_view' => Config::get('layout-master::views.layouts.options')
     ),
 
 
