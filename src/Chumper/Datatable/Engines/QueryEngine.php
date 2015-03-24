@@ -41,6 +41,7 @@ class QueryEngine extends BaseEngine {
         'counter'           =>  0,
         'noGroupByOnCount'  =>  false,
         'distinctCountGroup'=>  false,
+        'emptyAtEnd'      =>  false,
     );
 
     function __construct($builder)
@@ -98,6 +99,12 @@ class QueryEngine extends BaseEngine {
     public function setSearchWithAlias()
     {
         $this->options['searchWithAlias'] = true;
+        return $this;
+    }
+
+    public function setEmptyAtEnd()
+    {
+        $this->options['emptyAtEnd'] = true;
         return $this;
     }
 
@@ -286,10 +293,13 @@ class QueryEngine extends BaseEngine {
                     $c = explode(':', $ordCol[1]);
                     if(isset($c[2]))
                         $c[1] .= "($c[2])";
-                    $builder = $builder->orderByRaw("cast($c[0] as $c[1]) ".$this->orderDirection[$ordCol[0]]);
+                    $prefix = $this->options['emptyAtEnd'] ? "ISNULL({$c[0]}) asc," : '';
+                    $builder = $builder->orderByRaw($prefix." cast($c[0] as $c[1]) ".$this->orderDirection[$ordCol[0]]);
                 }
-                else
-                    $builder = $builder->orderBy($ordCol[1], $this->orderDirection[$ordCol[0]]);
+                else {
+                    $prefix = $this->options['emptyAtEnd'] ? "ISNULL({$ordCol[1]}) asc," : '';
+                    $builder = $builder->orderByRaw($prefix.' '.$ordCol[1].' '.$this->orderDirection[$ordCol[0]]);
+                }
             }
         }
         return $builder;
