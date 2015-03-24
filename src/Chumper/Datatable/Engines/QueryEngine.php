@@ -281,23 +281,15 @@ class QueryEngine extends BaseEngine {
         //var_dump($this->orderColumn);
         if(!is_null($this->orderColumn))
         {
-            $i = 0;
-            foreach($columns as $col)
-            {
-
-                if($i === (int) $this->orderColumn[0])
-                {
-                    if(strrpos($this->orderColumn[1], ':')){
-                        $c = explode(':', $this->orderColumn[1]);
-                        if(isset($c[2]))
-                            $c[1] .= "($c[2])";
-                        $builder = $builder->orderByRaw("cast($c[0] as $c[1]) ".$this->orderDirection);
-                    }
-                    else
-                        $builder = $builder->orderBy($col->getName(), $this->orderDirection);
-                    return $builder;
+            foreach ($this->orderColumn as $ordCol) {
+                if(strrpos($ordCol[1], ':')){
+                    $c = explode(':', $ordCol[1]);
+                    if(isset($c[2]))
+                        $c[1] .= "($c[2])";
+                    $builder = $builder->orderByRaw("cast($c[0] as $c[1]) ".$this->orderDirection[$ordCol[0]]);
                 }
-                $i++;
+                else
+                    $builder = $builder->orderBy($ordCol[1], $this->orderDirection[$ordCol[0]]);
             }
         }
         return $builder;
