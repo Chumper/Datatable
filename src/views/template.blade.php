@@ -11,6 +11,15 @@
         @endforeach
     </tr>
     </thead>
+    @if ($footerMode !== 'hidden')
+        <tfoot>
+        <tr>
+            @foreach($columns as $i => $c)
+            <th align="center" valign="middle" class="footer{{ $i }}">@if($footerMode === 'columns') {{ $c }} @endif</th>
+            @endforeach
+        </tr>
+        </tfoot>
+    @endif
     <tbody>
     @foreach($data as $d)
     <tr>
