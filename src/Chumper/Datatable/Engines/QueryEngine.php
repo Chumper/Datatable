@@ -90,15 +90,15 @@ class QueryEngine extends BaseEngine {
         return $this;
     }
 
-    public function setSearchWithAlias()
+    public function setSearchWithAlias($value = true)
     {
-        $this->options['searchWithAlias'] = true;
+        $this->options['searchWithAlias'] = (bool)$value;
         return $this;
     }
 
-    public function setNoGroupByOnCount()
+    public function setNoGroupByOnCount($value = true)
     {
-        $this->options['noGroupByOnCount'] = true;
+        $this->options['noGroupByOnCount'] = (bool)$value;
         return $this;
     }
 
@@ -109,11 +109,12 @@ class QueryEngine extends BaseEngine {
      *
      * Instead of counting all of the rows, the distinct rows in the group by will be counted instead.
      *
+     * @param bool $value should this option be enabled?
      * @return $this
      */
     public function setDistinctCountGroup($value = true)
     {
-        $this->options['distinctCountGroup'] = $value;
+        $this->options['distinctCountGroup'] = (bool)$value;
         return $this;
     }
 
