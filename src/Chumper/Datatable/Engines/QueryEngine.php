@@ -41,6 +41,7 @@ class QueryEngine extends BaseEngine {
         'counter'           =>  0,
         'noGroupByOnCount'  =>  false,
         'distinctCountGroup'=>  false,
+        'returnQuery'       =>  false,
     );
 
     function __construct($builder)
@@ -118,6 +119,31 @@ class QueryEngine extends BaseEngine {
         return $this;
     }
 
+    /**
+     * Let internalMake return a QueryBuilder, instead of a collection.
+     *
+     * @param bool $value
+     * @return $this
+     */
+    public function setReturnQuery($value = true)
+    {
+        $this->options['returnQuery'] = $value;
+        return $this;
+    }
+
+    /**
+     * Get a Builder object back from the engine. Don't return a collection.
+     *
+     * @return Query\Builder
+     */
+    public function getQuery()
+    {
+        $this->prepareEngine();
+        $this->setReturnQuery();
+
+        return $this->internalMake($this->columns, $this->searchColumns);
+    }
+
     //--------PRIVATE FUNCTIONS
 
     protected function internalMake(Collection $columns, array $searchColumns = array())
@@ -154,6 +180,10 @@ class QueryEngine extends BaseEngine {
         }
 
         $builder = $this->doInternalOrder($builder, $columns);
+
+        if ($this->options['returnQuery'])
+            return $this->getQuery($builder);
+
         $collection = $this->compile($builder, $columns);
 
         return $collection;
@@ -163,19 +193,27 @@ class QueryEngine extends BaseEngine {
      * @param $builder
      * @return Collection
      */
-    private function getCollection($builder)
+    private function getQuery($builder)
     {
-        if($this->collection == null)
-        {
-            if($this->skip > 0)
-            {
+        // dd($builder->toSql());
+        if ($this->collection == null) {
+            if ($this->skip > 0) {
                 $builder = $builder->skip($this->skip);
             }
-            if($this->limit > 0)
-            {
+            if ($this->limit > 0) {
                 $builder = $builder->take($this->limit);
             }
-            //dd($this->builder->toSql());
+        }
+
+        return $builder;
+    }
+
+    private function getCollection($builder)
+    {
+        $builder = $this->getQuery($builder);
+
+        if ($this->collection == null)
+        {
             $this->collection = $builder->get();
 
             if(is_array($this->collection))
@@ -196,6 +234,7 @@ class QueryEngine extends BaseEngine {
 
         return $builder;
     }
+
     private function buildSearchQuery($builder, $columns)
     {
         $like = $this->options['searchOperator'];
