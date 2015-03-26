@@ -136,7 +136,7 @@ class QueryEngine extends BaseEngine {
      *
      * @return Query\Builder
      */
-    public function getQuery()
+    public function getQueryBuilder()
     {
         $this->prepareEngine();
         $this->setReturnQuery();
