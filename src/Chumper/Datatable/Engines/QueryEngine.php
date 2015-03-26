@@ -132,6 +132,29 @@ class QueryEngine extends BaseEngine {
     }
 
     /**
+     * Allow setting an array of options on the QueryEngine without needing to run each setter.
+     *
+     * @param array $options
+     * @return $this
+     * @throws Exception
+     */
+    public function setOptions($options = array())
+    {
+        foreach($options as $option_name => $option_value)
+        {
+            if (!isset($this->options[$option_name]))
+                throw new Exception("The option $option_name is not a valid that can be selected.");
+
+            if (is_bool($this->options[$option_name]))
+                $option_value = (bool)$option_value;
+
+            $this->options[$option_name] = $option_value;
+        }
+
+        return $this;
+    }
+
+    /**
      * Get a Builder object back from the engine. Don't return a collection.
      *
      * @return Query\Builder
