@@ -230,13 +230,21 @@ abstract class BaseEngine {
     }
 
     /**
+     * Used to handle all the inputs directly from an engine, instead of from Datatables.
+     * @see QueryEngine
+     */
+    protected function prepareEngine()
+    {
+        $this->handleInputs();
+        $this->prepareSearchColumns();
+    }
+
+    /**
      * @return \Illuminate\Http\JsonResponse
      */
     public function make()
     {
-        //TODO Handle all inputs
-        $this->handleInputs();
-        $this->prepareSearchColumns();
+        $this->prepareEngine();
 
         $output = array(
             "aaData" => $this->internalMake($this->columns, $this->searchColumns)->toArray(),
