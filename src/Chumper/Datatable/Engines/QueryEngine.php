@@ -17,11 +17,6 @@ class QueryEngine extends BaseEngine {
     public $originalBuilder;
 
     /**
-     * @var array single column searches
-     */
-    public $columnSearches = array();
-
-    /**
      * @var Collection the returning collection
      */
     private $resultCollection;
