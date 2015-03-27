@@ -36,6 +36,7 @@ class QueryEngine extends BaseEngine {
         'counter'           =>  0,
         'noGroupByOnCount'  =>  false,
         'distinctCountGroup'=>  false,
+        'emptyAtEnd'      =>  false,
         'returnQuery'       =>  false,
     );
 
@@ -65,7 +66,12 @@ class QueryEngine extends BaseEngine {
         {
             $this->originalBuilder->groups = null;
         }
-        return $this->originalBuilder->count();
+        if($this->options['searchWithAlias']) {
+            $cnt = count($this->originalBuilder->get());
+        } else {
+            $cnt = $this->originalBuilder->count();
+        }
+        return $cnt;
     }
 
     public function getArray()
@@ -89,6 +95,12 @@ class QueryEngine extends BaseEngine {
     public function setSearchWithAlias($value = true)
     {
         $this->options['searchWithAlias'] = (bool)$value;
+        return $this;
+    }
+
+    public function setEmptyAtEnd()
+    {
+        $this->options['emptyAtEnd'] = true;
         return $this;
     }
 
@@ -334,23 +346,18 @@ class QueryEngine extends BaseEngine {
         //var_dump($this->orderColumn);
         if(!is_null($this->orderColumn))
         {
-            $i = 0;
-            foreach($columns as $col)
-            {
-
-                if($i === (int) $this->orderColumn[0])
-                {
-                    if(strrpos($this->orderColumn[1], ':')){
-                        $c = explode(':', $this->orderColumn[1]);
-                        if(isset($c[2]))
-                            $c[1] .= "($c[2])";
-                        $builder = $builder->orderByRaw("cast($c[0] as $c[1]) ".$this->orderDirection);
-                    }
-                    else
-                        $builder = $builder->orderBy($col->getName(), $this->orderDirection);
-                    return $builder;
+            foreach ($this->orderColumn as $ordCol) {
+                if(strrpos($ordCol[1], ':')){
+                    $c = explode(':', $ordCol[1]);
+                    if(isset($c[2]))
+                        $c[1] .= "($c[2])";
+                    $prefix = $this->options['emptyAtEnd'] ? "ISNULL({$c[0]}) asc," : '';
+                    $builder = $builder->orderByRaw($prefix." cast($c[0] as $c[1]) ".$this->orderDirection[$ordCol[0]]);
                 }
-                $i++;
+                else {
+                    $prefix = $this->options['emptyAtEnd'] ? "ISNULL({$ordCol[1]}) asc," : '';
+                    $builder = $builder->orderByRaw($prefix.' '.$ordCol[1].' '.$this->orderDirection[$ordCol[0]]);
+                }
             }
         }
         return $builder;
