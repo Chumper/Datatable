@@ -16,7 +16,7 @@
 @endforeach
 @endif
 @if ( $first == false ),@endif
-@foreach ($callbacks as $k => $o) {!! json_encode($k) !!}: {!! $o !!}
+@foreach ($callbacks as $k => $o) {!! json_encode($k) !!}: {!! $o !!},
 @endforeach
 });
     });
