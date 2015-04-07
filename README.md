@@ -90,10 +90,10 @@ There are two ways you can use the plugin, within one route or within two routes
     <script type="text/javascript" src="/assets/js/jquery.js"></script>
     <script type="text/javascript" src="/assets/js/jquery.dataTables.min.js"></script>
 
-    {{ Datatable::table()
+    {!! Datatable::table()
     ->addColumn('id','Name')       // these are the column headings to be shown
     ->setUrl(route('api.users'))   // this is the route where data will be retrieved
-    ->render() }}
+    ->render() !!}
 ```
 
 * Create a controller function to return your data in a way that can be read by Datatables:
