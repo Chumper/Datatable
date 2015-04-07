@@ -36,8 +36,9 @@ class QueryEngine extends BaseEngine {
         'counter'           =>  0,
         'noGroupByOnCount'  =>  false,
         'distinctCountGroup'=>  false,
-        'emptyAtEnd'      =>  false,
+        'emptyAtEnd'        =>  false,
         'returnQuery'       =>  false,
+        'queryKeepsLimits'  =>  false,
     );
 
     function __construct($builder)
@@ -162,6 +163,18 @@ class QueryEngine extends BaseEngine {
     }
 
     /**
+     * Change the behaviour of getQueryBuiler for limits
+     *
+     * @param bool $value
+     * @return $this
+     */
+    public function setQueryKeepsLimits($value = true)
+    {
+        $this->options['queryKeepsLimits'] = $value;
+        return $this;
+    }
+
+    /**
      * Get a Builder object back from the engine. Don't return a collection.
      *
      * @return Query\Builder
@@ -212,7 +225,10 @@ class QueryEngine extends BaseEngine {
         $builder = $this->doInternalOrder($builder, $columns);
 
         if ($this->options['returnQuery'])
-            return $this->getQuery($builder);
+            if ($this->options['queryKeepsLimits'])
+                return $this->getQuery($builder);
+            else
+                return $builder;
 
         $collection = $this->compile($builder, $columns);
 
