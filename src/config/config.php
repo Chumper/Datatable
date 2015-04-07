@@ -117,7 +117,7 @@ return array(
           |
         */
         
-        'options_view' => Config::get('chumper.datatable::options')
+        'options_view' => 'chumper.datatable::options',
 
     ),
 
