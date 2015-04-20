@@ -107,7 +107,7 @@ return array(
         */
 
         'script_view' => 'chumper.datatable::javascript',
-        
+
         /*
           |--------------------------------------------------------------------------
           | Option view
@@ -116,7 +116,7 @@ return array(
           | Template used to render the options recursive
           |
         */
-        
+
         'options_view' => 'chumper.datatable::options'
 
     ),
@@ -143,7 +143,16 @@ return array(
 
         'exactWordSearch' => false,
 
+    ),
+    /*
+    |--------------------------------------------------------------------------
+    | Allow overrides Datatable core classes
+    |--------------------------------------------------------------------------
+    |
+    */
+    'classmap' => array(
+        'CollectionEngine' => 'Chumper\Datatable\Engines\CollectionEngine',
+        'QueryEngine' => 'Chumper\Datatable\Engines\QueryEngine',
+        'Table' => 'Chumper\Datatable\Table',
     )
-
-
 );
