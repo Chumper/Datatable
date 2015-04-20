@@ -34,7 +34,7 @@ class QueryEngine extends BaseEngine {
     /**
      * @var array Different options
      */
-    private $options = array(
+    protected $options = array(
         'searchOperator'    =>  'LIKE',
         'searchWithAlias'   =>  false,
         'orderOrder'        =>  null,
@@ -162,7 +162,7 @@ class QueryEngine extends BaseEngine {
 
         return $builder;
     }
-    private function buildSearchQuery($builder, $columns)
+    protected function buildSearchQuery($builder, $columns)
     {
         $like = $this->options['searchOperator'];
         $search = $this->search;
