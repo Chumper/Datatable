@@ -15,7 +15,7 @@ class Datatable {
 
     /**
      * @param $query
-     * @return QueryEngine
+     * @return \Chumper\Datatable\Engines\QueryEngine
      */
     public function query($query)
     {
@@ -24,7 +24,7 @@ class Datatable {
 
     /**
      * @param $collection
-     * @return CollectionEngine
+     * @return \Chumper\Datatable\Engines\CollectionEngine
      */
     public function collection($collection)
     {
@@ -32,7 +32,7 @@ class Datatable {
     }
 
     /**
-     * @return Table
+     * @return \Chumper\Datatable\Table
      */
     public function table()
     {
