@@ -329,7 +329,7 @@ You must name the column exactly like the database column that you're displaying
 
 ```php
 	$column = new FunctionColumn('foo', function ($row) { return strtolower($row->foo); }
-	Datatable::query(DB::table('table')->lists('foo'))
+	Datatable::query(DB::table('table')->select(array('foo')))
 	         ->showColumns('foo')
 	         ->addColumn($column)
 	         ->orderColumns('foo')
@@ -341,7 +341,7 @@ This will allow you to have sortable and searchable columns using the QueryEngin
 Eg: linking an user_id column to it's page listing
 ```php
 	$column = new FunctionColumn('user_id', function ($row) { return link_to('users/'.$row->user_id, $row->username) }
-	Datatable::query(DB::table('table')->lists('user_id', 'username'))
+	Datatable::query(DB::table('table')->select(array('user_id', 'username')))
 	         ->showColumns('user_id')
 	         ->addColumn($column)
 	         ->orderColumns('user_id')
@@ -403,7 +403,7 @@ Will get a column by its name, mainly used for testing and debugging, not really
 If you want to use an alias column on the query engine and you don't get the correct results back while searching then you should try this flag.
 E.g.:
 ```php
-		Datatable::from(DB::table("users")->select('firstname', "users.email as email2")->join('partners','users.partner_id','=','partners.id'))
+		Datatable::from(DB::table("users")->select(array('firstname', "users.email as email2"))->join('partners','users.partner_id','=','partners.id'))
         ->showColumns('firstname','email2')
         ->setSearchWithAlias()
         ->searchColumns("email2")
