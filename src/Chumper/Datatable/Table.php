@@ -357,6 +357,7 @@ class Table {
         return View::make($this->script_view,array(
             'options'   =>  $this->options,
             'callbacks' =>  $this->callbacks,
+            'values'    =>  $this->customValues,
             'id'        =>  $this->idName,
         ));
     }
