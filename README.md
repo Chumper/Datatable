@@ -314,10 +314,10 @@ You can also just add a predefined Column, like a DateColumn, a FunctionColumn, 
 E.g.:
 
 ```php
-	$column = new TextColumn('foo', 'bar'); // Will always return the text bar
-	//$column = new FunctionColumn('foo', function($model){return $model->bar}); // Will return the bar column
-	//$column = new DateColumn('foo', DateColumn::TIME); // Will return the foo date object as toTimeString() representation
-	//$column = new DateColumn('foo', DateColumn::CUSTOM, 'd.M.Y H:m:i'); // Will return the foo date object as custom representation
+	$column = new \Chumper\Datatable\Columns\TextColumn('foo', 'bar'); // Will always return the text bar
+	//$column = new \Chumper\Datatable\Columns\FunctionColumn('foo', function($model){return $model->bar}); // Will return the bar column
+	//$column = new \Chumper\Datatable\Columns\DateColumn('foo', DateColumn::TIME); // Will return the foo date object as toTimeString() representation
+	//$column = new \Chumper\Datatable\Columns\DateColumn('foo', DateColumn::CUSTOM, 'd.M.Y H:m:i'); // Will return the foo date object as custom representation
 
 	Datatable::collection(User::all())
     ->addColumn($column)
@@ -328,7 +328,7 @@ You can also overwrite the results returned by the QueryMethod by using addColum
 You must name the column exactly like the database column that you're displaying using showColumns in order for this to work.
 
 ```php
-	$column = new FunctionColumn('foo', function ($row) { return strtolower($row->foo); }
+	$column = new \Chumper\Datatable\Columns\FunctionColumn('foo', function ($row) { return strtolower($row->foo); }
 	Datatable::query(DB::table('table')->select(array('foo')))
 	         ->showColumns('foo')
 	         ->addColumn($column)
@@ -340,7 +340,7 @@ This will allow you to have sortable and searchable columns using the QueryEngin
 
 Eg: linking an user_id column to it's page listing
 ```php
-	$column = new FunctionColumn('user_id', function ($row) { return link_to('users/'.$row->user_id, $row->username) }
+	$column = new \Chumper\Datatable\Columns\FunctionColumn('user_id', function ($row) { return link_to('users/'.$row->user_id, $row->username) }
 	Datatable::query(DB::table('table')->select(array('user_id', 'username')))
 	         ->showColumns('user_id')
 	         ->addColumn($column)
