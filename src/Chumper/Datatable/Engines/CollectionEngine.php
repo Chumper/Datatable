@@ -250,15 +250,15 @@ class CollectionEngine extends BaseEngine {
 
             if($self->getAliasMapping())
             {
-                $column = $self->getNameByIndex($column);
+                $column = $self->getNameByIndex($column[0]);
             }
             if($stripOrder)
             {
-                return strip_tags($row[$column]);
+                return strip_tags($row[$column[0]]);
             }
             else
             {
-                return $row[$column];
+                return $row[$column[0]];
             }
         });
 
