@@ -473,7 +473,7 @@ abstract class BaseEngine {
 
         $allColumns = array_keys($this->columns->all());
         foreach ($sortingCols as $num) {
-            if(in_array($allColumns[$num], $cleanNames)) {
+            if(isset($allColumns[$num]) && in_array($allColumns[$num], $cleanNames)) {
                 $columns[] = array(0 => $num, 1 => $this->orderColumns[array_search($allColumns[$num],$cleanNames)]);
             }
         }
