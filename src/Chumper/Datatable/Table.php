@@ -298,8 +298,7 @@ class Table {
         }
 
         return View::make($this->table_view,array(
-            'options'   => $this->options,
-            'callbacks' => $this->callbacks,
+            'options' => $this->convertData(array_merge($this->options, $this->callbacks)),
             'values'    => $this->customValues,
             'data'      => $this->data,
             'columns'   => array_combine($this->aliasColumns,$this->columns),
@@ -372,7 +371,7 @@ class Table {
         }
 
         return View::make($this->script_view,array(
-			'options' => $this->convertData(array_merge($this->options, $this->callbacks)),
+            'options' => $this->convertData(array_merge($this->options, $this->callbacks)),
             'id'        =>  $this->idName,
         ));
     }
