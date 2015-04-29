@@ -13,7 +13,7 @@
             {!! json_encode($o) !!}
         @endif
     @else
-        @if (is_array($o) && ($obj = false) == false)
+        @if (is_array($o))
             @include(Config::get('chumper.datatable.table.options_view'), array('options' => $o))
         @else
             {!! json_encode($o) !!}
