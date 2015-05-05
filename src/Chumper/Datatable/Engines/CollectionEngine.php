@@ -244,13 +244,15 @@ class CollectionEngine extends BaseEngine {
             return;
 
         $column = $this->orderColumn[0];
+        $direction = $this->orderDirection[0];
         $stripOrder = $this->options['stripOrder'];
-        $self = $this;
-        $this->workingCollection->sortBy(function($row) use ($column,$stripOrder,$self) {
 
-            if($self->getAliasMapping())
+        $this->workingCollection->sortBy(function($row) use ($column,$stripOrder) {
+
+            if($this->getAliasMapping())
             {
-                $column = $self->getNameByIndex($column);
+                $column = $this->getNameByIndex($column[0]);
+                return $row[$column];
             }
             if($stripOrder)
             {
@@ -258,11 +260,13 @@ class CollectionEngine extends BaseEngine {
             }
             else
             {
+                if (is_array($column))
+                    return $row[$column[0]];
                 return $row[$column];
             }
         });
 
-        if($this->orderDirection == BaseEngine::ORDER_DESC)
+        if($direction == BaseEngine::ORDER_DESC)
             $this->workingCollection = $this->workingCollection->reverse();
     }
 
