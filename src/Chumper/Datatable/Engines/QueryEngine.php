@@ -99,9 +99,9 @@ class QueryEngine extends BaseEngine {
         return $this;
     }
 
-    public function setEmptyAtEnd()
+    public function setEmptyAtEnd($value = true)
     {
-        $this->options['emptyAtEnd'] = true;
+        $this->options['emptyAtEnd'] = $value;
         return $this;
     }
 
