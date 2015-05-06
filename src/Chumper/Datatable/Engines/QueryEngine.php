@@ -242,7 +242,6 @@ class QueryEngine extends BaseEngine {
      */
     private function getQuery($builder)
     {
-        // dd($builder->toSql());
         if (is_null($this->collection)) {
             if ($this->skip > 0) {
                 $builder = $builder->skip($this->skip);
@@ -363,7 +362,6 @@ class QueryEngine extends BaseEngine {
 
     private function doInternalOrder($builder, $columns)
     {
-        //var_dump($this->orderColumn);
         if(!is_null($this->orderColumn))
         {
             foreach ($this->orderColumn as $ordCol) {
