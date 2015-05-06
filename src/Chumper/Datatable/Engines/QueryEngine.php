@@ -50,14 +50,10 @@ class QueryEngine extends BaseEngine {
             $this->builder = $builder->getBaseQuery();
             $this->originalBuilder = clone $builder->getBaseQuery();
         }
-        elseif ($builder instanceof Builder)
+        else
         {
             $this->builder = $builder;
             $this->originalBuilder = clone $builder;
-        }
-        else
-        {
-            throw new Exception("Please provide me with a QueryBuilder or Relation, not what you gave me.");
         }
     }
 
