@@ -432,26 +432,24 @@ class Table {
     {
         // set options for better handling
         // merge with existing options
-        if(!array_key_exists('aoColumns', $this->options))
-        {
+        if (!array_key_exists('aoColumns', $this->options)) {
             $this->options['aoColumns'] = array();
         }
+
         $matching = array();
         $i = 0;
-        foreach($this->aliasColumns as $name)
-        {
-            if(array_key_exists($i,$this->options['aoColumns']))
-            {
-                $this->options['aoColumns'][$i] = array_merge_recursive($this->options['aoColumns'][$i],array('mData' => $name));
-            }
-            else
-            {
+
+        foreach ($this->aliasColumns as $name) {
+            if (array_key_exists($i, $this->options['aoColumns'])) {
+                $this->options['aoColumns'][$i] = array_merge_recursive($this->options['aoColumns'][$i], array('mData' => $name));
+            } else {
                 $this->options['aoColumns'][$i] = array('mData' => $name);
             }
             $i++;
         }
+
         $this->createdMapping = true;
-        //dd($matching);
+
         return $matching;
     }
 }
