@@ -247,7 +247,11 @@ class CollectionEngine extends BaseEngine {
         $direction = $this->orderDirection[0];
         $stripOrder = $this->options['stripOrder'];
 
-        $this->workingCollection->sortBy(function($row) use ($column,$stripOrder) {
+        $sortFunction = 'sortBy';
+        if ($direction == BaseEngine::ORDER_DESC)
+            $sortFunction = 'sortByDesc';
+
+        $this->workingCollection->{$sortFunction}(function($row) use ($column,$stripOrder) {
 
             if($this->getAliasMapping())
             {
@@ -265,9 +269,6 @@ class CollectionEngine extends BaseEngine {
                 return $row[$column];
             }
         });
-
-        if($direction == BaseEngine::ORDER_DESC)
-            $this->workingCollection = $this->workingCollection->reverse();
     }
 
     private function compileArray($columns)
