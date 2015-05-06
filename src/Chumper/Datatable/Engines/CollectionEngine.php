@@ -172,7 +172,7 @@ class CollectionEngine extends BaseEngine {
         }
 
         $self = $this;
-        $this->workingCollection = $this->workingCollection->filter(function($row) use ($value, $toSearch, $caseSensitive, $self, $searchType)
+        $this->workingCollection = $this->workingCollection->filter(function($row) use ($toSearch, $caseSensitive, $self, $searchType)
         {
 
             for($i=0, $stack=array(), $nb=count($row); $i<$nb; $i++)
