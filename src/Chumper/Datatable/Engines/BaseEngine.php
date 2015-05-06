@@ -1,7 +1,6 @@
 <?php namespace Chumper\Datatable\Engines;
 
 use Exception;
-use Assetic\Extension\Twig\AsseticFilterFunction;
 use Chumper\Datatable\Columns\DateColumn;
 use Chumper\Datatable\Columns\FunctionColumn;
 use Chumper\Datatable\Columns\TextColumn;
@@ -489,7 +488,6 @@ abstract class BaseEngine {
      */
     protected function handleSingleColumnSearch($columnIndex, $searchValue)
     {
-        //dd($columnIndex, $searchValue, $this->searchColumns);
         if (!isset($this->searchColumns[$columnIndex])) return;
         if (empty($searchValue) && $searchValue !== '0') return;
 
