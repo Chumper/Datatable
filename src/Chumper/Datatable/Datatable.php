@@ -3,7 +3,6 @@
 use Chumper\Datatable\Engines\CollectionEngine;
 use Chumper\Datatable\Engines\QueryEngine;
 use Input;
-use Request;
 
 /**
  * Class Datatable

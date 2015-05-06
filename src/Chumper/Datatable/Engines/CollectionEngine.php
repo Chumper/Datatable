@@ -32,7 +32,6 @@ class CollectionEngine extends BaseEngine {
      */
     const AND_CONDITION = 'AND';
 
-
     /**
      * @var array Different options
      */

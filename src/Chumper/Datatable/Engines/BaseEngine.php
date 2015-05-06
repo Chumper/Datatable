@@ -1,7 +1,6 @@
 <?php namespace Chumper\Datatable\Engines;
 
 use Exception;
-use Assetic\Extension\Twig\AsseticFilterFunction;
 use Chumper\Datatable\Columns\DateColumn;
 use Chumper\Datatable\Columns\FunctionColumn;
 use Chumper\Datatable\Columns\TextColumn;
