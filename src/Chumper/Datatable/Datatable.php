@@ -10,8 +10,6 @@ use Input;
  */
 class Datatable {
 
-    private $columnNames = array();
-
     /**
      * @param $query
      * @return QueryEngine
