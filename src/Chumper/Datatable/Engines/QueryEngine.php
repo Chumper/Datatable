@@ -1,6 +1,6 @@
 <?php namespace Chumper\Datatable\Engines;
 
-use Chumper\Datatable\Datatable;
+use \Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
@@ -8,11 +8,12 @@ use Illuminate\Support\Collection;
 class QueryEngine extends BaseEngine {
 
     /**
-     * @var Builder
+     * @var \Illuminate\Database\Query\Builder
      */
     public $builder;
+
     /**
-     * @var Builder
+     * @var \Illuminate\Database\Query\Builder
      */
     public $originalBuilder;
 
@@ -49,10 +50,14 @@ class QueryEngine extends BaseEngine {
             $this->builder = $builder->getBaseQuery();
             $this->originalBuilder = clone $builder->getBaseQuery();
         }
-        else
+        elseif ($builder instanceof Builder)
         {
             $this->builder = $builder;
             $this->originalBuilder = clone $builder;
+        }
+        else
+        {
+            throw new Exception("Please provide me with a QueryBuilder or Relation, not what you gave me.");
         }
     }
 
@@ -242,7 +247,7 @@ class QueryEngine extends BaseEngine {
     private function getQuery($builder)
     {
         // dd($builder->toSql());
-        if ($this->collection == null) {
+        if (is_null($this->collection)) {
             if ($this->skip > 0) {
                 $builder = $builder->skip($this->skip);
             }
@@ -258,7 +263,7 @@ class QueryEngine extends BaseEngine {
     {
         $builder = $this->getQuery($builder);
 
-        if ($this->collection == null)
+        if (is_null($this->collection))
         {
             $this->collection = $builder->get();
 
@@ -271,7 +276,7 @@ class QueryEngine extends BaseEngine {
     private function doInternalSearch($builder, $columns)
     {
         if (!empty($this->search)) {
-            $builder = $this->buildSearchQuery($builder, $columns);
+            $builder = $this->doInternalSearch($builder, $columns);
         }
 
         if (!empty($this->columnSearches)) {
@@ -286,7 +291,7 @@ class QueryEngine extends BaseEngine {
         $like = $this->options['searchOperator'];
         $search = $this->search;
         $exact = $this->exactWordSearch;
-        $builder = $builder->where(function($query) use ($columns, $search, $like, $exact) {
+        $builder = $builder->where(function(Builder $query) use ($columns, $search, $like, $exact) {
             foreach ($columns as $c) {
                 //column to CAST following the pattern column:newType:[maxlength]
                 if(strrpos($c, ':')){
@@ -306,16 +311,19 @@ class QueryEngine extends BaseEngine {
      * @param $builder
      * Modified by sburkett to facilitate individual exact match searching on individual columns (rather than for all columns)
      */
-     
-    private function buildSingleColumnSearches($builder)
+    private function buildSingleColumnSearches(Builder $builder)
     {
-      foreach ($this->columnSearches as $index => $searchValue) {
-        if(@$this->columnSearchExact[ $this->fieldSearches[$index] ] == 1) {
-          $builder->where($this->fieldSearches[$index], '=', $searchValue );
-        } else {
-          $builder->where($this->fieldSearches[$index], $this->options['searchOperator'], '%' . $searchValue . '%');
+        foreach ($this->columnSearches as $index => $searchValue) {
+            $fieldSearchIndex = $this->fieldSearches[$index];
+
+            if (isset($this->columnSearchExact[$fieldSearchIndex])
+                && $this->columnSearchExact[$fieldSearchIndex] == 1)
+            {
+                $builder->where($fieldSearchIndex, '=', $searchValue);
+            } else {
+                $builder->where($fieldSearchIndex, $this->options['searchOperator'], '%' . $searchValue . '%');
+            }
         }
-      }
 
     }
 
