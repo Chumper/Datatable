@@ -38,5 +38,4 @@ class DatatableServiceProvider extends ServiceProvider {
     {
         return array('datatable');
     }
-
 }
