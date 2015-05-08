@@ -243,8 +243,9 @@ class CollectionEngine extends BaseEngine {
         if(is_null($this->orderColumn))
             return;
 
-        $column = $this->orderColumn[0];
-        $direction = $this->orderDirection[0];
+        // Bug added on pull request #309
+        $column = array_values($this->orderColumn)[0];
+        $direction = array_values($this->orderDirection)[0];
         $stripOrder = $this->options['stripOrder'];
 
         $sortFunction = 'sortBy';
