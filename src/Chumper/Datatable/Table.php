@@ -169,7 +169,7 @@ class Table {
         $_orders = array();
         foreach ($order as $number => $sort)
         {
-            $_orders[] = [$number, "' . $sort . '" ];
+            $_orders[] = [$number, $sort];
         }
 
         $this->callbacks['aaSorting'] = $_orders;
