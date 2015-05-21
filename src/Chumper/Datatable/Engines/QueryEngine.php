@@ -169,24 +169,22 @@ class QueryEngine extends BaseEngine {
         $exact = $this->exactWordSearch;
         $builder = $builder->where(function($query) use ($columns, $search, $like, $exact) {
             foreach ($columns as $c) {
-                foreach ($columns as $c) {
-                    //column to search within relationships : relatedModel::column
-                    if(strrpos($c, '::')) {
-                        $c = explode('::', $c);
-                        $query->orWhereHas($c[0], function($q) use($c, $like, $exact, $search){
-                            $q->where($c[1], $like, $exact ? $search : '%' . $search . '%');
-                        });
-                    }
-                    //column to CAST following the pattern column:newType:[maxlength]
-                    elseif(strrpos($c, ':')){
-                        $c = explode(':', $c);
-                        if(isset($c[2]))
-                            $c[1] .= "($c[2])";
-                        $query->orWhereRaw("cast($c[0] as $c[1]) ".$like." ?", array($exact ? "$search" : "%$search%"));
-                    }
-                    else
-                        $query->orWhere($c, $like, $exact ? $search : '%' . $search . '%');
+                //column to search within relationships : relatedModel::column
+                if(strrpos($c, '::')) {
+                    $c = explode('::', $c);
+                    $query->orWhereHas($c[0], function($q) use($c, $like, $exact, $search){
+                        $q->where($c[1], $like, $exact ? $search : '%' . $search . '%');
+                    });
                 }
+                //column to CAST following the pattern column:newType:[maxlength]
+                elseif(strrpos($c, ':')){
+                    $c = explode(':', $c);
+                    if(isset($c[2]))
+                        $c[1] .= "($c[2])";
+                    $query->orWhereRaw("cast($c[0] as $c[1]) ".$like." ?", array($exact ? "$search" : "%$search%"));
+                }
+                else
+                    $query->orWhere($c, $like, $exact ? $search : '%' . $search . '%');
             }
         });
         return $builder;
