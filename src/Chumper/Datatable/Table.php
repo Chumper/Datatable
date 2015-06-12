@@ -169,12 +169,10 @@ class Table {
         $_orders = array();
         foreach ($order as $number => $sort)
         {
-            $_orders[] .= '[ ' . $number . ', "' . $sort . '" ]';
+            $_orders[] = [$number, $sort];
         }
 
-        $_build = '[' . implode(', ', $_orders) . ']';
-
-        $this->callbacks['aaSorting'] = $_build;
+        $this->callbacks['aaSorting'] = $_orders;
         return $this;
     }
 
