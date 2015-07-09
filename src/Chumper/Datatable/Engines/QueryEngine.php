@@ -271,13 +271,34 @@ class QueryEngine extends BaseEngine {
     private function doInternalSearch($builder, $columns)
     {
         if (!empty($this->search)) {
-            $builder = $this->doInternalSearch($builder, $columns);
+            $builder = $this->buildSearchQuery($builder, $columns);
         }
 
         if (!empty($this->columnSearches)) {
             $builder = $this->buildSingleColumnSearches($builder);
         }
 
+        return $builder;
+    }
+
+    private function buildSearchQuery($builder, $columns)
+    {
+        $like = $this->options['searchOperator'];
+        $search = $this->search;
+        $exact = $this->exactWordSearch;
+        $builder = $builder->where(function(Builder $query) use ($columns, $search, $like, $exact) {
+            foreach ($columns as $c) {
+                //column to CAST following the pattern column:newType:[maxlength]
+                if(strrpos($c, ':')){
+                    $c = explode(':', $c);
+                    if(isset($c[2]))
+                        $c[1] .= "($c[2])";
+                    $query->orWhereRaw("cast($c[0] as $c[1]) ".$like." ?", array($exact ? "$search" : "%$search%"));
+                }
+                else
+                    $query->orWhere($c,$like,$exact ? $search : '%'.$search.'%');
+            }
+        });
         return $builder;
     }
 
