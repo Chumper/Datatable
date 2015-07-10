@@ -286,7 +286,7 @@ class QueryEngine extends BaseEngine {
         $like = $this->options['searchOperator'];
         $search = $this->search;
         $exact = $this->exactWordSearch;
-        $builder = $builder->where(function(Builder $query) use ($columns, $search, $like, $exact) {
+        $builder = $builder->where(function($query) use ($columns, $search, $like, $exact) {
             foreach ($columns as $c) {
                 //column to CAST following the pattern column:newType:[maxlength]
                 if(strrpos($c, ':')){
