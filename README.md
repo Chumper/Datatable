@@ -1,10 +1,14 @@
 Datatable
 =========
 
-This is a __laravel 4 package__ for the server and client side of datatables at http://datatables.net/
+This is a __Laravel 4 package__ for the server and client side of datatables at http://datatables.net/
 
-I developed this package because i was not happy with the only existing package at https://github.com/bllim/laravel4-datatables-package
-so i developed this package which in my opinion is superior.
+> A __Laravel 5__ package is [close to being completed](https://github.com/Chumper/Datatable/tree/version3). To install it:
+>
+>         composer require chumper/datatable "dev-version3"
+>
+> If you find any issues, please report them in the bug tracker!
+
 
 ### Please note:
 
@@ -73,6 +77,10 @@ I would be really thankful if you can provide a test that points to the issue.
 This package is available on http://packagist.org, just add it to your composer.json
 
 	"chumper/datatable": "2.*"
+
+Alternatively, you can install it using the `composer` command:
+
+        composer require chumper/datatable "2.*"
 
 It also has a ServiceProvider for usage in Laravel4. Add these lines to app.php:
 
