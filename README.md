@@ -1,10 +1,7 @@
 Datatable
 =========
 
-This is a __laravel 5 package__ for the server and client side of datatables at http://datatables.net/
-
-I developed this package because i was not happy with the only existing package at https://github.com/bllim/laravel4-datatables-package
-so i developed this package which in my opinion is superior.
+This is a __Laravel 5 package__ for the server and client side of datatables at http://datatables.net/
 
 ![Image](https://raw.githubusercontent.com/Chumper/Datatable/master/datatable.jpg)
 
@@ -21,16 +18,16 @@ so i developed this package which in my opinion is superior.
 
 This package supports:
 
-*   Support for Collections and Query Builder
-*   Easy to add and order columns
-*   Includes a simple helper for the HTML side
-*   Use your own functions and presenters in your columns
-*   Search in your custom defined columns ( Collection only!!! )
-*   Define your specific fields for searching and ordering
-*   Add custom javascript values for the table
-*   Tested! (Ok, maybe not fully, but I did my best :) )
+* Support for Collections and Query Builder
+* Easy to add and order columns
+* Includes a simple helper for the HTML side
+* Use your own functions and presenters in your columns
+* Search in your custom defined columns ( Collection only!!! )
+* Define your specific fields for searching and ordering
+* Add custom javascript values for the table
+* Tested! (Ok, maybe not fully, but I did my best :) )
 
-##Please note!
+## Please note!
 
 There are some differences between the collection part and the query part of this package.
 The differences are:
@@ -52,15 +49,27 @@ I would be really thankful if you can provide a test that points to the issue.
 ##Installation
 
 This package is available on http://packagist.org, just add it to your composer.json
-```
-        "chumper/datatable": "dev-develop"
-```
+
+	"chumper/datatable": "dev-develop"
+
+Alternatively, you can install it using the `composer` command:
+
+        composer require chumper/datatable "dev-develop"
+
+
 In Config/App.php: Add line Provider:
 
 ```php
 
         'Chumper\Datatable\DatatableServiceProvider',
 ```
+
+__If using Laravel 5.1:__ you will want to add:
+```php
+
+        Chumper\Datatable\DatatableServiceProvider::class,
+```
+
 Add line Alias:
 ```php
 
