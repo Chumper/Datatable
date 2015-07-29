@@ -50,7 +50,7 @@ I would be really thankful if you can provide a test that points to the issue.
 
 This package is available on http://packagist.org, just add it to your composer.json
 
-	"chumper/datatable": "dev-develop"
+        "chumper/datatable": "dev-develop"
 
 Alternatively, you can install it using the `composer` command:
 
@@ -60,19 +60,16 @@ Alternatively, you can install it using the `composer` command:
 In Config/App.php: Add line Provider:
 
 ```php
-
         'Chumper\Datatable\DatatableServiceProvider',
 ```
 
 __If using Laravel 5.1:__ you will want to add:
 ```php
-
         Chumper\Datatable\DatatableServiceProvider::class,
 ```
 
 Add line Alias:
 ```php
-
     //new
     'Datatable' => 'Chumper\Datatable\Facades\DatatableFacade',
 ```
