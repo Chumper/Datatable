@@ -52,9 +52,9 @@ abstract class BaseEngine {
     /**
      * @var array
      * support for DB::raw fields on where
-     * sburkett - added for column-based exact matching                                                                                                            
-     */                                                                                                                                                            
-    protected $columnSearchExact = array(); 
+     * sburkett - added for column-based exact matching
+     */
+    protected $columnSearchExact = array();
 
     /**
      * @var
@@ -226,7 +226,7 @@ abstract class BaseEngine {
             else
             {
                 $this->columns->put($property, new FunctionColumn($property, function($model) use($property){
-                    try{return is_array($model)?$model[$property]:$model->$property;}catch(Exception $e){return null;}    
+                    try{return is_array($model)?$model[$property]:$model->$property;}catch(Exception $e){return null;}
                 }));
             }
             $this->showColumns[] = $property;
@@ -325,13 +325,13 @@ abstract class BaseEngine {
         $this->aliasMapping = $value;
         return $this;
     }
-    
+
     public function setExactWordSearch($value = true)
     {
         $this->exactWordSearch = $value;
         return $this;
     }
-    
+
     public function setEnableDisplayAll($value = true)
     {
         $this->enableDisplayAll = $value;
@@ -374,7 +374,7 @@ abstract class BaseEngine {
     {
         return $this->aliasMapping;
     }
-    
+
     public function getEnableDisplayAll()
     {
         return $this->enableDisplayAll;
@@ -443,7 +443,7 @@ abstract class BaseEngine {
         //check if order is allowed
         if(empty($this->orderColumns))
         {
-            $columns[] = array(0 => $value, 1 => $this->getNameByIndex($value));
+            $columns[] = array(0 => $value, 1 => '`'.$this->getNameByIndex($value).'`');
             $this->order($columns, $direction);
             return;
         }
@@ -473,7 +473,7 @@ abstract class BaseEngine {
         $allColumns = array_keys($this->columns->all());
         foreach ($sortingCols as $num) {
             if(isset($allColumns[$num]) && in_array($allColumns[$num], $cleanNames)) {
-                $columns[] = array(0 => $num, 1 => $this->orderColumns[array_search($allColumns[$num],$cleanNames)]);
+                $columns[] = array(0 => $num, 1 => '`'.$this->orderColumns[array_search($allColumns[$num],$cleanNames)].'`');
             }
         }
         $this->order($columns, $direction);
