@@ -3,7 +3,7 @@ Datatable
 
 This is a __Laravel 4 package__ for the server and client side of datatables at http://datatables.net/
 
-> A __Laravel 5__ package is [close to being completed](https://github.com/Chumper/Datatable/tree/version3). To install it:
+> A __Laravel 5__ package is [close to being completed](https://github.com/Chumper/Datatable/tree/develop). To install it:
 >
 >         composer require chumper/datatable "dev-develop"
 >
