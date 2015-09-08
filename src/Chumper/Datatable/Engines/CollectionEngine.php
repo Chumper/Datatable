@@ -207,7 +207,7 @@ class CollectionEngine extends BaseEngine {
         $column = $this->orderColumn[0];
         $stripOrder = $this->options['stripOrder'];
         $self = $this;
-        $this->workingCollection->sortBy(function($row) use ($column,$stripOrder,$self) {
+        $this->workingCollection = $this->workingCollection->sortBy(function($row) use ($column,$stripOrder,$self) {
 
             if($self->getAliasMapping())
             {
