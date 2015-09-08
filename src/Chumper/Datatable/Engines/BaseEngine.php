@@ -269,6 +269,9 @@ abstract class BaseEngine {
             $cols = func_get_args();
         }
 
+        if (count($cols) == 1 && $cols[0] == '*')
+            $cols = $this->showColumns;
+
         $this->orderColumns = $cols;
         return $this;
     }
