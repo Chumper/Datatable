@@ -325,7 +325,7 @@ class Table {
         return $this;
     }
 
-	private function convertData($options) {
+    private function convertData($options, $callbacks = []) {
 		$is_obj = false;
 		$first = true;
 		$data = "";
@@ -342,11 +342,28 @@ class Table {
 				$data .= json_encode($k) . ":";
 			}
 			if (is_string($o)) {
-				if (@preg_match("#^\s*function\s*\([^\)]*#", $o)) {
-					$data .= $o;
+                            $data .= json_encode($o);
+                    } else {
+                            if (is_array($o)) {
+                                    $data .= $this->convertData($o);
 				} else {
 					$data .= json_encode($o);
 				}
+                    }
+            }
+
+            foreach($callbacks as $k => $o){
+                    if ($first == true) {
+                        if (!is_numeric($k)) {
+                                $is_obj = true;
+                        }
+                        $first = false;
+                    } else {
+                            $data .= ",\n";
+                    }
+                    $data .= json_encode($k) . ":";
+                    if (is_string($o)) {	
+                            $data .= $o;
 			} else {
 				if (is_array($o)) {
 					$data .= $this->convertData($o);
@@ -377,7 +394,7 @@ class Table {
         }
 
         return View::make($this->script_view,array(
-            'options' => $this->convertData(array_merge($this->options, $this->callbacks)),
+            'options' => $this->convertData($this->options, $this->callbacks),
             'id'        =>  $this->idName,
         ));
     }
