@@ -39,6 +39,7 @@ class CollectionEngineTest extends TestCase {
                 'exactWordSearch' => false,
             )
         );
+        Config::shouldReceive('offsetGet')->andReturn([[]]);
 
         $this->collection = Mockery::mock('Illuminate\Support\Collection');
         $this->c = new CollectionEngine($this->collection);
@@ -277,7 +278,7 @@ class CollectionEngineTest extends TestCase {
 
     }
 
-    protected function tearDown()
+    public function tearDown()
     {
         Mockery::close();
     }

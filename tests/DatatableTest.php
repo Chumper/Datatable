@@ -4,21 +4,26 @@ use Chumper\Datatable\Datatable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 
-class DatatableTest extends PHPUnit_Framework_TestCase {
+class DatatableTest extends \Orchestra\Testbench\TestCase {
 
     /**
      * @var Datatable
      */
     private $dt;
 
-    protected function setUp()
+    public function setUp()
     {
+        parent::setUp();
         // set up config
         Config::shouldReceive('get')->zeroOrMoreTimes()->with("chumper.datatable.engine")->andReturn(
             array(
                 'exactWordSearch' => false,
             )
         );
+        Config::shouldReceive('get')->zeroOrMoreTimes()->with("chumper.datatable.classmap.QueryEngine",NULL)->andReturn('Chumper\Datatable\Engines\QueryEngine');
+        Config::shouldReceive('get')->zeroOrMoreTimes()->with("chumper.datatable.classmap.CollectionEngine",NULL)->andReturn('Chumper\Datatable\Engines\CollectionEngine');
+        Config::shouldReceive('get')->zeroOrMoreTimes()->with("chumper.datatable.classmap.Table",NULL)->andReturn('Chumper\Datatable\Table');
+        
         Config::shouldReceive('get')->zeroOrMoreTimes()->with("chumper.datatable.table")->andReturn(
             array(
                 'class' => 'table table-bordered',
