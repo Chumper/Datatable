@@ -64,7 +64,22 @@ class QueryEngine extends BaseEngine {
 
     public function totalCount()
     {
-        return $this->originalBuilder->count();
+        // Store temporary copy as we may modify it, we'd be stupid to modify
+        // the actual "original" copy...
+        $originalBuilder = $this->originalBuilder;
+
+        if ($this->options['noGroupByOnCount']) {
+            // Remove the GROUP BY clause for the count
+            if ($originalBuilder instanceof Builder) {
+                $query = $originalBuilder->getQuery();
+                $query->groups = null;
+                $originalBuilder->setQuery($query);
+            } else {
+                $originalBuilder->groups = null;
+            }
+        }
+
+        return $originalBuilder->count();
     }
 
     public function getArray()
@@ -113,8 +128,18 @@ class QueryEngine extends BaseEngine {
         }
         else
         {
+            // Remove the GROUP BY clause for the count
             if ($this->options['noGroupByOnCount']) {
-                $countBuilder->groups = null;
+                // Handle \Illuminate\Database\Eloquent\Builder
+                if ($countBuilder instanceof Builder) {
+                    $query = $countBuilder->getQuery();
+                    $query->groups = null;
+                    $countBuilder->setQuery($query);
+                }
+                // Handle \Illuminate\Database\Query\Builder
+                else {
+                    $countBuilder->groups = null;
+                }
             }
             $this->options['counter'] = $countBuilder->count();
         }
