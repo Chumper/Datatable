@@ -2,6 +2,7 @@
 
 use Chumper\Datatable\Datatable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
 
@@ -69,14 +70,7 @@ class QueryEngine extends BaseEngine {
         $originalBuilder = $this->originalBuilder;
 
         if ($this->options['noGroupByOnCount']) {
-            // Remove the GROUP BY clause for the count
-            if ($originalBuilder instanceof Builder) {
-                $query = $originalBuilder->getQuery();
-                $query->groups = null;
-                $originalBuilder->setQuery($query);
-            } else {
-                $originalBuilder->groups = null;
-            }
+            $originalBuilder = $this->removeGroupBy($originalBuilder);
         }
 
         return $originalBuilder->count();
@@ -130,16 +124,7 @@ class QueryEngine extends BaseEngine {
         {
             // Remove the GROUP BY clause for the count
             if ($this->options['noGroupByOnCount']) {
-                // Handle \Illuminate\Database\Eloquent\Builder
-                if ($countBuilder instanceof Builder) {
-                    $query = $countBuilder->getQuery();
-                    $query->groups = null;
-                    $countBuilder->setQuery($query);
-                }
-                // Handle \Illuminate\Database\Query\Builder
-                else {
-                    $countBuilder->groups = null;
-                }
+                $countBuilder = $this->removeGroupBy($countBuilder);
             }
             $this->options['counter'] = $countBuilder->count();
         }
@@ -148,6 +133,28 @@ class QueryEngine extends BaseEngine {
         $collection = $this->compile($builder, $columns);
 
         return $collection;
+    }
+
+    /**
+     * Remove the GROUP BY clause from a builder.
+     *
+     * @param Builder|QueryBuilder $builder
+     * @return Builder|QueryBuilder $builder with the groups property set to null.
+     */
+    private function removeGroupBy($builder)
+    {
+        // Handle \Illuminate\Database\Eloquent\Builder
+        if ($builder instanceof Builder) {
+            $query = $builder->getQuery();
+            $query->groups = null;
+            $builder->setQuery($query);
+        }
+        // Handle \Illuminate\Database\Query\Builder
+        else {
+            $builder->groups = null;
+        }
+
+        return $builder;
     }
 
     /**
