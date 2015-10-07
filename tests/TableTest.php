@@ -13,13 +13,9 @@ class TableTest extends TestCase {
      */
     private $table;
 
-    public function setUp()
+    protected function getEnvironmentSetUp($app)
     {
-        parent::setUp();
-
-        Config::shouldReceive('offsetGet');
-        Config::shouldReceive('get')->zeroOrMoreTimes()->with("chumper.datatable.table")->andReturn(
-            array(
+        $app['config']->set('chumper.datatable.table', array(
                 'class' => 'table table-bordered',
                 'id' => '',
                 'options' => array(
@@ -30,8 +26,12 @@ class TableTest extends TestCase {
                 'noScript' => false,
                 'table_view' => 'datatable::template',
                 'script_view' => 'datatable::javascript',
-            )
-        );
+            ));
+    }
+    
+    public function setUp()
+    {
+        parent::setUp();
 
         $this->table = new Table();
     }
@@ -107,14 +107,12 @@ class TableTest extends TestCase {
     public function testRender()
     {
 
-        View::shouldReceive('make')->once()/*
+        View::shouldReceive('make')->once()
             ->with('datatable::template', array(
-                'options'   => array(
-                    'sAjaxSource' => 'fooBar',
-                    'bServerSide' => true,
-                    'sPaginationType'=>'full_numbers',
-                    'bProcessing'=>false
-                ),
+                'options'   => '{ "sPaginationType":"full_numbers",
+"bProcessing":false,
+"sAjaxSource":"fooBar",
+"bServerSide":true }',
                 'callbacks' => array(),
                 'values'    => array(),
                 'data'      => array(),
@@ -123,8 +121,9 @@ class TableTest extends TestCase {
                 'class'     => $this->table->getClass(),
                 'id'        => $this->table->getId(),
 
-            ))*/->andReturn(true);
+            ))->andReturn(true);
 
+        $this->table->setUrl('fooBar');
         $table1 = $this->table->addColumn('foo')->render();
 
         $this->assertTrue($table1);
