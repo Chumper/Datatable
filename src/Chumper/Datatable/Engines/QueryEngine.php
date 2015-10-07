@@ -2,6 +2,7 @@
 
 use Chumper\Datatable\Datatable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
 
@@ -64,7 +65,15 @@ class QueryEngine extends BaseEngine {
 
     public function totalCount()
     {
-        return $this->originalBuilder->count();
+        // Store temporary copy as we may modify it, we'd be stupid to modify
+        // the actual "original" copy...
+        $originalBuilder = $this->originalBuilder;
+
+        if ($this->options['noGroupByOnCount']) {
+            $originalBuilder = $this->removeGroupBy($originalBuilder);
+        }
+
+        return $originalBuilder->count();
     }
 
     public function getArray()
@@ -113,8 +122,9 @@ class QueryEngine extends BaseEngine {
         }
         else
         {
+            // Remove the GROUP BY clause for the count
             if ($this->options['noGroupByOnCount']) {
-                $countBuilder->groups = null;
+                $countBuilder = $this->removeGroupBy($countBuilder);
             }
             $this->options['counter'] = $countBuilder->count();
         }
@@ -123,6 +133,28 @@ class QueryEngine extends BaseEngine {
         $collection = $this->compile($builder, $columns);
 
         return $collection;
+    }
+
+    /**
+     * Remove the GROUP BY clause from a builder.
+     *
+     * @param Builder|QueryBuilder $builder
+     * @return Builder|QueryBuilder $builder with the groups property set to null.
+     */
+    private function removeGroupBy($builder)
+    {
+        // Handle \Illuminate\Database\Eloquent\Builder
+        if ($builder instanceof Builder) {
+            $query = $builder->getQuery();
+            $query->groups = null;
+            $builder->setQuery($query);
+        }
+        // Handle \Illuminate\Database\Query\Builder
+        else {
+            $builder->groups = null;
+        }
+
+        return $builder;
     }
 
     /**
