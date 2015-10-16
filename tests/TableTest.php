@@ -108,12 +108,15 @@ class TableTest extends TestCase {
     {
 
         View::shouldReceive('make')->once()
-            ->with('datatable::template', array(
-                'options'   => '{ "sPaginationType":"full_numbers",
-"bProcessing":false,
-"sAjaxSource":"fooBar",
-"bServerSide":true }',
-                'callbacks' => array(),
+            ->with('datatable::template', \Mockery::any())->andReturn(true);
+
+        $this->table->setUrl('fooBar');
+        $table1 = $this->table->addColumn('foo')->render();
+        $this->assertEquals(array(
+                'options'   => '{ "sPaginationType":"full_numbers",'.PHP_EOL
+            . '"bProcessing":false,'.PHP_EOL
+            . '"sAjaxSource":"fooBar",'.PHP_EOL
+            . '"bServerSide":true }',
                 'values'    => array(),
                 'data'      => array(),
                 'columns'   => array(1=>'foo'),
@@ -121,11 +124,7 @@ class TableTest extends TestCase {
                 'class'     => $this->table->getClass(),
                 'id'        => $this->table->getId(),
 
-            ))->andReturn(true);
-
-        $this->table->setUrl('fooBar');
-        $table1 = $this->table->addColumn('foo')->render();
-
+            ), $this->table->getViewParameters());
         $this->assertTrue($table1);
     }
 
