@@ -284,6 +284,15 @@ class Table {
         if( ! is_null($view))
             $this->table_view = $view;
 
+        return View::make($this->table_view, $this->getViewParameters());
+    }
+    
+    /**
+     * returns an array with the parameters that will be passed to the view when it's rendered
+     * @return array
+     */
+    public function getViewParameters()
+    {
         if(!isset($this->options['sAjaxSource']))
         {
             $this->setUrl(Request::url());
@@ -294,8 +303,7 @@ class Table {
         {
             $this->createMapping();
         }
-
-        return View::make($this->table_view,array(
+        return array(
             'options' => $this->convertData(array_merge($this->options, $this->callbacks)),
             'values'    => $this->customValues,
             'data'      => $this->data,
@@ -303,7 +311,7 @@ class Table {
             'noScript'  => $this->noScript,
             'id'        => $this->idName,
             'class'     => $this->className,
-        ));
+        );
     }
 
     /**
