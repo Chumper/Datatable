@@ -69,6 +69,20 @@ class TableTest extends TestCase {
         $this->table->setCallbacks('foo', 'bar', 'baz');
         $this->assertTrue(False);  // should throw exception before here
     }
+    
+    public function testSetNamedFunctionAsCallback()
+    {
+        //set an anonymous function
+        $this->table->setCallbacks(['foo'=>'function(){ return foo; }']);
+        //set a named function
+        $this->table->setCallbacks(['bar'=>'myBar']);
+        $parameters = $this->table->getViewParameters();
+        
+        //an anonymous function should be included as it is.
+        $this->assertThat($parameters['options'],$this->stringContains('"foo":function(){ return foo; }') );
+        //the callback it's a function name, it shouldn't be quoted
+        $this->assertThat($parameters['options'],$this->stringContains('"bar":myBar') );
+    }
 
     /**
      * @expectedException Exception
