@@ -8,7 +8,15 @@
 
 == Introduction
 
-This is the development and proposal version of Datatable3 for laravel 5. Here we develop and discuss the structure of the new version.
+This is the development and proposal version of Datatable3 for laravel 5. Here we develop and discuss the structure of
+the new version.
+
+== Thanks
+
+NOTE: First all i want to thank Tim Groeneveld for doing such an awesome job on maintaining this library and making it
+ready for laravel 5.
+Tim, without your help this library would not be what it is now and that you took over the development means a lot to
+me, you did a great job and you deserve all my gratitude. Let us improve this library together.
 
 == Usage
 
@@ -18,12 +26,63 @@ Proposed usage of the api.
 
 [source, php]
 ----
+{{
+    $table = Datatable::html()
+    ->column("Name", "Email")
+    ->url(URL::to('auth/users/table'))
+    ->compile()
+}}
 
+{{
+    $table->body() //<1>
+    $table->script() //<2>
+}}
+
+{{
+    $table = Datatable::html()
+    ->column("Name", "Email")
+    ->url(URL::to('auth/users/table'))
+    ->compile()
+}}
 ----
+<1> Render the html table
+<2> Render the javascript
 
 === Server side
 
 [source, php]
 ----
 
+Datatable::data($provider)
+    ->...
+
 ----
+
+I think of different providers, like collection, Eloquent or even your own providers
+
+=== Internal usage
+
+Internally i would like to change the structure to be more flexible.
+E.g. we should only hve one method that will accept the data `Datatable::data($provider)`
+where the `$provider` will provide all the extra operations on the object.
+
+I would also like to make the api more fluent.
+
+The `data(...)` method will return a builder where all other base methods can be called upon:
+[source]
+----
+->visible("name")
+->searchable("name")
+----
+
+=== To discuss
+
+Where should the declarations of searchable and orderable columns happen?::
+Normally it is part of the jquery declaration, but maybe it is easier to define it on the backend and transfer it to
+the frontend.
+
+Can we glue together the `data(...)` and `html(...)` method?::
+In my opinion it would be the best to declare the datable ones and get the same behaviour in the frontend and the
+backend, but i currently have no idea on how to achieve this.
+
+
