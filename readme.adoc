@@ -42,11 +42,15 @@ Proposed usage of the api.
     $table = Datatable::html()
     ->column("Name", "Email")
     ->url(URL::to('auth/users/table'))
+    ->option(...)
     ->compile()
 }}
 ----
 <1> Render the html table
 <2> Render the javascript
+
+Maybe we need to drop the client side of the plugin if it is too much work, but i always liked the easy setup with the
+tables.
 
 === Server side
 
@@ -58,7 +62,9 @@ Datatable::data($provider)
 
 ----
 
-I think of different providers, like collection, Eloquent or even your own providers
+I could imagine different providers, like `CollectionProvider` , `EloquentProvider` or even your own providers.
+
+This would decouple the provider configuration from the engine and makes it easier to add new providers.
 
 === Internal usage
 
@@ -73,6 +79,7 @@ The `data(...)` method will return a builder where all other base methods can be
 ----
 ->visible("name")
 ->searchable("name")
+->column('foo', function($data) { return $data->bar; })
 ----
 
 === To discuss
@@ -85,4 +92,23 @@ Can we glue together the `data(...)` and `html(...)` method?::
 In my opinion it would be the best to declare the datable ones and get the same behaviour in the frontend and the
 backend, but i currently have no idea on how to achieve this.
 
+Can we include some adapters into the library?::
+I would love to include some common adapters into the library, like DatePicker, SingleColumnSearch or even an Editor with live update.
+I can imagine that it would look like this
 
+[source, php]
+----
+Datatable::data(...)
+    ->adapter(new SingleColumnSearchAdapter(...))
+    ->adapter(
+        new EditorAdapter(
+            ...model to edit,
+            ...url to POST to
+            ...fields to edit,
+            ...template,
+            ...etc
+        )
+    )
+----
+
+Maybe we need to customize the javascript for that so we need to pacakge that with the plugin
