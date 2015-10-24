@@ -94,6 +94,34 @@ I could imagine different providers, like `CollectionProvider` , `EloquentProvid
 
 This would decouple the provider configuration from the engine and makes it easier to add new providers.
 
+==== ColumnConfiguration
+
+The `Datatable` should only contain the configuration of the data, while the `Provider` do all the heavy lifting with
+the data.
+
+I can imagine the column configuration be look something like this:
+
+[source, php]
+----
+
+Datatable::data($provider)
+    ->column('name') // just show the name column of the data without any additional configuration
+    ->column('name', 'Username') // show the name column and map the view header cell to the name `Username`
+    ->column('name', function($data) { return $data->username; }) // return custom data within a function
+    ->column('name', 'Username', function($data) { return $data->username; }) // name, mapping and function
+    ->configure('name', function($data) { return $data->username; }) // will return a ColumnConfigurer
+        ->searchable(...)
+        ->orderable(...)
+        ->regex(...)
+        ->label(...)
+        ->build()
+
+----
+
+The `Datatable` then holds a configuration of all columns and accepts the incoming request parameters.
+It will then delegate the data processing to the `Provider` and will provide a `ColumnConfiguration` object and
+a `PresenterDetail` or similar which will include information on what the frontend requested.
+
 === Internal usage
 
 Internally i would like to change the structure to be more flexible.
