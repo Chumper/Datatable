@@ -21,6 +21,18 @@ class DatatableServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->app->singleton('Chumper\Datatable\Datatable', function ($app) {
+            return new Datatable(config('datatable'));
+        });
     }
+
+    /**
+     * Perform post-registration booting of services.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+    }
+
 }

@@ -20,17 +20,45 @@ me, you did a great job and you deserve all my gratitude. Let us improve this li
 
 == Usage
 
-Proposed usage of the api.
+Here i want to discuss the proposed usage of the API. In general i would prefer to concentrate on a single route
+functionality so we can transfer all server side settings into the view without declaring it twice.
+
+Nevertheless I would also offer the possibility for two routes, which will require more configuration from the developer
+
+=== Single Usage
+
+==== Most basic example
+
+[source, php]
+----
+$datatable = Datatable::make(new EloquentModelProvider(User::class))
+
+return view("template", $datatable)
+----
+
+And in the view
+
+[source, php]
+----
+{{
+    $datatable->table();
+    $datatable->script();
+    // or
+    $datatable->html();
+
+}}
+----
+
+So all configurations from the server side are passed to the client side without the need to declare it twice.
 
 === Client side
 
 [source, php]
 ----
 {{
-    $table = Datatable::html()
+    $table = Datatable::view()
     ->column("Name", "Email")
     ->url(URL::to('auth/users/table'))
-    ->compile()
 }}
 
 {{
@@ -39,11 +67,11 @@ Proposed usage of the api.
 }}
 
 {{
-    $table = Datatable::html()
+    $table = Datatable::view()
     ->column("Name", "Email")
     ->url(URL::to('auth/users/table'))
     ->option(...)
-    ->compile()
+    ->html()
 }}
 ----
 <1> Render the html table
