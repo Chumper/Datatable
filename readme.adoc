@@ -1,0 +1,29 @@
+= Chumper/Datatable
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+:sectlinks:
+
+== Introduction
+
+This is the development and proposal version of Datatable3 for laravel 5. Here we develop and discuss the structure of the new version.
+
+== Usage
+
+Proposed usage of the api.
+
+=== Client side
+
+[source, php]
+----
+
+----
+
+=== Server side
+
+[source, php]
+----
+
+----
