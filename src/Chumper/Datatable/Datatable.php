@@ -1,20 +1,17 @@
 <?php
 
-namespace packages\chumper\datatable\src\Chumper\Datatable;
+namespace Chumper\Datatable;
 
 
-use packages\chumper\datatable\src\Chumper\Datatable\Interfaces\DatatableProvider;
+use Chumper\Datatable\Interfaces\DatatableProvider;
+use Chumper\Datatable\Interfaces\DTConfigurer;
 
-/**
- * Class Datatable
- * @package Chumper\Datatable
- */
 class Datatable
 {
 
     public function data(DatatableProvider $provider)
     {
+        return null;
     }
-
 
 }
