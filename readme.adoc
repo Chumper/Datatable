@@ -11,6 +11,8 @@
 This is the development and proposal version of Datatable3 for laravel 5. Here we develop and discuss the structure of
 the new version.
 
+image:https://travis-ci.org/Chumper/Datatable.svg?branch=datatable3["Build Status", link="https://travis-ci.org/Chumper/Datatable"]
+
 == Thanks
 
 NOTE: First all i want to thank Tim Groeneveld for doing such an awesome job on maintaining this library and making it
