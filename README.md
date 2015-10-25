@@ -9,14 +9,13 @@ This is a __Laravel 4 package__ for the server and client side of datatables at 
 >
 > If you find any issues, please report them in the bug tracker!
 
+*Please Note*, if you want Datatable 1.10 support & Laravel 5 support, try out our newest branch!
 
-### Please note:
-
-This package is for DataTables 1.9! It is NOT compatible with 1.10+!
-
-![Image](https://raw.githubusercontent.com/Chumper/Datatable/master/datatable.jpg)
-
-If you you want support for Laravel 5, or DataTables 1.10, please use the `develop` branch.
+> A new version of this package, `version5` is currently in development.
+>
+>         composer require chumper/datatable "dev-develop"
+>
+> If you find any issues, please report them in the bug tracker!
 
 ##Important
 
