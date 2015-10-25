@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: n.plaschke
- * Date: 24/10/15
- * Time: 21:14
- */
 
 namespace Chumper\Datatable\Facades;
 

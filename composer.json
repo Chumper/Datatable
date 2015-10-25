@@ -1,5 +1,5 @@
 {
-    "description": "This is a laravel 4 package for the server and client side of datatables at http://datatables.net/",
+    "description": "This is a laravel 5 package for the server and client side of datatables at http://datatables.net/",
     "keywords" : ["laravel","datatables", "ajax", "jquery"],
     "license": "MIT",
     "homepage": "http://github.com/Chumper/datatable",
@@ -12,5 +12,7 @@
         }
     ],
     "name": "chumper/datatable",
-    "require": {}
+    "require-dev": {
+        "phpunit/phpunit": "~5.0"
+    }
 }

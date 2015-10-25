@@ -3,15 +3,27 @@
 namespace Chumper\Datatable;
 
 
-use Chumper\Datatable\Interfaces\DatatableProvider;
-use Chumper\Datatable\Interfaces\DTConfigurer;
+use Chumper\Datatable\Interfaces\DTProvider;
+use Chumper\Datatable\Interfaces\DTDataConfigurer;
+use Chumper\Datatable\Interfaces\DTViewConfigurer;
 
 class Datatable
 {
 
-    public function data(DatatableProvider $provider)
+    /**
+     * @return DTDataConfigurer
+     */
+    public function data(DTProvider $provider)
     {
-        return null;
+        return new DTDataConfigurer($provider);
+    }
+
+    /**
+     * @return DTViewConfigurer
+     */
+    public function view()
+    {
+        return new DTViewConfigurer();
     }
 
 }
