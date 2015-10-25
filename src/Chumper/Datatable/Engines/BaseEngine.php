@@ -71,7 +71,7 @@ abstract class BaseEngine {
     /**
      * @var array
      */
-    protected  $searchColumns = array();
+    protected $searchColumns = array();
 
     /**
      * @var array
@@ -81,7 +81,7 @@ abstract class BaseEngine {
     /**
      * @var array
      */
-    protected  $orderColumns = array();
+    protected $orderColumns = array();
 
     /**
      * @var int
@@ -113,6 +113,8 @@ abstract class BaseEngine {
      */
     protected $orderDirection = BaseEngine::ORDER_ASC;
 
+    protected $orderingColumns = [];
+
     /**
      * @var boolean If the return should be alias mapped
      */
@@ -123,12 +125,27 @@ abstract class BaseEngine {
      */
     protected $exactWordSearch = false;
 
+    /**
+     * @var \Chumper\Datatable\InputEngine
+     */
+    protected $input;
+
+    /**
+     * @var \Chumper\Datatable\Response\VersionResponse
+     */
+    protected $response;
+
 
     function __construct()
     {
         $this->columns = new Collection();
         $this->config = Config::get('chumper.datatable.engine');
         $this->setExactWordSearch( $this->config['exactWordSearch'] );
+
+        $this->input = app()->make('Chumper\Datatable\InputEngine');
+        $this->response = $this->input->get_response_engine();
+        $this->response->parse_request();
+
         return $this;
     }
 
@@ -141,19 +158,15 @@ abstract class BaseEngine {
         if(func_num_args() != 2 && func_num_args() != 1)
             throw new Exception('Invalid number of arguments');
 
-        if(func_num_args() == 1)
-        {
+        if(func_num_args() == 1) {
             //add a predefined column
             $this->columns->put(func_get_arg(0)->getName(), func_get_arg(0));
-        }
-        else if(is_callable(func_get_arg(1)))
-        {
+        } else if (is_callable(func_get_arg(1))) {
             $this->columns->put(func_get_arg(0), new FunctionColumn(func_get_arg(0), func_get_arg(1)));
+        } else {
+            $this->columns->put(func_get_arg(0), new TextColumn(func_get_arg(0), func_get_arg(1)));
         }
-        else
-        {
-            $this->columns->put(func_get_arg(0), new TextColumn(func_get_arg(0),func_get_arg(1)));
-        }
+
         return $this;
     }
 
@@ -205,24 +218,26 @@ abstract class BaseEngine {
      */
     public function showColumns($cols)
     {
-        if ( ! is_array($cols)) {
+        if (!is_array($cols)) {
             $cols = func_get_args();
         }
 
         foreach ($cols as $property) {
             //quick fix for created_at and updated_at columns
-            if(in_array($property, array('created_at', 'updated_at')))
-            {
+            if (in_array($property, array('created_at', 'updated_at'))) {
                 $this->columns->put($property, new DateColumn($property, DateColumn::DAY_DATE));
-            }
-            else
-            {
-                $this->columns->put($property, new FunctionColumn($property, function($model) use($property){
-                    try{return is_array($model)?$model[$property]:$model->$property;}catch(Exception $e){return null;}    
+            } else {
+                $this->columns->put($property, new FunctionColumn($property, function ($model) use ($property) {
+                    try {
+                        return is_array($model) ? $model[$property] : $model->$property;
+                    } catch (Exception $e) {
+                        return null;
+                    }
                 }));
             }
             $this->showColumns[] = $property;
         }
+
         return $this;
     }
 
@@ -231,7 +246,7 @@ abstract class BaseEngine {
      */
     public function make()
     {
-        //TODO Handle all inputs
+        // TODO Handle all inputs
         $this->handleInputs();
         $this->prepareSearchColumns();
 
@@ -241,6 +256,7 @@ abstract class BaseEngine {
             "iTotalRecords" => $this->totalCount(),
             "iTotalDisplayRecords" => $this->count(),
         );
+
         return Response::json($output);
     }
 
@@ -387,7 +403,6 @@ abstract class BaseEngine {
         $this->search($value);
     }
 
-
     /**
      * @param $value
      */
@@ -399,22 +414,17 @@ abstract class BaseEngine {
             $direction = BaseEngine::ORDER_ASC;
 
         //check if order is allowed
-        if(empty($this->orderColumns))
-        {
+        if(empty($this->orderColumns)) {
             $this->order(array(0 => $value, 1 => $this->getNameByIndex($value)), $direction);
             return;
         }
 
         //prepare order array
         $cleanNames = array();
-        foreach($this->orderColumns as $c)
-        {
-            if(strpos($c,':') !== FALSE)
-            {
+        foreach($this->orderColumns as $c) {
+            if(strpos($c,':') !== FALSE) {
                 $cleanNames[] = substr($c, 0, strpos($c,':'));
-            }
-            else
-            {
+            } else {
                 $cleanNames[] = $c;
             }
         }
@@ -422,12 +432,69 @@ abstract class BaseEngine {
         $i = 0;
         foreach($this->columns as $name => $column)
         {
-            if($i == $value && in_array($name, $cleanNames))
-            {
-                $this->order(array(0 => $value, 1 => $this->orderColumns[array_search($name,$cleanNames)]), $direction);
+            if($i == $value && in_array($name, $cleanNames)) {
+                $this->order(array(0 => $value, 1 => $this->orderColumns[array_search($name, $cleanNames)]), $direction);
+
                 return;
             }
             $i++;
+        }
+    }
+
+    protected function handleSort($columns)
+    {
+        if (!is_array($columns) or count($columns) < 1) {
+            return;
+        }
+
+        //prepare order array
+        $cleanNames = array();
+        foreach($this->orderColumns as $c) {
+            if(strpos($c,':') !== FALSE) {
+                $cleanNames[] = substr($c, 0, strpos($c,':'));
+            } else {
+                $cleanNames[] = $c;
+            }
+        }
+
+        /**
+         * Build the multisort array...
+         */
+        $column_sort = array();
+
+        // this is a loop for all of the **TO BE SORTED** array items
+        $i = 0;
+        foreach($columns as $col) {
+            $value = $col['column'];
+
+            $current_column = 0;
+            foreach ($this->columns as $name => $column) {
+                if ($current_column == $value && in_array($name, $cleanNames)) {
+                    $column_sort[] = ['name' => $name, 'dir' => $col['dir']];
+                }
+                $current_column++;
+            }
+
+            $i++;
+        }
+
+        $this->orderingColumns = $column_sort;
+    }
+
+    private function direction_to_sort($direction)
+    {
+        if ($direction === 'asc')
+            return SORT_ASC;
+        elseif($direction === 'desc')
+            return SORT_DESC;
+    }
+
+    protected function handleColumnSearch()
+    {
+        foreach($this->input->columns as $id => $column) {
+            if (isset($column['search_value'])) {
+                $this->handleSingleColumnSearch($id, $column['search_value']);
+            }
         }
     }
 
@@ -452,20 +519,19 @@ abstract class BaseEngine {
      */
     protected function handleInputs()
     {
-        //Handle all inputs magically
-        foreach (Input::all() as $key => $input) {
-
-            // handle single column search
-            if ($this->isParameterForSingleColumnSearch($key))
-            {
-                $columnIndex = str_replace('sSearch_','',$key);
-                $this->handleSingleColumnSearch($columnIndex, $input);
-                continue;
-            }
-
-            if(method_exists($this, $function = 'handle'.$key))
-                $this->$function($input);
+        if ($this->response->search_individual_columns) {
+            $this->handleColumnSearch();
         }
+
+        if ($this->response->is_searching) {
+            $this->handlesSearch($this->response->search_string);
+        }
+
+        $this->handleiDisplayStart($this->response->start);
+        $this->handleiDisplayLength($this->response->length);
+        $this->handlesEcho($this->response->echo_value);
+
+        $this->handleSort($this->response->order);
     }
 
     /**
@@ -532,11 +598,20 @@ abstract class BaseEngine {
     public function getNameByIndex($index)
     {
         $i = 0;
-        foreach($this->columns as $name => $col)
-        {
-            if($index == $i)
-            {
+        foreach ($this->columns as $name => $col) {
+            if ($index == $i) {
                 return $name;
+            }
+            $i++;
+        }
+    }
+
+    public function getIndexByName($name)
+    {
+        $i = 0;
+        foreach ($this->columns as $_name => $col) {
+            if ($name == $_name) {
+                return $i;
             }
             $i++;
         }

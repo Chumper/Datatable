@@ -13,17 +13,6 @@ use Illuminate\Support\Collection;
 class CollectionEngine extends BaseEngine {
 
     /**
-     * Constant for OR queries in internal search
-     * @var string
-     */
-    const OR_CONDITION = 'OR';
-    /**
-     * Constant for AND queries in internal search
-     * @var string
-     */
-    const AND_CONDITION = 'AND';
-
-    /**
      * @var \Illuminate\Support\Collection
      */
     private $workingCollection;
@@ -137,50 +126,33 @@ class CollectionEngine extends BaseEngine {
         return $this->workingCollection->slice($this->skip,$this->limit);
     }
 
-    /**
-     * Filter a collection based on the DataTables search parameters (sSearch_0 etc)
-     * See http://legacy.datatables.net/usage/server-side
-     *
-     * @param Collection $columns       All the columns in the DataTable
-     * @param array      $searchColumns Columns to search on - values are case-sensitive (must match definition from $columns)
-     */
     private function doInternalSearch(Collection $columns, array $searchColumns)
     {
-        if((is_null($this->search) || empty($this->search)) && empty($this->fieldSearches))
+        if(is_null($this->search) or empty($this->search))
             return;
 
         $value = $this->search;
         $caseSensitive = $this->options['caseSensitive'];
 
         $toSearch = array();
-        $searchType = self::AND_CONDITION;
+
         // Map the searchColumns to the real columns
         $ii = 0;
         foreach($columns as $i => $col)
         {
-            if(in_array($columns->get($i)->getName(), $searchColumns) || in_array($columns->get($i)->getName(), $this->fieldSearches))
+            if(in_array($columns->get($i)->getName(), $searchColumns))
             {
-                // map values to columns, where there is no value use the global value
-                if(($field = array_search($columns->get($i)->getName(), $this->fieldSearches)) !== FALSE)
-                {
-                    $toSearch[$ii] = $this->columnSearches[$field];
-                }
-                else
-                {
-                    if($value)
-                        $searchType = self::OR_CONDITION;
-                    $toSearch[$ii] = $value;
-                }
+                $toSearch[] = $ii;
             }
             $ii++;
         }
 
         $self = $this;
-        $this->workingCollection = $this->workingCollection->filter(function($row) use ($toSearch, $caseSensitive, $self, $searchType)
+        $this->workingCollection = $this->workingCollection->filter(function($row) use ($value, $toSearch, $caseSensitive, $self)
         {
-            for($i=0, $stack=array(), $nb=count($row); $i<$nb; $i++)
+            for($i = 0; $i < count($row); $i++)
             {
-                if(!array_key_exists($i, $toSearch))
+                if(!in_array($i, $toSearch))
                     continue;
 
                 $column = $i;
@@ -201,67 +173,67 @@ class CollectionEngine extends BaseEngine {
                 {
                     if($self->exactWordSearch)
                     {
-                        if($toSearch[$i] === $search)
-                            $stack[$i] = true;
+                        if($value === $search)
+                            return true;
                     }
                     else
                     {
-                        if(str_contains($search,$toSearch[$i]))
-                            $stack[$i] = true;
+                        if(str_contains($search,$value))
+                            return true;
                     }
                 }
                 else
                 {
                     if($self->getExactWordSearch())
                     {
-                        if(mb_strtolower($toSearch[$i]) === mb_strtolower($search))
-                            $stack[$i] = true;
+                        if(strtolower($value) === strtolower($search))
+                            return true;
                     }
                     else
                     {
-                        if(str_contains(mb_strtolower($search),mb_strtolower($toSearch[$i])))
-                            $stack[$i] = true;
+                        if(str_contains(strtolower($search),strtolower($value)))
+                            return true;
                     }
                 }
-            }
-            if($searchType == $self::AND_CONDITION)
-            {
-                $result = array_diff_key(array_filter($toSearch), $stack);
-                if(empty($result))
-                    return true;
-            }
-            else
-            {
-                if(!empty($stack))
-                    return true;
             }
         });
     }
 
     private function doInternalOrder()
     {
-        if(is_null($this->orderColumn))
-            return;
+        if (count($this->orderingColumns) < 1)
+            return false;
 
-        $column = $this->orderColumn[0];
+        // prepare order array
+        $cleanNames = array();
+        foreach($this->orderColumns as $c) {
+            if(strpos($c,':') !== FALSE) {
+                $cleanNames[] = substr($c, 0, strpos($c,':'));
+            } else {
+                $cleanNames[] = $c;
+            }
+        }
+
         $stripOrder = $this->options['stripOrder'];
-        $self = $this;
-        $this->workingCollection = $this->workingCollection->sortBy(function($row) use ($column,$stripOrder,$self) {
 
-            if($self->getAliasMapping())
-            {
+        $orderColumn = $this->orderingColumns[0];
+        $value = $this->getIndexByName($orderColumn['name']);
+        $this->order(array(0 => $value, 1 => $orderColumn['name']), $orderColumn['dir']);
+        $column = $this->orderColumn[0];
+
+        $self = $this;
+        $this->workingCollection = $this->workingCollection->sortBy(function ($row) use ($column, $stripOrder, $self) {
+            if ($self->getAliasMapping()) {
                 $column = $self->getNameByIndex($column);
             }
-            if($stripOrder)
-            {
-                if(is_callable($stripOrder)){
+
+            if ($stripOrder) {
+                if (is_callable($stripOrder)) {
                     return $stripOrder($row, $column);
-                }else{
+                } else {
                     return strip_tags($row[$column]);
                 }
-            }
-            else
-            {
+            } else {
                 return $row[$column];
             }
         }, SORT_NATURAL);
@@ -270,6 +242,7 @@ class CollectionEngine extends BaseEngine {
             $this->workingCollection = $this->workingCollection->reverse();
     }
 
+
     private function compileArray($columns)
     {
         $self = $this;
@@ -277,32 +250,27 @@ class CollectionEngine extends BaseEngine {
             $entry = array();
 
             // add class and id if needed
-            if(!is_null($self->getRowClass()) && is_callable($self->getRowClass()))
-            {
-                $entry['DT_RowClass'] = call_user_func($self->getRowClass(),$row);
+            if(!is_null($self->getRowClass()) && is_callable($self->getRowClass())) {
+                $entry['DT_RowClass'] = call_user_func($self->getRowClass(), $row);
             }
-            if(!is_null($self->getRowId()) && is_callable($self->getRowId()))
-            {
-                $entry['DT_RowId'] = call_user_func($self->getRowId(),$row);
+            if (!is_null($self->getRowId()) && is_callable($self->getRowId())) {
+                $entry['DT_RowId'] = call_user_func($self->getRowId(), $row);
             }
-            if(!is_null($self->getRowData()) && is_callable($self->getRowData()))
-            {
-                $entry['DT_RowData'] = call_user_func($self->getRowData(),$row);
+            if (!is_null($self->getRowData()) && is_callable($self->getRowData())) {
+                $entry['DT_RowData'] = call_user_func($self->getRowData(), $row);
             }
-            $i=0;
-            foreach ($columns as $col)
-            {
-                if($self->getAliasMapping())
-                {
-                    $entry[$col->getName()] =  $col->run($row);
-                }
-                else
-                {
-                    $entry[$i] =  $col->run($row);
+
+            $i = 0;
+            foreach ($columns as $col) {
+                if ($self->getAliasMapping()) {
+                    $entry[$col->getName()] = $col->run($row);
+                } else {
+                    $entry[$i] = $col->run($row);
                 }
 
                 $i++;
             }
+
             return $entry;
         });
     }
