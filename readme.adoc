@@ -12,6 +12,10 @@ This is the development and proposal version of Datatable3 for laravel 5. Here w
 the new version.
 
 image:https://travis-ci.org/Chumper/Datatable.svg?branch=datatable3["Build Status", link="https://travis-ci.org/Chumper/Datatable"]
+image:https://poser.pugx.org/chumper/datatable/v/stable["Version", link="https://packagist.org/packages/chumper/datatable"]
+image:https://poser.pugx.org/chumper/datatable/downloads["Downloads", link="https://travis-ci.org/Chumper/Datatable"]
+image:https://poser.pugx.org/chumper/datatable/v/unstable["Latest Unstable Version", link="https://packagist.org/packages/chumper/datatable"]
+image:https://poser.pugx.org/chumper/datatable/license["License", link="https://packagist.org/packages/chumper/datatable"]
 
 == Thanks
 
