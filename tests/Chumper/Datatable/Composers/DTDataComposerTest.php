@@ -27,14 +27,13 @@ class DTDataComposerTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->provider = m::mock('Chumper\Datatable\Providers\DTProvider');
-//        $this->provider = m::mock('Chumper\Datatable\Providers\DTProvider');
-
         $this->composer = new DTDataComposer($this->provider);
     }
 
     public function testGetProvider()
     {
         $this->assertTrue($this->provider != null);
+        $this->assertTrue($this->composer != null);
         $this->assertSame($this->provider, $this->composer->getProvider());
     }
 }
