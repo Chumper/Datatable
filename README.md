@@ -13,7 +13,7 @@ This is a __Laravel 4 package__ for the server and client side of datatables at 
 
 > A new version of this package, `version5` is currently in development.
 >
->         composer require chumper/datatable "dev-develop"
+>         composer require chumper/datatable "dev-version5"
 >
 > If you find any issues, please report them in the bug tracker!
 
