@@ -1,6 +1,6 @@
 <?php
 
-namespace Chumper\Datatable\Interfaces;
+namespace Chumper\Datatable\Composers;
 
 
 class DTViewComposer

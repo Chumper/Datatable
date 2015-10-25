@@ -2,28 +2,20 @@
 
 namespace Chumper\Datatable;
 
-
-use Chumper\Datatable\Interfaces\DTProvider;
-use Chumper\Datatable\Interfaces\DTDataConfigurer;
-use Chumper\Datatable\Interfaces\DTViewConfigurer;
+use Chumper\Datatable\Providers\DTProvider;
+use Chumper\Datatable\Composers\DTDataComposer;
 
 class Datatable
 {
 
     /**
-     * @return DTDataConfigurer
+     * Will create a new DTDataComposer with the given provider as implementation.
+     *
+     * @param DTProvider $provider The providder for the underlying data.
+     * @return DTDataComposer
      */
-    public function data(DTProvider $provider)
+    public function make(DTProvider $provider)
     {
-        return new DTDataConfigurer($provider);
+        return new DTDataComposer($provider);
     }
-
-    /**
-     * @return DTViewConfigurer
-     */
-    public function view()
-    {
-        return new DTViewConfigurer();
-    }
-
 }
