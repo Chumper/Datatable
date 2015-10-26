@@ -326,29 +326,29 @@ class Table {
     }
 
     private function convertData($options, $callbacks = []) {
-            $is_obj = false;
-            $first = true;
-            $data = "";
-            foreach ($options as $k => $o) {
-                    if ($first == true) {
-                            if (!is_numeric($k)) {
-                                    $is_obj = true;
-                            }
-                            $first = false;
-                    } else {
-                            $data .= ",\n";
-                    }
-                    if (!is_numeric($k)) {
-                            $data .= json_encode($k) . ":";
-                    }
-                    if (is_string($o)) {	
+		$is_obj = false;
+		$first = true;
+		$data = "";
+		foreach ($options as $k => $o) {
+			if ($first == true) {
+				if (!is_numeric($k)) {
+					$is_obj = true;
+				}
+				$first = false;
+			} else {
+				$data .= ",\n";
+			}
+			if (!is_numeric($k)) {
+				$data .= json_encode($k) . ":";
+			}
+			if (is_string($o)) {
                             $data .= json_encode($o);
                     } else {
                             if (is_array($o)) {
                                     $data .= $this->convertData($o);
-                            } else {
-                                    $data .= json_encode($o);
-                            }
+				} else {
+					$data .= json_encode($o);
+				}
                     }
             }
 
@@ -364,24 +364,24 @@ class Table {
                     $data .= json_encode($k) . ":";
                     if (is_string($o)) {	
                             $data .= $o;
-                    } else {
-                            if (is_array($o)) {
-					$data .= $this->convertData($o);
-                            } else {
-                                    $data .= json_encode($o);
-                            }
-                    }
+			} else {
+				if (is_array($o)) {
+                                    $data .= $this->convertData([],$o);
+				} else {
+					$data .= json_encode($o);
+				}
+			}
 
-            }
+		}
 
-            if ($is_obj) {
-                    $data = "{ $data }";
-            } else {
-                    $data = "[ $data ]";
-            }
+		if ($is_obj) {
+			$data = "{ $data }";
+		} else {
+			$data = "[ $data ]";
+		}
 
-            return $data;
-    }
+		return $data;
+	}
 
     public function script($view = null)
     {
