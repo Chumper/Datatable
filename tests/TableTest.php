@@ -1,21 +1,21 @@
 <?php
 
 use Chumper\Datatable\Table;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\View;
+use Orchestra\Testbench\TestCase;
 
-class TableTest extends PHPUnit_Framework_TestCase {
+class TableTest extends TestCase {
 
     /**
      * @var Table
      */
     private $table;
 
-    protected function setUp()
+    protected function getEnvironmentSetUp($app)
     {
-        parent::setUp();
-
-        Config::shouldReceive('get')->zeroOrMoreTimes()->with("chumper.datatable.table")->andReturn(
-            array(
+        $app['config']->set('chumper.datatable.table', array(
                 'class' => 'table table-bordered',
                 'id' => '',
                 'options' => array(
@@ -26,8 +26,12 @@ class TableTest extends PHPUnit_Framework_TestCase {
                 'noScript' => false,
                 'table_view' => 'datatable::template',
                 'script_view' => 'datatable::javascript',
-            )
-        );
+            ));
+    }
+    
+    public function setUp()
+    {
+        parent::setUp();
 
         $this->table = new Table();
     }
@@ -64,6 +68,20 @@ class TableTest extends PHPUnit_Framework_TestCase {
 
         $this->table->setCallbacks('foo', 'bar', 'baz');
         $this->assertTrue(False);  // should throw exception before here
+    }
+    
+    public function testSetNamedFunctionAsCallback()
+    {
+        //set an anonymous function
+        $this->table->setCallbacks(['foo'=>'function(){ return foo; }']);
+        //set a named function
+        $this->table->setCallbacks(['bar'=>'myBar']);
+        $parameters = $this->table->getViewParameters();
+        
+        //an anonymous function should be included as it is.
+        $this->assertThat($parameters['options'],$this->stringContains('"foo":function(){ return foo; }') );
+        //the callback it's a function name, it shouldn't be quoted
+        $this->assertThat($parameters['options'],$this->stringContains('"bar":myBar') );
     }
 
     /**
@@ -102,17 +120,17 @@ class TableTest extends PHPUnit_Framework_TestCase {
 
     public function testRender()
     {
-        Request::shouldReceive('url')->once()->andReturn('fooBar');
 
         View::shouldReceive('make')->once()
-            ->with('datatable::template', array(
-                'options'   => array(
-                    'sAjaxSource' => 'fooBar',
-                    'bServerSide' => true,
-                    'sPaginationType'=>'full_numbers',
-                    'bProcessing'=>false
-                ),
-                'callbacks' => array(),
+            ->with('datatable::template', \Mockery::any())->andReturn(true);
+
+        $this->table->setUrl('fooBar');
+        $table1 = $this->table->addColumn('foo')->render();
+        $this->assertEquals(array(
+                'options'   => '{ "sPaginationType":"full_numbers",'.PHP_EOL
+            . '"bProcessing":false,'.PHP_EOL
+            . '"sAjaxSource":"fooBar",'.PHP_EOL
+            . '"bServerSide":true }',
                 'values'    => array(),
                 'data'      => array(),
                 'columns'   => array(1=>'foo'),
@@ -120,10 +138,7 @@ class TableTest extends PHPUnit_Framework_TestCase {
                 'class'     => $this->table->getClass(),
                 'id'        => $this->table->getId(),
 
-            ))->andReturn(true);
-
-        $table1 = $this->table->addColumn('foo')->render();
-
+            ), $this->table->getViewParameters());
         $this->assertTrue($table1);
     }
 
@@ -157,7 +172,7 @@ class TableTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals('foo/url',$return['sAjaxSource']);
     }
 
-    protected function tearDown()
+    public function tearDown()
     {
         Mockery::close();
     }
