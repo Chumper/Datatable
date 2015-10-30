@@ -11,11 +11,12 @@ This is a __Laravel 4 package__ for the server and client side of datatables at 
 
 *Please Note*, if you want Datatable 1.10 support & Laravel 5 support, try out our newest branch!
 
-> A new version of this package, `version5` is currently in development.
+> A new version of this package is currently in development. Please visit https://github.com/OpenSkill/Datatable for updates.
+> We welcome everybody to contribute and discuss the development there.
 >
->         composer require chumper/datatable "dev-version5"
+> This is a collaboration between timgws, Chumper and others
 >
-> If you find any issues, please report them in the bug tracker!
+> If you find any issues or want to discuss the development, please report them in the bug tracker!
 
 ##Important
 
