@@ -73,7 +73,9 @@ class QueryEngine extends BaseEngine {
             $originalBuilder = $this->removeGroupBy($originalBuilder);
         }
 
-        return $originalBuilder->count();
+        return \DB::table(\DB::raw('('.$originalBuilder->toSql().') as temp_tbl'))
+                    ->mergeBindings($originalBuilder->getQuery())
+                    ->count();
     }
 
     public function getArray()
@@ -126,7 +128,9 @@ class QueryEngine extends BaseEngine {
             if ($this->options['noGroupByOnCount']) {
                 $countBuilder = $this->removeGroupBy($countBuilder);
             }
-            $this->options['counter'] = $countBuilder->count();
+            $this->options['counter'] = \DB::table(\DB::raw('('.$countBuilder->toSql().') as temp_tbl'))
+                                            ->mergeBindings($countBuilder->getQuery())
+                                            ->count();
         }
 
         $builder = $this->doInternalOrder($builder, $columns);
