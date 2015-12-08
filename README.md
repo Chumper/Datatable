@@ -1,6 +1,19 @@
 Datatable
 =========
 
+##Important
+
+> **This package will not receive any new updates!**
+> You can still use this package, but be preparared that a new version is in development.
+>
+> A new version of this package is currently in development. Please visit https://github.com/OpenSkill/Datatable for updates.
+> We welcome everybody to contribute and discuss the development there.
+>
+> This is a collaboration between timgws, Chumper and others
+>
+> If you find any issues or want to discuss the development, please report them in the bug tracker!
+
+## Introduction
 This is a __Laravel 4 package__ for the server and client side of datatables at http://datatables.net/
 
 > A __Laravel 5__ package is [close to being completed](https://github.com/Chumper/Datatable/tree/develop). To install it:
@@ -10,15 +23,6 @@ This is a __Laravel 4 package__ for the server and client side of datatables at 
 > If you find any issues, please report them in the bug tracker!
 
 *Please Note*, if you want Datatable 1.10 support & Laravel 5 support, try out our newest branch!
-
-> A new version of this package is currently in development. Please visit https://github.com/OpenSkill/Datatable for updates.
-> We welcome everybody to contribute and discuss the development there.
->
-> This is a collaboration between timgws, Chumper and others
->
-> If you find any issues or want to discuss the development, please report them in the bug tracker!
-
-##Important
 
 If you upgrade from version 2.1.* or below please make sure you adjust your app.php with the new alias:
 
