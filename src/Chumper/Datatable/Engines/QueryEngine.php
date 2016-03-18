@@ -74,7 +74,7 @@ class QueryEngine extends BaseEngine {
         }
 
         return \DB::table(\DB::raw('('.$originalBuilder->toSql().') as temp_tbl'))
-                    ->mergeBindings($originalBuilder->getQuery())
+                    ->mergeBindings($originalBuilder)
                     ->count();
     }
 
@@ -129,7 +129,7 @@ class QueryEngine extends BaseEngine {
                 $countBuilder = $this->removeGroupBy($countBuilder);
             }
             $this->options['counter'] = \DB::table(\DB::raw('('.$countBuilder->toSql().') as temp_tbl'))
-                                            ->mergeBindings($countBuilder->getQuery())
+                                            ->mergeBindings($countBuilder)
                                             ->count();
         }
 
