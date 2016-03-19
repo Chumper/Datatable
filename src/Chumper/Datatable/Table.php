@@ -59,6 +59,11 @@ class Table {
     protected $className;
 
     /**
+     * @var String The footer's display mode
+     */
+    protected $footerMode = 'hidden';
+
+    /**
      * @var String The view used to render the table
      */
     protected $table_view;
@@ -311,6 +316,7 @@ class Table {
             'noScript'  => $this->noScript,
             'id'        => $this->idName,
             'class'     => $this->className,
+            'footerMode'=> $this->footerMode,
         );
     }
 
@@ -322,6 +328,18 @@ class Table {
     public function noScript()
     {
         $this->noScript = true;
+        return $this;
+    }
+
+    /**
+    * Set the footer display mode.
+    *
+    * @param $value the one of next values: 'hidden', 'columns', 'empty'
+    * @return $this
+    */
+    public function showFooter($value = 'columns')
+    {
+        $this->footerMode = $value;
         return $this;
     }
 
