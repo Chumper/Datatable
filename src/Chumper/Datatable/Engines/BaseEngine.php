@@ -123,6 +123,10 @@ abstract class BaseEngine {
      */
     protected $exactWordSearch = false;
 
+    /**
+     * @var mixed Additional data which passed from server to client.
+     */
+    protected $additionalData = null;
 
     function __construct()
     {
@@ -240,6 +244,7 @@ abstract class BaseEngine {
             "sEcho" => intval($this->sEcho),
             "iTotalRecords" => $this->totalCount(),
             "iTotalDisplayRecords" => $this->count(),
+            "aaAdditional" => $this->additionalData,
         );
         return Response::json($output);
     }
@@ -328,6 +333,12 @@ abstract class BaseEngine {
         $this->columnSearchExact[ $columnIndex ] = true;
 
       return $this;
+    }
+
+    public function setAdditionalData($data)
+    {
+        $this->additionalData = $data;
+        return $this;
     }
 
     public function getRowClass()
