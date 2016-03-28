@@ -74,8 +74,9 @@ class QueryEngine extends BaseEngine {
             $originalBuilder = $this->removeGroupBy($originalBuilder);
         }
 
+        $qBuilder = $originalBuilder instanceof QueryBuilder ? $originalBuilder : $originalBuilder->getQuery();
         return \DB::table(\DB::raw('('.$originalBuilder->toSql().') as temp_tbl'))
-                    ->mergeBindings($originalBuilder)
+                    ->mergeBindings($qBuilder)
                     ->count();
     }
 
@@ -135,8 +136,9 @@ class QueryEngine extends BaseEngine {
             if ($this->options['noGroupByOnCount']) {
                 $countBuilder = $this->removeGroupBy($countBuilder);
             }
+            $qBuilder = $countBuilder instanceof QueryBuilder ? $countBuilder : $countBuilder->getQuery();
             $this->options['counter'] = \DB::table(\DB::raw('('.$countBuilder->toSql().') as temp_tbl'))
-                                            ->mergeBindings($countBuilder)
+                                            ->mergeBindings($qBuilder)
                                             ->count();
         }
 
