@@ -134,7 +134,7 @@ class CollectionEngine extends BaseEngine {
         $this->doInternalSearch($columns, $searchColumns);
         $this->doInternalOrder();
 
-        return $this->workingCollection->slice($this->skip,$this->limit);
+        return $this->workingCollection->slice($this->skip,$this->limit)->values();
     }
 
     private function doInternalSearch(Collection $columns, array $searchColumns)
