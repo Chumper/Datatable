@@ -36,6 +36,6 @@ class DatatableServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return array('datatable');
+        return ['datatable'];
     }
 }

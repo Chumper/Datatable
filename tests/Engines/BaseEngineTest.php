@@ -20,9 +20,9 @@ class BaseEngineTest extends TestCase
     {
         // set up config
         Config::shouldReceive('get')->zeroOrMoreTimes()->with("datatable::engine")->andReturn(
-            array(
+            [
                 'exactWordSearch' => false,
-                )
+                ]
         );
 
         $this->collection = new Collection();
@@ -51,7 +51,7 @@ class BaseEngineTest extends TestCase
             $this->engine->getColumn('foo2')
         );
 
-        $this->assertEquals(array(1 => 'foo2', 0 => 'foo'), $this->engine->getOrder());
+        $this->assertEquals([1 => 'foo2', 0 => 'foo'], $this->engine->getOrder());
 
         $this->engine->addColumn();
     }
@@ -65,51 +65,51 @@ class BaseEngineTest extends TestCase
         );
 
         $this->engine->clearColumns();
-        $this->assertEquals(array(), $this->engine->getOrder());
+        $this->assertEquals([], $this->engine->getOrder());
     }
 
     public function testSearchColumns()
     {
         $this->engine->searchColumns('id');
 
-        $this->assertEquals(array('id'), $this->engine->getSearchingColumns());
+        $this->assertEquals(['id'], $this->engine->getSearchingColumns());
 
         $this->engine->searchColumns('name', 'email');
 
-        $this->assertEquals(array('name','email'), $this->engine->getSearchingColumns());
+        $this->assertEquals(['name','email'], $this->engine->getSearchingColumns());
 
-        $this->engine->searchColumns(array('foo', 'bar'));
+        $this->engine->searchColumns(['foo', 'bar']);
 
-        $this->assertEquals(array('foo', 'bar'), $this->engine->getSearchingColumns());
+        $this->assertEquals(['foo', 'bar'], $this->engine->getSearchingColumns());
     }
 
     public function testOrderColumns()
     {
         $this->engine->orderColumns('id');
 
-        $this->assertEquals(array('id'), $this->engine->getOrderingColumns());
+        $this->assertEquals(['id'], $this->engine->getOrderingColumns());
 
         $this->engine->orderColumns('name', 'email');
 
-        $this->assertEquals(array('name','email'), $this->engine->getOrderingColumns());
+        $this->assertEquals(['name','email'], $this->engine->getOrderingColumns());
 
-        $this->engine->orderColumns(array('foo', 'bar'));
+        $this->engine->orderColumns(['foo', 'bar']);
 
-        $this->assertEquals(array('foo', 'bar'), $this->engine->getOrderingColumns());
+        $this->assertEquals(['foo', 'bar'], $this->engine->getOrderingColumns());
     }
 
     public function testShowColumns()
     {
         $this->engine->showColumns('id');
 
-        $this->assertEquals(array('id'), $this->engine->getOrder());
+        $this->assertEquals(['id'], $this->engine->getOrder());
 
         $this->engine->showColumns('name', 'email');
 
-        $this->assertEquals(array('id','name','email'), $this->engine->getOrder());
+        $this->assertEquals(['id','name','email'], $this->engine->getOrder());
 
-        $this->engine->showColumns(array('foo', 'bar'));
+        $this->engine->showColumns(['foo', 'bar']);
 
-        $this->assertEquals(array('id','name','email', 'foo', 'bar'), $this->engine->getOrder());
+        $this->assertEquals(['id','name','email', 'foo', 'bar'], $this->engine->getOrder());
     }
 }

@@ -22,7 +22,7 @@ abstract class BaseEngine
     /**
      * @var array
      */
-    protected $config = array();
+    protected $config = [];
 
     /**
      * @var mixed
@@ -42,20 +42,20 @@ abstract class BaseEngine
     /**
      * @var array
      */
-    protected $columnSearches = array();
+    protected $columnSearches = [];
 
     /**
      * @var array
      * support for DB::raw fields on where
      */
-    protected $fieldSearches = array();
+    protected $fieldSearches = [];
 
     /**
      * @var array
      * support for DB::raw fields on where
      * sburkett - added for column-based exact matching
      */
-    protected $columnSearchExact = array();
+    protected $columnSearchExact = [];
 
     /**
      * @var
@@ -70,17 +70,17 @@ abstract class BaseEngine
     /**
      * @var array
      */
-    protected $searchColumns = array();
+    protected $searchColumns = [];
 
     /**
      * @var array
      */
-    protected $showColumns = array();
+    protected $showColumns = [];
 
     /**
      * @var array
      */
-    protected $orderColumns = array();
+    protected $orderColumns = [];
 
     /**
      * @var int
@@ -216,7 +216,7 @@ abstract class BaseEngine
 
         foreach ($cols as $property) {
             //quick fix for created_at and updated_at columns
-            if (in_array($property, array('created_at', 'updated_at'))) {
+            if (in_array($property, ['created_at', 'updated_at'])) {
                 $this->columns->put($property, new DateColumn($property, DateColumn::DAY_DATE));
             } else {
                 $this->columns->put($property, new FunctionColumn($property, function ($model) use ($property) {
@@ -249,13 +249,13 @@ abstract class BaseEngine
     {
         $this->prepareEngine();
 
-        $output = array(
+        $output = [
             "aaData" => $this->internalMake($this->columns, $this->searchColumns)->toArray(),
             "sEcho" => intval($this->sEcho),
             "iTotalRecords" => $this->totalCount(),
             "iTotalDisplayRecords" => $this->count(),
             "aaAdditional" => $this->additionalData,
-        );
+        ];
         return Response::json($output);
     }
 
@@ -439,16 +439,16 @@ abstract class BaseEngine
             $direction[$value] = BaseEngine::ORDER_ASC;
         }
 
-        $columns = array();
+        $columns = [];
         //check if order is allowed
         if (empty($this->orderColumns)) {
-            $columns[] = array(0 => $value, 1 => '`'.$this->getNameByIndex($value).'`');
+            $columns[] = [0 => $value, 1 => '`'.$this->getNameByIndex($value).'`'];
             $this->order($columns, $direction);
             return;
         }
 
         //prepare order array
-        $cleanNames = array();
+        $cleanNames = [];
         foreach ($this->orderColumns as $c) {
             if (strpos($c, ':') !== false) {
                 $cleanNames[] = substr($c, 0, strpos($c, ':'));
@@ -468,7 +468,7 @@ abstract class BaseEngine
         $allColumns = array_keys($this->columns->all());
         foreach ($sortingCols as $num) {
             if (isset($allColumns[$num]) && in_array($allColumns[$num], $cleanNames)) {
-                $columns[] = array(0 => $num, 1 => '`'.$this->orderColumns[array_search($allColumns[$num], $cleanNames)].'`');
+                $columns[] = [0 => $num, 1 => '`'.$this->orderColumns[array_search($allColumns[$num], $cleanNames)].'`'];
             }
         }
         $this->order($columns, $direction);
@@ -594,5 +594,5 @@ abstract class BaseEngine
 
     abstract protected function totalCount();
     abstract protected function count();
-    abstract protected function internalMake(Collection $columns, array $searchColumns = array());
+    abstract protected function internalMake(Collection $columns, array $searchColumns = []);
 }

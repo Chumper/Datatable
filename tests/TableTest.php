@@ -16,18 +16,18 @@ class TableTest extends PHPUnit_Framework_TestCase
         parent::setUp();
 
         Config::shouldReceive('get')->zeroOrMoreTimes()->with("datatable::table")->andReturn(
-            array(
+            [
                 'class' => 'table table-bordered',
                 'id' => '',
-                'options' => array(
+                'options' => [
                     "sPaginationType" => "full_numbers",
                     "bProcessing" => false
-                ),
-                'callbacks' => array(),
+                ],
+                'callbacks' => [],
                 'noScript' => false,
                 'table_view' => 'datatable::template',
                 'script_view' => 'datatable::javascript',
-            )
+            ]
         );
 
         $this->table = new Table();
@@ -40,10 +40,10 @@ class TableTest extends PHPUnit_Framework_TestCase
     {
         $this->table->setOptions('foo', 'bar');
 
-        $this->table->setOptions(array(
+        $this->table->setOptions([
             'foo2' => 'bar2',
             'foo3' => 'bar3'
-        ));
+        ]);
 
         $this->table->setOptions('foo', 'bar', 'baz');
     }
@@ -56,10 +56,10 @@ class TableTest extends PHPUnit_Framework_TestCase
         $this->table->setCallbacks('foo', 'bar');
         $this->assertArrayHasKey('foo', $this->table->getCallbacks());
 
-        $this->table->setCallbacks(array(
+        $this->table->setCallbacks([
             'foo2' => 'bar2',
             'foo3' => 'bar3'
-        ));
+        ]);
         $this->assertArrayHasKey('foo2', $this->table->getCallbacks());
         $this->assertArrayHasKey('foo3', $this->table->getCallbacks());
 
@@ -75,10 +75,10 @@ class TableTest extends PHPUnit_Framework_TestCase
         $this->table->setCustomValues('foo', 'bar');
         $this->assertArrayHasKey('foo', $this->table->getCustomValues());
 
-        $this->table->setCustomValues(array(
+        $this->table->setCustomValues([
             'foo2' => 'bar2',
             'foo3' => 'bar3'
-        ));
+        ]);
         $this->assertArrayHasKey('foo2', $this->table->getCustomValues());
         $this->assertArrayHasKey('foo3', $this->table->getCustomValues());
 
@@ -96,7 +96,7 @@ class TableTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(3, $this->table->countColumns());
 
-        $this->table->addColumn(array('foo3','foo4'));
+        $this->table->addColumn(['foo3','foo4']);
 
         $this->assertEquals(5, $this->table->countColumns());
     }
@@ -106,22 +106,22 @@ class TableTest extends PHPUnit_Framework_TestCase
         Request::shouldReceive('url')->once()->andReturn('fooBar');
 
         View::shouldReceive('make')->once()
-            ->with('datatable::template', array(
-                'options'   => array(
+            ->with('datatable::template', [
+                'options'   => [
                     'sAjaxSource' => 'fooBar',
                     'bServerSide' => true,
                     'sPaginationType'=>'full_numbers',
                     'bProcessing'=>false
-                ),
-                'callbacks' => array(),
-                'values'    => array(),
-                'data'      => array(),
-                'columns'   => array(1=>'foo'),
+                ],
+                'callbacks' => [],
+                'values'    => [],
+                'data'      => [],
+                'columns'   => [1=>'foo'],
                 'noScript'  => false,
                 'class'     => $this->table->getClass(),
                 'id'        => $this->table->getId(),
 
-            ))->andReturn(true);
+            ])->andReturn(true);
 
         $table1 = $this->table->addColumn('foo')->render();
 
@@ -130,16 +130,16 @@ class TableTest extends PHPUnit_Framework_TestCase
 
     public function testSetData()
     {
-        $data = array(
-            array(
+        $data = [
+            [
                 'foo',
                 'bar'
-            ),
-            array(
+            ],
+            [
                 'foo2',
                 'bar2'
-            ),
-        );
+            ],
+        ];
 
         $this->table->setData($data);
         $this->assertEquals($data, $this->table->getData());

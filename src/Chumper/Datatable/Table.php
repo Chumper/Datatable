@@ -15,34 +15,34 @@ class Table
     /**
      * @var array
      */
-    private $config = array();
+    private $config = [];
 
     /**
      * @var array
      */
-    private $columns = array();
+    private $columns = [];
 
     /**
      * @var array
      */
-    private $options = array();
+    private $options = [];
 
     /**
      * @var array
      */
-    private $callbacks = array();
+    private $callbacks = [];
 
     /**
      * Values to be sent to custom templates
      *
      * @var array
      */
-    private $customValues = array();
+    private $customValues = [];
 
     /**
      * @var array
      */
-    private $data = array();
+    private $data = [];
 
     /**
      * @var boolean Determines if the template should echo the javascript
@@ -82,7 +82,7 @@ class Table
     /**
      * @var array name of mapped columns
      */
-    private $aliasColumns = array();
+    private $aliasColumns = [];
 
     function __construct()
     {
@@ -168,9 +168,9 @@ class Table
      * @return $this
      * @throws \Exception
      */
-    public function setOrder($order = array())
+    public function setOrder($order = [])
     {
-        $_orders = array();
+        $_orders = [];
         foreach ($order as $number => $sort) {
             $_orders[] .= '[ ' . $number . ', "' . $sort . '" ]';
         }
@@ -293,7 +293,7 @@ class Table
             $this->createMapping();
         }
 
-        $template_variables = array (
+        $template_variables =  [
             'options'   => $this->options,
             'callbacks' => $this->callbacks,
             'values'    => $this->customValues,
@@ -303,7 +303,7 @@ class Table
             'id'        => $this->idName,
             'class'     => $this->className,
             'footerMode'=> $this->footerMode,
-        );
+        ];
 
         if (is_array($additional_template_variables)) {
             $template_variables += $additional_template_variables;
@@ -338,11 +338,11 @@ class Table
             $this->createMapping();
         }
 
-        return View::make($this->script_view, array(
+        return View::make($this->script_view, [
             'options'   =>  $this->options,
             'callbacks' =>  $this->callbacks,
             'id'        =>  $this->idName,
-        ));
+        ]);
     }
 
     /**
@@ -417,17 +417,17 @@ class Table
         // set options for better handling
         // merge with existing options
         if (!array_key_exists('aoColumns', $this->options)) {
-            $this->options['aoColumns'] = array();
+            $this->options['aoColumns'] = [];
         }
 
-        $matching = array();
+        $matching = [];
         $i = 0;
 
         foreach ($this->aliasColumns as $name) {
             if (array_key_exists($i, $this->options['aoColumns'])) {
-                $this->options['aoColumns'][$i] = array_merge_recursive($this->options['aoColumns'][$i], array('mData' => $name));
+                $this->options['aoColumns'][$i] = array_merge_recursive($this->options['aoColumns'][$i], ['mData' => $name]);
             } else {
-                $this->options['aoColumns'][$i] = array('mData' => $name);
+                $this->options['aoColumns'][$i] = ['mData' => $name];
             }
             $i++;
         }

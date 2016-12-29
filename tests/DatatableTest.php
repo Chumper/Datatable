@@ -16,23 +16,23 @@ class DatatableTest extends PHPUnit_Framework_TestCase
     {
         // set up config
         Config::shouldReceive('get')->zeroOrMoreTimes()->with("datatable::engine")->andReturn(
-            array(
+            [
                 'exactWordSearch' => false,
-            )
+            ]
         );
         Config::shouldReceive('get')->zeroOrMoreTimes()->with("datatable::table")->andReturn(
-            array(
+            [
                 'class' => 'table table-bordered',
                 'id' => '',
-                'options' => array(
+                'options' => [
                     "sPaginationType" => "full_numbers",
                     "bProcessing" => false
-                ),
-                'callbacks' => array(),
+                ],
+                'callbacks' => [],
                 'noScript' => false,
                 'table_view' => 'datatable::template',
                 'script_view' => 'datatable::javascript',
-            )
+            ]
         );
 
         $this->dt = new Datatable;

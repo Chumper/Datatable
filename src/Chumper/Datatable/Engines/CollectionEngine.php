@@ -36,11 +36,11 @@ class CollectionEngine extends BaseEngine
     /**
      * @var array Different options
      */
-    private $options = array(
+    private $options = [
         'stripOrder'        =>  false,
         'stripSearch'       =>  false,
         'caseSensitive'     =>  false,
-    );
+    ];
 
     /**
      * @param Collection $collection
@@ -75,7 +75,7 @@ class CollectionEngine extends BaseEngine
     {
         $this->handleInputs();
         $this->compileArray($this->columns);
-        $this->doInternalSearch(new Collection(), array());
+        $this->doInternalSearch(new Collection(), []);
         $this->doInternalOrder();
 
         return array_values($this->workingCollection
@@ -128,7 +128,7 @@ class CollectionEngine extends BaseEngine
     }
     //--------------PRIVATE FUNCTIONS-----------------
 
-    protected function internalMake(Collection $columns, array $searchColumns = array())
+    protected function internalMake(Collection $columns, array $searchColumns = [])
     {
         $this->compileArray($columns);
         $this->doInternalSearch($columns, $searchColumns);
@@ -146,7 +146,7 @@ class CollectionEngine extends BaseEngine
         $value = $this->search;
         $caseSensitive = $this->options['caseSensitive'];
 
-        $toSearch = array();
+        $toSearch = [];
 
         $searchType = self::AND_CONDITION;
 
@@ -171,7 +171,7 @@ class CollectionEngine extends BaseEngine
         $self = $this;
         $this->workingCollection = $this->workingCollection->filter(function ($row) use ($toSearch, $caseSensitive, $self, $searchType) {
 
-            for ($i=0, $stack=array(), $nb=count($row); $i<$nb; $i++) {
+            for ($i=0, $stack=[], $nb=count($row); $i<$nb; $i++) {
                 if (!array_key_exists($i, $toSearch)) {
                     continue;
                 }
@@ -260,7 +260,7 @@ class CollectionEngine extends BaseEngine
     {
         $self = $this;
         $this->workingCollection = $this->collection->map(function ($row) use ($columns, $self) {
-            $entry = array();
+            $entry = [];
 
             // add class and id if needed
             if (!is_null($self->getRowClass()) && is_callable($self->getRowClass())) {

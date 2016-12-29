@@ -28,17 +28,17 @@ class CollectionEngineTest extends TestCase
     public function setUp()
     {
         Config::shouldReceive('get')->zeroOrMoreTimes()->with("datatable::engine")->andReturn(
-            array(
+            [
                 'exactWordSearch' => false,
-            )
+            ]
         );
 
         parent::setUp();
 
         Config::shouldReceive('get')->zeroOrMoreTimes()->with("datatable::engine")->andReturn(
-            array(
+            [
                 'exactWordSearch' => false,
-            )
+            ]
         );
 
         $this->collection = Mockery::mock('Illuminate\Support\Collection');
@@ -47,20 +47,20 @@ class CollectionEngineTest extends TestCase
 
     public function testOrder()
     {
-        $should = array(
-            array(
+        $should = [
+            [
                 'id' => 'eoo'
-            ),
-            array(
+            ],
+            [
                 'id' => 'foo'
-            )
-        );
+            ]
+        ];
 
         Input::replace(
-            array(
+            [
                 'iSortCol_0' => 0,
                 'sSortDir_0' => 'asc',
-            )
+            ]
         );
 
         $engine = new CollectionEngine(new Collection($this->getTestArray()));
@@ -71,20 +71,20 @@ class CollectionEngineTest extends TestCase
         $this->assertEquals($should, $engine->getArray());
 
         Input::merge(
-            array(
+            [
                 'iSortCol_0' => 0,
                 'sSortDir_0' => 'desc'
-            )
+            ]
         );
 
-        $should2 = array(
-            array(
+        $should2 = [
+            [
                 'id' => 'foo'
-            ),
-            array(
+            ],
+            [
                 'id' => 'eoo'
-            )
-        );
+            ]
+        ];
 
         $this->assertEquals($should2, $engine->getArray());
     }
@@ -93,9 +93,9 @@ class CollectionEngineTest extends TestCase
     {
         // Facade expection
         Input::replace(
-            array(
+            [
                 'sSearch' => 'eoo'
-            )
+            ]
         );
 
         $engine = new CollectionEngine(new Collection($this->getTestArray()));
@@ -109,7 +109,7 @@ class CollectionEngineTest extends TestCase
         $this->assertEquals($should, $actual);
         //------------------TEST 2-----------------
         // search in outputed data
-        $engine = new CollectionEngine(new Collection(array(array('foo', 'foo2', 'foo3'),array('bar', 'bar2', 'bar3'))));
+        $engine = new CollectionEngine(new Collection([['foo', 'foo2', 'foo3'],['bar', 'bar2', 'bar3']]));
         $engine->addColumn(new FunctionColumn('bla', function ($row) {
             return $row[0]." - ".$row[1];
         }));
@@ -123,18 +123,18 @@ class CollectionEngineTest extends TestCase
         $engine->setAliasMapping();
 
         Input::replace(
-            array(
+            [
                 'sSearch' => 'foo2'
-            )
+            ]
         );
 
-        $should = array(
-            array(
+        $should = [
+            [
                 'bla' => 'foo - foo2',
                 '1' => 'foo3',
                 'bla3' => 'foo - foo3'
-            )
-        );
+            ]
+        ];
 
         $response = json_decode($engine->make()->getContent());
         $this->assertEquals(json_encode($should), json_encode((array)($response->aaData)));
@@ -143,7 +143,7 @@ class CollectionEngineTest extends TestCase
         // search in initial data
         // TODO: Search in initial data columns?
 
-        $engine = new CollectionEngine(new Collection(array(array('foo', 'foo2', 'foo3'),array('bar', 'bar2', 'bar3'))));
+        $engine = new CollectionEngine(new Collection([['foo', 'foo2', 'foo3'],['bar', 'bar2', 'bar3']]));
         $engine->addColumn(new FunctionColumn('bla3', function ($row) {
             return $row[0]." - ".$row[2];
         }));
@@ -154,17 +154,17 @@ class CollectionEngineTest extends TestCase
         $engine->setAliasMapping();
 
         Input::replace(
-            array(
+            [
                 'sSearch' => 'foo2'
-            )
+            ]
         );
 
-        $should = array(
-            array(
+        $should = [
+            [
                 'bla3' => 'foo - foo3',
                 '1' => 'foo2'
-            )
-        );
+            ]
+        ];
 
         $response = json_decode($engine->make()->getContent());
         $this->assertEquals(json_encode($should), json_encode($response->aaData));
@@ -178,25 +178,25 @@ class CollectionEngineTest extends TestCase
         $engine->setAliasMapping();
 
         Input::replace(
-            array(
+            [
                 'iDisplayStart' => 1
-            )
+            ]
         );
 
-        $should = array(
-            array(
+        $should = [
+            [
                 'id' => 'eoo',
-            )
-        );
+            ]
+        ];
         $this->assertEquals($should, $engine->getArray());
     }
 
     public function testTake()
     {
         Input::replace(
-            array(
+            [
                 'iDisplayLength' => 1
-            )
+            ]
         );
 
         $engine = new CollectionEngine(new Collection($this->getTestArray()));
@@ -204,11 +204,11 @@ class CollectionEngineTest extends TestCase
         $engine->setAliasMapping();
         $engine->make();
 
-        $should = array(
-            array(
+        $should = [
+            [
                 'id' => 'foo',
-            )
-        );
+            ]
+        ];
         $this->assertEquals($should, $engine->getArray());
     }
 
@@ -220,9 +220,9 @@ class CollectionEngineTest extends TestCase
         $engine->setAliasMapping();
 
         Input::replace(
-            array(
+            [
                 'sSearch' => 't'
-            )
+            ]
         );
 
         $test = json_decode($engine->make()->getContent());
@@ -238,9 +238,9 @@ class CollectionEngineTest extends TestCase
         $engine->setAliasMapping();
 
         Input::replace(
-            array(
+            [
                 'sSearch' => 'plasch'
-            )
+            ]
         );
 
         $test = json_decode($engine->make()->getContent());
@@ -256,9 +256,9 @@ class CollectionEngineTest extends TestCase
         $engine->setAliasMapping();
 
         Input::replace(
-            array(
+            [
                 'sSearch' => 'tay'
-            )
+            ]
         );
 
         $test = json_decode($engine->make()->getContent());
@@ -276,9 +276,9 @@ class CollectionEngineTest extends TestCase
         $engine->setAliasMapping();
 
         Input::replace(
-            array(
+            [
                 'sSearch' => 'O'
-            )
+            ]
         );
 
         $test = json_decode($engine->make()->getContent());
@@ -295,27 +295,27 @@ class CollectionEngineTest extends TestCase
 
     private function getTestArray()
     {
-        return array(
-            array(
+        return [
+            [
                 'id' => 'foo'
-            ),
-            array(
+            ],
+            [
                 'id' => 'eoo'
-            )
-        );
+            ]
+        ];
     }
     private function getRealArray()
     {
-        return array(
-            array(
+        return [
+            [
                 'name' => 'Nils Plaschke',
                 'email'=> 'github@nilsplaschke.de'
-            ),
-            array(
+            ],
+            [
                 'name' => 'Taylor Otwell',
                 'email'=> 'taylorotwell@gmail.com'
-            )
-        );
+            ]
+        ];
     }
 
     private function addRealColumns($engine)

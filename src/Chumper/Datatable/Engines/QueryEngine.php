@@ -31,7 +31,7 @@ class QueryEngine extends BaseEngine
     /**
      * @var array Different options
      */
-    private $options = array(
+    private $options = [
         'searchOperator'    =>  'LIKE',
         'searchWithAlias'   =>  false,
         'orderOrder'        =>  null,
@@ -41,7 +41,7 @@ class QueryEngine extends BaseEngine
         'emptyAtEnd'        =>  false,
         'returnQuery'       =>  false,
         'queryKeepsLimits'  =>  false,
-    );
+    ];
 
     function __construct($builder)
     {
@@ -144,7 +144,7 @@ class QueryEngine extends BaseEngine
      * @return $this
      * @throws Exception
      */
-    public function setOptions($options = array())
+    public function setOptions($options = [])
     {
         foreach ($options as $option_name => $option_value) {
             if (!isset($this->options[$option_name])) {
@@ -188,7 +188,7 @@ class QueryEngine extends BaseEngine
 
     //--------PRIVATE FUNCTIONS
 
-    protected function internalMake(Collection $columns, array $searchColumns = array())
+    protected function internalMake(Collection $columns, array $searchColumns = [])
     {
         $builder = clone $this->builder;
         $countBuilder = clone $this->builder;
@@ -287,7 +287,7 @@ class QueryEngine extends BaseEngine
                     if (isset($c[2])) {
                         $c[1] .= "($c[2])";
                     }
-                    $query->orWhereRaw("cast($c[0] as $c[1]) ".$like." ?", array($exact ? "$search" : "%$search%"));
+                    $query->orWhereRaw("cast($c[0] as $c[1]) ".$like." ?", [$exact ? "$search" : "%$search%"]);
                 } else {
                     $query->orWhere($c, $like, $exact ? $search : '%'.$search.'%');
                 }
@@ -320,7 +320,7 @@ class QueryEngine extends BaseEngine
 
         $self = $this;
         $this->resultCollection = $this->resultCollection->map(function ($row) use ($columns, $self) {
-            $entry = array();
+            $entry = [];
             // add class and id if needed
             if (!is_null($self->getRowClass()) && is_callable($self->getRowClass())) {
                 $entry['DT_RowClass'] = call_user_func($self->getRowClass(), $row);
