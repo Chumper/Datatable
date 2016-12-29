@@ -1,7 +1,12 @@
 {
     "name": "chumper/datatable",
     "description": "This is a laravel 4 package for the server and client side of datatables at http://datatables.net/",
-    "keywords" : ["laravel","datatables", "ajax", "jquery"],
+    "keywords": [
+        "laravel",
+        "datatables",
+        "ajax",
+        "jquery"
+    ],
     "license": "MIT",
     "homepage": "http://github.com/Chumper/datatable",
     "authors": [
