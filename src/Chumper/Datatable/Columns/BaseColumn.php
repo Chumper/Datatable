@@ -4,7 +4,8 @@
  * Class BaseColumn
  * @package Chumper\Datatable\Columns
  */
-abstract class BaseColumn {
+abstract class BaseColumn
+{
 
     /**
      * @var String name of the column
@@ -25,7 +26,7 @@ abstract class BaseColumn {
      * @return mixed the return value of the implementation,
      *              should be text in most of the cases
      */
-    public abstract function run($model);
+    abstract public function run($model);
 
     /**
      * @return String The name of the column

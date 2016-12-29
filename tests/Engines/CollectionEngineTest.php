@@ -7,7 +7,8 @@ use Illuminate\Support\Facades\Input;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Config;
 
-class CollectionEngineTest extends TestCase {
+class CollectionEngineTest extends TestCase
+{
 
     /**
      * @var CollectionEngine
@@ -63,7 +64,9 @@ class CollectionEngineTest extends TestCase {
         );
 
         $engine = new CollectionEngine(new Collection($this->getTestArray()));
-        $engine->addColumn(new FunctionColumn('id', function($model){return $model['id'];}));
+        $engine->addColumn(new FunctionColumn('id', function ($model) {
+            return $model['id'];
+        }));
         $engine->setAliasMapping();
         $this->assertEquals($should, $engine->getArray());
 
@@ -84,7 +87,6 @@ class CollectionEngineTest extends TestCase {
         );
 
         $this->assertEquals($should2, $engine->getArray());
-
     }
 
     public function testSearch()
@@ -104,14 +106,20 @@ class CollectionEngineTest extends TestCase {
         $should = '{"aaData":[{"id":"eoo"}],"sEcho":0,"iTotalRecords":2,"iTotalDisplayRecords":1}';
         $actual = $engine->make()->getContent();
 
-        $this->assertEquals($should,$actual);
+        $this->assertEquals($should, $actual);
         //------------------TEST 2-----------------
         // search in outputed data
         $engine = new CollectionEngine(new Collection(array(array('foo', 'foo2', 'foo3'),array('bar', 'bar2', 'bar3'))));
-        $engine->addColumn(new FunctionColumn('bla', function($row){return $row[0]." - ".$row[1];}));
-        $engine->addColumn(new FunctionColumn('1', function($row){return $row[2];}));
-        $engine->addColumn(new FunctionColumn('bla3', function($row){return $row[0]." - ".$row[2];}));
-        $engine->searchColumns("bla",1);
+        $engine->addColumn(new FunctionColumn('bla', function ($row) {
+            return $row[0]." - ".$row[1];
+        }));
+        $engine->addColumn(new FunctionColumn('1', function ($row) {
+            return $row[2];
+        }));
+        $engine->addColumn(new FunctionColumn('bla3', function ($row) {
+            return $row[0]." - ".$row[2];
+        }));
+        $engine->searchColumns("bla", 1);
         $engine->setAliasMapping();
 
         Input::replace(
@@ -136,9 +144,13 @@ class CollectionEngineTest extends TestCase {
         // TODO: Search in initial data columns?
 
         $engine = new CollectionEngine(new Collection(array(array('foo', 'foo2', 'foo3'),array('bar', 'bar2', 'bar3'))));
-        $engine->addColumn(new FunctionColumn('bla3', function($row){return $row[0]." - ".$row[2];}));
-        $engine->addColumn(new FunctionColumn('1', function($row){return $row[1];}));
-        $engine->searchColumns("bla3",1);
+        $engine->addColumn(new FunctionColumn('bla3', function ($row) {
+            return $row[0]." - ".$row[2];
+        }));
+        $engine->addColumn(new FunctionColumn('1', function ($row) {
+            return $row[1];
+        }));
+        $engine->searchColumns("bla3", 1);
         $engine->setAliasMapping();
 
         Input::replace(
@@ -204,7 +216,7 @@ class CollectionEngineTest extends TestCase {
     {
         $engine = new CollectionEngine(new Collection($this->getRealArray()));
         $this->addRealColumns($engine);
-        $engine->searchColumns('foo','bar');
+        $engine->searchColumns('foo', 'bar');
         $engine->setAliasMapping();
 
         Input::replace(
@@ -216,13 +228,13 @@ class CollectionEngineTest extends TestCase {
         $test = json_decode($engine->make()->getContent());
         $test = $test->aaData;
 
-        $this->assertTrue($this->arrayHasKeyValue('foo','Nils',(array) $test));
-        $this->assertTrue($this->arrayHasKeyValue('foo','Taylor',(array) $test));
+        $this->assertTrue($this->arrayHasKeyValue('foo', 'Nils', (array) $test));
+        $this->assertTrue($this->arrayHasKeyValue('foo', 'Taylor', (array) $test));
 
         //Test2
         $engine = new CollectionEngine(new Collection($this->getRealArray()));
         $this->addRealColumns($engine);
-        $engine->searchColumns('foo','bar');
+        $engine->searchColumns('foo', 'bar');
         $engine->setAliasMapping();
 
         Input::replace(
@@ -234,13 +246,13 @@ class CollectionEngineTest extends TestCase {
         $test = json_decode($engine->make()->getContent());
         $test = $test->aaData;
 
-        $this->assertTrue($this->arrayHasKeyValue('foo','Nils',(array) $test));
-        $this->assertFalse($this->arrayHasKeyValue('foo','Taylor',(array) $test));
+        $this->assertTrue($this->arrayHasKeyValue('foo', 'Nils', (array) $test));
+        $this->assertFalse($this->arrayHasKeyValue('foo', 'Taylor', (array) $test));
 
         //test3
         $engine = new CollectionEngine(new Collection($this->getRealArray()));
         $this->addRealColumns($engine);
-        $engine->searchColumns('foo','bar');
+        $engine->searchColumns('foo', 'bar');
         $engine->setAliasMapping();
 
         Input::replace(
@@ -254,13 +266,13 @@ class CollectionEngineTest extends TestCase {
 
 
 
-        $this->assertFalse($this->arrayHasKeyValue('foo','Nils',(array) $test));
-        $this->assertTrue($this->arrayHasKeyValue('foo','Taylor',(array) $test));
+        $this->assertFalse($this->arrayHasKeyValue('foo', 'Nils', (array) $test));
+        $this->assertTrue($this->arrayHasKeyValue('foo', 'Taylor', (array) $test));
 
         //test4
         $engine = new CollectionEngine(new Collection($this->getRealArray()));
         $this->addRealColumns($engine);
-        $engine->searchColumns('foo','bar');
+        $engine->searchColumns('foo', 'bar');
         $engine->setAliasMapping();
 
         Input::replace(
@@ -272,9 +284,8 @@ class CollectionEngineTest extends TestCase {
         $test = json_decode($engine->make()->getContent());
         $test = $test->aaData;
 
-        $this->assertFalse($this->arrayHasKeyValue('foo','Nils',(array) $test));
-        $this->assertTrue($this->arrayHasKeyValue('foo','Taylor',(array) $test));
-
+        $this->assertFalse($this->arrayHasKeyValue('foo', 'Nils', (array) $test));
+        $this->assertTrue($this->arrayHasKeyValue('foo', 'Taylor', (array) $test));
     }
 
     protected function tearDown()
@@ -309,24 +320,29 @@ class CollectionEngineTest extends TestCase {
 
     private function addRealColumns($engine)
     {
-        $engine->addColumn(new FunctionColumn('foo', function($m){return $m['name'];}));
-        $engine->addColumn(new FunctionColumn('bar', function($m){return $m['email'];}));
+        $engine->addColumn(new FunctionColumn('foo', function ($m) {
+            return $m['name'];
+        }));
+        $engine->addColumn(new FunctionColumn('bar', function ($m) {
+            return $m['email'];
+        }));
     }
 
     private function getTestColumns()
     {
-        return new FunctionColumn('id', function($row){return $row['id'];});
+        return new FunctionColumn('id', function ($row) {
+            return $row['id'];
+        });
     }
 
-    private function arrayHasKeyValue($key,$value,$array)
+    private function arrayHasKeyValue($key, $value, $array)
     {
-        $array = array_pluck($array,$key);
-        foreach ($array as $val)
-        {
-            if(str_contains($val, $value))
+        $array = array_pluck($array, $key);
+        foreach ($array as $val) {
+            if (str_contains($val, $value)) {
                 return true;
+            }
         }
         return false;
-
     }
 }

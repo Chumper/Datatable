@@ -5,7 +5,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
 
-class QueryEngine extends BaseEngine {
+class QueryEngine extends BaseEngine
+{
 
     /**
      * @var \Illuminate\Database\Query\Builder
@@ -45,13 +46,10 @@ class QueryEngine extends BaseEngine {
     function __construct($builder)
     {
         parent::__construct();
-        if($builder instanceof Relation)
-        {
+        if ($builder instanceof Relation) {
             $this->builder = $builder->getBaseQuery();
             $this->originalBuilder = clone $builder->getBaseQuery();
-        }
-        else
-        {
+        } else {
             $this->builder = $builder;
             $this->originalBuilder = clone $builder;
         }
@@ -64,11 +62,10 @@ class QueryEngine extends BaseEngine {
 
     public function totalCount()
     {
-        if ($this->options['distinctCountGroup'] && count($this->originalBuilder->groups) == 1)
-        {
+        if ($this->options['distinctCountGroup'] && count($this->originalBuilder->groups) == 1) {
             $this->originalBuilder->groups = null;
         }
-        if($this->options['searchWithAlias']) {
+        if ($this->options['searchWithAlias']) {
             $cnt = count($this->originalBuilder->get());
         } else {
             $cnt = $this->originalBuilder->count();
@@ -78,7 +75,7 @@ class QueryEngine extends BaseEngine {
 
     public function getArray()
     {
-       return $this->getCollection($this->builder)->toArray();
+        return $this->getCollection($this->builder)->toArray();
     }
 
     public function reset()
@@ -149,13 +146,14 @@ class QueryEngine extends BaseEngine {
      */
     public function setOptions($options = array())
     {
-        foreach($options as $option_name => $option_value)
-        {
-            if (!isset($this->options[$option_name]))
+        foreach ($options as $option_name => $option_value) {
+            if (!isset($this->options[$option_name])) {
                 throw new Exception("The option $option_name is not a valid that can be selected.");
+            }
 
-            if (is_bool($this->options[$option_name]))
+            if (is_bool($this->options[$option_name])) {
                 $option_value = (bool)$option_value;
+            }
 
             $this->options[$option_name] = $option_value;
         }
@@ -198,25 +196,18 @@ class QueryEngine extends BaseEngine {
         $builder = $this->doInternalSearch($builder, $searchColumns);
         $countBuilder = $this->doInternalSearch($countBuilder, $searchColumns);
 
-        if ($this->options['distinctCountGroup'] && count($countBuilder->groups) == 1)
-        {
+        if ($this->options['distinctCountGroup'] && count($countBuilder->groups) == 1) {
             $countBuilder->select(\DB::raw('COUNT(DISTINCT `' . $countBuilder->groups[0] . '`) as total'));
             $countBuilder->groups = null;
 
             $results = $countBuilder->get('rows');
-            if (isset($results[0]))
-            {
+            if (isset($results[0])) {
                 $result = array_change_key_case((array) $results[0]);
-
             }
             $this->options['counter'] = $result['total'];
-        }
-        elseif($this->options['searchWithAlias'])
-        {
+        } elseif ($this->options['searchWithAlias']) {
             $this->options['counter'] = count($countBuilder->get());
-        }
-        else
-        {
+        } else {
             if ($this->options['noGroupByOnCount']) {
                 $countBuilder->groups = null;
             }
@@ -225,11 +216,13 @@ class QueryEngine extends BaseEngine {
 
         $builder = $this->doInternalOrder($builder, $columns);
 
-        if ($this->options['returnQuery'])
-            if ($this->options['queryKeepsLimits'])
+        if ($this->options['returnQuery']) {
+            if ($this->options['queryKeepsLimits']) {
                 return $this->getQuery($builder);
-            else
+            } else {
                 return $builder;
+            }
+        }
 
         $collection = $this->compile($builder, $columns);
 
@@ -258,12 +251,12 @@ class QueryEngine extends BaseEngine {
     {
         $builder = $this->getQuery($builder);
 
-        if (is_null($this->collection))
-        {
+        if (is_null($this->collection)) {
             $this->collection = $builder->get();
 
-            if(is_array($this->collection))
+            if (is_array($this->collection)) {
                 $this->collection = new Collection($this->collection);
+            }
         }
         return $this->collection;
     }
@@ -286,17 +279,18 @@ class QueryEngine extends BaseEngine {
         $like = $this->options['searchOperator'];
         $search = $this->search;
         $exact = $this->exactWordSearch;
-        $builder = $builder->where(function($query) use ($columns, $search, $like, $exact) {
+        $builder = $builder->where(function ($query) use ($columns, $search, $like, $exact) {
             foreach ($columns as $c) {
                 //column to CAST following the pattern column:newType:[maxlength]
-                if(strrpos($c, ':')){
+                if (strrpos($c, ':')) {
                     $c = explode(':', $c);
-                    if(isset($c[2]))
+                    if (isset($c[2])) {
                         $c[1] .= "($c[2])";
+                    }
                     $query->orWhereRaw("cast($c[0] as $c[1]) ".$like." ?", array($exact ? "$search" : "%$search%"));
+                } else {
+                    $query->orWhere($c, $like, $exact ? $search : '%'.$search.'%');
                 }
-                else
-                    $query->orWhere($c,$like,$exact ? $search : '%'.$search.'%');
             }
         });
         return $builder;
@@ -312,14 +306,12 @@ class QueryEngine extends BaseEngine {
             $fieldSearchIndex = $this->fieldSearches[$index];
 
             if (isset($this->columnSearchExact[$fieldSearchIndex])
-                && $this->columnSearchExact[$fieldSearchIndex] == 1)
-            {
+                && $this->columnSearchExact[$fieldSearchIndex] == 1) {
                 $builder->where($fieldSearchIndex, '=', $searchValue);
             } else {
                 $builder->where($fieldSearchIndex, $this->options['searchOperator'], '%' . $searchValue . '%');
             }
         }
-
     }
 
     private function compile($builder, $columns)
@@ -327,30 +319,23 @@ class QueryEngine extends BaseEngine {
         $this->resultCollection = $this->getCollection($builder);
 
         $self = $this;
-        $this->resultCollection = $this->resultCollection->map(function($row) use ($columns,$self) {
+        $this->resultCollection = $this->resultCollection->map(function ($row) use ($columns, $self) {
             $entry = array();
             // add class and id if needed
-            if(!is_null($self->getRowClass()) && is_callable($self->getRowClass()))
-            {
-                $entry['DT_RowClass'] = call_user_func($self->getRowClass(),$row);
+            if (!is_null($self->getRowClass()) && is_callable($self->getRowClass())) {
+                $entry['DT_RowClass'] = call_user_func($self->getRowClass(), $row);
             }
-            if(!is_null($self->getRowId()) && is_callable($self->getRowId()))
-            {
-                $entry['DT_RowId'] = call_user_func($self->getRowId(),$row);
+            if (!is_null($self->getRowId()) && is_callable($self->getRowId())) {
+                $entry['DT_RowId'] = call_user_func($self->getRowId(), $row);
             }
-            if(!is_null($self->getRowData()) && is_callable($self->getRowData()))
-            {
-                $entry['DT_RowData'] = call_user_func($self->getRowData(),$row);
+            if (!is_null($self->getRowData()) && is_callable($self->getRowData())) {
+                $entry['DT_RowData'] = call_user_func($self->getRowData(), $row);
             }
             $i = 0;
-            foreach ($columns as $col)
-            {
-                if($self->getAliasMapping())
-                {
+            foreach ($columns as $col) {
+                if ($self->getAliasMapping()) {
                     $entry[$col->getName()] =  $col->run($row);
-                }
-                else
-                {
+                } else {
                     $entry[$i] =  $col->run($row);
                 }
                 $i++;
@@ -362,17 +347,16 @@ class QueryEngine extends BaseEngine {
 
     private function doInternalOrder($builder, $columns)
     {
-        if(!is_null($this->orderColumn))
-        {
+        if (!is_null($this->orderColumn)) {
             foreach ($this->orderColumn as $ordCol) {
-                if(strrpos($ordCol[1], ':')){
+                if (strrpos($ordCol[1], ':')) {
                     $c = explode(':', $ordCol[1]);
-                    if(isset($c[2]))
+                    if (isset($c[2])) {
                         $c[1] .= "($c[2])";
+                    }
                     $prefix = $this->options['emptyAtEnd'] ? "ISNULL({$c[0]}) asc," : '';
                     $builder = $builder->orderByRaw($prefix." cast($c[0] as $c[1]) ".$this->orderDirection[$ordCol[0]]);
-                }
-                else {
+                } else {
                     $prefix = $this->options['emptyAtEnd'] ? "ISNULL({$ordCol[1]}) asc," : '';
                     $builder = $builder->orderByRaw($prefix.' '.$ordCol[1].' '.$this->orderDirection[$ordCol[0]]);
                 }

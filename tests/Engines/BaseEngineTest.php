@@ -6,7 +6,8 @@ use Illuminate\Support\Facades\Input;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Config;
 
-class BaseEngineTest extends TestCase {
+class BaseEngineTest extends TestCase
+{
 
     private $collection;
 
@@ -41,7 +42,9 @@ class BaseEngineTest extends TestCase {
             $this->engine->getColumn('foo')
         );
 
-        $this->engine->addColumn('foo2', function($model){return $model->fooBar;});
+        $this->engine->addColumn('foo2', function ($model) {
+            return $model->fooBar;
+        });
 
         $this->assertInstanceOf(
             'Chumper\Datatable\Columns\FunctionColumn',
@@ -55,7 +58,7 @@ class BaseEngineTest extends TestCase {
 
     public function testClearColumns()
     {
-        $this->engine->addColumn('foo','Bar');
+        $this->engine->addColumn('foo', 'Bar');
         $this->assertInstanceOf(
             'Chumper\Datatable\Columns\TextColumn',
             $this->engine->getColumn('foo')
@@ -110,4 +113,3 @@ class BaseEngineTest extends TestCase {
         $this->assertEquals(array('id','name','email', 'foo', 'bar'), $this->engine->getOrder());
     }
 }
- 

@@ -3,7 +3,8 @@
 use Carbon\Carbon;
 use Mockery;
 
-class DateColumnTest extends \PHPUnit_Framework_TestCase {
+class DateColumnTest extends \PHPUnit_Framework_TestCase
+{
 
     public function testAll()
     {
@@ -53,4 +54,3 @@ class DateColumnTest extends \PHPUnit_Framework_TestCase {
         Mockery::close();
     }
 }
- 

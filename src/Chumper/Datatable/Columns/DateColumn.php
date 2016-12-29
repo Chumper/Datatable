@@ -1,6 +1,7 @@
 <?php namespace Chumper\Datatable\Columns;
 
-class DateColumn extends BaseColumn {
+class DateColumn extends BaseColumn
+{
 
     /**
      * Constants for the time representation
@@ -38,18 +39,15 @@ class DateColumn extends BaseColumn {
     public function run($model)
     {
 
-        if (is_string(is_array($model) ? $model[$this->name] : $model->{$this->name}))
-        {
-            if ($this->custom)
-            {
+        if (is_string(is_array($model) ? $model[$this->name] : $model->{$this->name})) {
+            if ($this->custom) {
                 return strftime($this->custom, strtotime($model->{$this->name}));
             }
 
             return is_array($model) ? $model[$this->name] : $model->{$this->name};
         }
 
-        switch($this->format)
-        {
+        switch ($this->format) {
             case DateColumn::DATE:
                 return is_array($model) ? $model[$this->name]->toDateString(): $model->{$this->name}->toDateString();
                 break;
@@ -68,7 +66,6 @@ class DateColumn extends BaseColumn {
             case DateColumn::DAY_DATE:
                 return is_array($model) ? $model[$this->name]->toDayDateTimeString(): $model->{$this->name}->toDayDateTimeString();
                 break;
-
         }
     }
 }

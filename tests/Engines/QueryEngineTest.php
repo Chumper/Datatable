@@ -6,7 +6,8 @@ use Chumper\Datatable\Engines\EngineInterface;
 use Chumper\Datatable\Engines\QueryEngine;
 use Illuminate\Support\Collection;
 
-class QueryEngineTest extends PHPUnit_Framework_TestCase {
+class QueryEngineTest extends PHPUnit_Framework_TestCase
+{
 
     /**
      * @var QueryEngine
@@ -53,7 +54,6 @@ class QueryEngineTest extends PHPUnit_Framework_TestCase {
                 'sSortDir_0' => 'desc'
             )
         );
-
     }
 
     public function testSearch()
@@ -138,7 +138,7 @@ class QueryEngineTest extends PHPUnit_Framework_TestCase {
         $engine = new QueryEngine($this->builder);
 
         $this->addRealColumns($engine);
-        $engine->searchColumns('foo','bar');
+        $engine->searchColumns('foo', 'bar');
         $engine->setAliasMapping();
 
         Input::replace(
@@ -150,14 +150,14 @@ class QueryEngineTest extends PHPUnit_Framework_TestCase {
         $test = json_decode($engine->make()->getContent());
         $test = $test->aaData;
 
-        $this->assertTrue($this->arrayHasKeyValue('foo','Nils',$test));
-        $this->assertTrue($this->arrayHasKeyValue('foo','Taylor',$test));
+        $this->assertTrue($this->arrayHasKeyValue('foo', 'Nils', $test));
+        $this->assertTrue($this->arrayHasKeyValue('foo', 'Taylor', $test));
 
         //Test2
         $engine = new QueryEngine($this->builder);
 
         $this->addRealColumns($engine);
-        $engine->searchColumns('foo','bar');
+        $engine->searchColumns('foo', 'bar');
         $engine->setAliasMapping();
 
         Input::replace(
@@ -169,14 +169,14 @@ class QueryEngineTest extends PHPUnit_Framework_TestCase {
         $test = json_decode($engine->make()->getContent());
         $test = $test->aaData;
 
-        $this->assertTrue($this->arrayHasKeyValue('foo','Nils',$test));
-        $this->assertTrue($this->arrayHasKeyValue('foo','Taylor',$test));
+        $this->assertTrue($this->arrayHasKeyValue('foo', 'Nils', $test));
+        $this->assertTrue($this->arrayHasKeyValue('foo', 'Taylor', $test));
 
         //test3
         $engine = new QueryEngine($this->builder);
 
         $this->addRealColumns($engine);
-        $engine->searchColumns('foo','bar');
+        $engine->searchColumns('foo', 'bar');
         $engine->setAliasMapping();
 
         Input::replace(
@@ -188,14 +188,14 @@ class QueryEngineTest extends PHPUnit_Framework_TestCase {
         $test = json_decode($engine->make()->getContent());
         $test = $test->aaData;
 
-        $this->assertTrue($this->arrayHasKeyValue('foo','Nils',$test));
-        $this->assertTrue($this->arrayHasKeyValue('foo','Taylor',$test));
+        $this->assertTrue($this->arrayHasKeyValue('foo', 'Nils', $test));
+        $this->assertTrue($this->arrayHasKeyValue('foo', 'Taylor', $test));
 
         //test4
         $engine = new QueryEngine($this->builder);
 
         $this->addRealColumns($engine);
-        $engine->searchColumns('foo','bar');
+        $engine->searchColumns('foo', 'bar');
         $engine->setAliasMapping();
 
         Input::replace(
@@ -207,8 +207,8 @@ class QueryEngineTest extends PHPUnit_Framework_TestCase {
         $test = json_decode($engine->make()->getContent());
         $test = $test->aaData;
 
-        $this->assertTrue($this->arrayHasKeyValue('foo','Nils',$test));
-        $this->assertTrue($this->arrayHasKeyValue('foo','Taylor',$test));
+        $this->assertTrue($this->arrayHasKeyValue('foo', 'Nils', $test));
+        $this->assertTrue($this->arrayHasKeyValue('foo', 'Taylor', $test));
     }
 
     protected function tearDown()
@@ -232,20 +232,22 @@ class QueryEngineTest extends PHPUnit_Framework_TestCase {
 
     private function addRealColumns($engine)
     {
-        $engine->addColumn(new FunctionColumn('foo', function($m){return $m['name'];}));
-        $engine->addColumn(new FunctionColumn('bar', function($m){return $m['email'];}));
+        $engine->addColumn(new FunctionColumn('foo', function ($m) {
+            return $m['name'];
+        }));
+        $engine->addColumn(new FunctionColumn('bar', function ($m) {
+            return $m['email'];
+        }));
     }
 
-    private function arrayHasKeyValue($key,$value,$array)
+    private function arrayHasKeyValue($key, $value, $array)
     {
-        $array = array_pluck($array,$key);
-        foreach ($array as $val)
-        {
-            if(str_contains($val, $value))
+        $array = array_pluck($array, $key);
+        foreach ($array as $val) {
+            if (str_contains($val, $value)) {
                 return true;
+            }
         }
         return false;
-
     }
-
 }

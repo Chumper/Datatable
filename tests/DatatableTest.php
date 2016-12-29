@@ -4,7 +4,8 @@ use Chumper\Datatable\Datatable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 
-class DatatableTest extends PHPUnit_Framework_TestCase {
+class DatatableTest extends PHPUnit_Framework_TestCase
+{
 
     /**
      * @var Datatable
@@ -52,5 +53,4 @@ class DatatableTest extends PHPUnit_Framework_TestCase {
 
         $this->assertInstanceOf('Chumper\Datatable\Table', $table);
     }
-
 }
