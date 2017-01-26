@@ -59,6 +59,11 @@ class Table {
     protected $className;
 
     /**
+     * @var String The footer's display mode
+     */
+    protected $footerMode = 'hidden';
+
+    /**
      * @var String The view used to render the table
      */
     protected $table_view;
@@ -304,13 +309,14 @@ class Table {
             $this->createMapping();
         }
         return array(
-            'options' => $this->convertData(array_merge($this->options, $this->callbacks)),
+            'options' => $this->convertData($this->options, $this->callbacks),
             'values'    => $this->customValues,
             'data'      => $this->data,
             'columns'   => array_combine($this->aliasColumns,$this->columns),
             'noScript'  => $this->noScript,
             'id'        => $this->idName,
             'class'     => $this->className,
+            'footerMode'=> $this->footerMode,
         );
     }
 
@@ -325,7 +331,19 @@ class Table {
         return $this;
     }
 
-	private function convertData($options) {
+    /**
+    * Set the footer display mode.
+    *
+    * @param $value the one of next values: 'hidden', 'columns', 'empty'
+    * @return $this
+    */
+    public function showFooter($value = 'columns')
+    {
+        $this->footerMode = $value;
+        return $this;
+    }
+
+	private function convertData($options, $callbacks = null) {
 		$is_obj = false;
 		$first = true;
 		$data = "";
@@ -342,17 +360,19 @@ class Table {
 				$data .= json_encode($k) . ":";
 			}
 			if (is_string($o)) {
-				if (@preg_match("#^\s*function\s*\([^\)]*#", $o)) {
-					$data .= $o;
-				} else {
-					$data .= json_encode($o);
-				}
+				$data .= json_encode($o);
 			} else {
 				if (is_array($o)) {
 					$data .= $this->convertData($o);
 				} else {
 					$data .= json_encode($o);
 				}
+			}
+		}
+		if ($callbacks) {
+			foreach ($callbacks as $k => $o) {
+				$data .= empty($data) ? '' : ",\n";
+				$data .= json_encode($k) . ":" . $o;
 			}
 		}
 
@@ -377,7 +397,7 @@ class Table {
         }
 
         return View::make($this->script_view,array(
-            'options' => $this->convertData(array_merge($this->options, $this->callbacks)),
+            'options' => $this->convertData($this->options, $this->callbacks),
             'id'        =>  $this->idName,
         ));
     }

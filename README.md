@@ -276,6 +276,10 @@ Note: If you want to search on number columns with the query engine, then you ca
 
  This will cast the columns int the given types when searching on this columns
 
+You also can use dot syntax if your query has identical fields in different tables
+ ```
+    ->searchColumns(array('category.title', 'job.title', 'phone'))
+ ```
 **orderColumns(..$fields)**
 
 Will enable the table to allow ordering only in the given columns.

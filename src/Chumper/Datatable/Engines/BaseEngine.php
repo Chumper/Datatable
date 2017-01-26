@@ -123,6 +123,10 @@ abstract class BaseEngine {
      */
     protected $exactWordSearch = false;
 
+    /**
+     * @var mixed Additional data which passed from server to client.
+     */
+    protected $additionalData = null;
 
     function __construct()
     {
@@ -240,6 +244,7 @@ abstract class BaseEngine {
             "sEcho" => intval($this->sEcho),
             "iTotalRecords" => $this->totalCount(),
             "iTotalDisplayRecords" => $this->count(),
+            "aaAdditional" => $this->additionalData,
         );
         return Response::json($output);
     }
@@ -330,6 +335,12 @@ abstract class BaseEngine {
       return $this;
     }
 
+    public function setAdditionalData($data)
+    {
+        $this->additionalData = $data;
+        return $this;
+    }
+
     public function getRowClass()
     {
         return $this->rowClass;
@@ -394,14 +405,16 @@ abstract class BaseEngine {
     protected function handleiSortCol_0($value)
     {
         if(Input::get('sSortDir_0') == 'desc')
-            $direction = BaseEngine::ORDER_DESC;
+            $direction[$value] = BaseEngine::ORDER_DESC;
         else
-            $direction = BaseEngine::ORDER_ASC;
+            $direction[$value] = BaseEngine::ORDER_ASC;
 
+        $columns = array();
         //check if order is allowed
         if(empty($this->orderColumns))
         {
-            $this->order(array(0 => $value, 1 => $this->getNameByIndex($value)), $direction);
+            $columns[] = array(0 => $value, 1 => $this->getNameByIndex($value));
+            $this->order($columns, $direction);
             return;
         }
 
@@ -419,16 +432,22 @@ abstract class BaseEngine {
             }
         }
 
-        $i = 0;
-        foreach($this->columns as $name => $column)
-        {
-            if($i == $value && in_array($name, $cleanNames))
-            {
-                $this->order(array(0 => $value, 1 => $this->orderColumns[array_search($name,$cleanNames)]), $direction);
-                return;
-            }
-            $i++;
+        $iSortingCols = Input::get('iSortingCols');
+        $sortingCols[] = $value;
+        for($i = 1; $i < $iSortingCols; $i++) {
+            $isc = Input::get('iSortCol_'.$i);
+            $sortingCols[] = $isc;
+            $direction[$isc] = Input::get('sSortDir_'.$i);
         }
+
+        $allColumns = array_keys($this->columns->all());
+        foreach ($sortingCols as $num) {
+            if(in_array($allColumns[$num], $cleanNames)) {
+                $columns[] = array(0 => $num, 1 => $this->orderColumns[array_search($allColumns[$num],$cleanNames)]);
+            }
+        }
+        $this->order($columns, $direction);
+        return;
     }
 
     /**
