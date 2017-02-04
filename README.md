@@ -4,14 +4,9 @@ Datatable
 ##Important
 
 > **This package will not receive any new updates!**
-> You can still use this package, but be preparared that a new version is in development.
+> You can still use this package, but be preparared that there is no active development for this project.
 >
-> A new version of this package is currently in development. Please visit https://github.com/OpenSkill/Datatable for updates.
-> We welcome everybody to contribute and discuss the development there.
->
-> This is a collaboration between timgws, Chumper and others
->
-> If you find any issues or want to discuss the development, please report them in the bug tracker!
+> This package is `abandoned` and not recommended for new projects
 
 ## Introduction
 This is a __Laravel 4 package__ for the server and client side of datatables at http://datatables.net/
