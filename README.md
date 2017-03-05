@@ -7,7 +7,7 @@ Datatable
 > You can still use this package, but be preparared that there is no active development for this project.
 >
 > This package is `abandoned` and not recommended for new projects. 
-> We recommend instead to use [Yajra's Package](https://github.com/yajra/laravel-datatables) which offers a nearly-similar API.
+> We recommend to use instead [Yajra's Package](https://github.com/yajra/laravel-datatables) which offers a nearly-similar API.
 
 ## Introduction
 This is a __Laravel 4 package__ for the server and client side of datatables at http://datatables.net/
