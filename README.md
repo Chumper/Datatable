@@ -1,7 +1,7 @@
 Datatable
 =========
 
-##Important
+## Important
 
 > **This package will not receive any new updates!**
 > You can still use this package, but be preparared that there is no active development for this project.
@@ -32,16 +32,16 @@ If you upgrade from version 2.1.* or below please make sure you adjust your app.
     'Datatable' => 'Chumper\Datatable\Facades\DatatableFacade',
 ```
 
-##Known Issues
+## Known Issues
 
 * none i know of so far
 
-##TODO
+## TODO
 
 * fix incoming bugs
 * code documentaion
 
-##Features
+## Features
 
 This package supports:
 
@@ -54,7 +54,7 @@ This package supports:
 *   Add custom javascript values for the table
 *   Tested! (Ok, maybe not fully, but I did my best :) )
 
-##Please note!
+## Please note!
 
 There are some differences between the collection part and the query part of this package.
 The differences are:
@@ -73,7 +73,7 @@ http://www.youtube.com/watch?v=c9fao_5Jo3Y
 Please let me know any issues or features you want to have in the issues section.
 I would be really thankful if you can provide a test that points to the issue.
 
-##Installation
+## Installation
 
 This package is available on http://packagist.org, just add it to your composer.json
 
@@ -102,11 +102,11 @@ To override the default configuration options you can publish the config file.
 You may now edit these options at app/config/packages/chumper/datatable/config.php.
 
 
-##Basic Usage
+## Basic Usage
 
 There are two ways you can use the plugin, within one route or within two routes:
 
-###Two routes
+### Two routes
 
 * Create two routes: One to deliver the view to the user, the other for datatable data, eg:
 
@@ -143,7 +143,7 @@ There are two ways you can use the plugin, within one route or within two routes
 
 You should now have a working datatable on your page.
 
-###One route
+### One route
 
 In your route you should use the Datatable::shouldHandle method which will check whether the plugin should handle the request or not.
 
@@ -160,7 +160,7 @@ In your route you should use the Datatable::shouldHandle method which will check
 
 The plugin will then query the same url for information. The shouldHandle method just checks for an ajax request and if sEcho is set.
 
-##HTML Example
+## HTML Example
 
 ```php
 	Datatable::table()
@@ -195,7 +195,7 @@ If you want to provide your own template for the table just provide the path to 
     	->setUrl(URL::to('auth/users/table'))
         ->render('views.templates.datatable');
 ```
-##Server Example
+## Server Example
 
 ```php
 	Datatable::collection(User::all())
@@ -228,7 +228,7 @@ You could now also access all relationship, so it would be easy for a book model
 
 The order of the columns is always defined by the user and will be the same order the user adds the columns to the Datatable.
 
-##Query or Collection?
+## Query or Collection?
 
 There is a difference between query() and collection().
 A collection will be compiled before any operation - like search or order - will be performed so that it can also include your custom fields.
@@ -247,7 +247,7 @@ Please see the following video for more details.
 
 http://www.youtube.com/watch?v=c9fao_5Jo3Y
 
-##Available functions
+## Available functions
 
 This package is separated into two smaller parts:
 
@@ -257,7 +257,7 @@ This package is separated into two smaller parts:
 
 The second and third one is for the server side, the first one is a helper to generate the needed table and javascript calls.
 
-###Collection & Query
+### Collection & Query
 
 **collection($collection)**
 
@@ -405,7 +405,7 @@ This will return an array with the columns that will be shown, mainly used for t
 
 Will get a column by its name, mainly used for testing and debugging, not really useful for you.
 
-###Specific QueryEngine methods
+### Specific QueryEngine methods
 
 **setSearchWithAlias()**
 
@@ -438,7 +438,7 @@ With this method you can set the operator on searches like "ILIKE" on PostgreSQL
 
 Will advice the engines only to search for the exact given search string.
 
-###Specific CollectionEngine methods
+### Specific CollectionEngine methods
 
 **setSearchStrip() & setOrderStrip()**
 
@@ -451,7 +451,7 @@ This can be useful if you return a link to the model detail but still want to pr
 
 Set the search method to case sensitive or not, default is false
 
-###Table
+### Table
 
 **noScript()**
 
@@ -598,7 +598,7 @@ Defines the order that a datatable will be ordered by on first page load.
     ->setOrder(array(2=>'asc', 1=>'asc')) // sort by last name then first name
     ->render('my.datatable.template') }}
 ```
-##Extras
+## Extras
 Some extras features, using the Datatables api.
 
 ### TableTools
@@ -626,22 +626,22 @@ To use TableTools you will need to add some files in your project (https://datat
 ```
 If you want to get some properties like "which row did i click?", see the javascript.blade.php and the variable $values.
 
-##Contributors
+## Contributors
 
 * [jgoux](https://github.com/jgoux) for helping with searching on number columns in the database
 * [jijoel](https://github.com/jijoel) for helping with callback options and documentation
 
-##Changelog
+## Changelog
 
 * 2.0.0:
 	* Seperated Query and Collection Engine
 	* Added single column search
 	* Code cleanup
 
-##Applications
+## Applications
 
 https://github.com/hillelcoren/invoice-ninja (by Hillel Coren)
 
-##License
+## License
 
 This package is licensed under the MIT License
