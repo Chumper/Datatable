@@ -100,9 +100,9 @@ class QueryEngine extends BaseEngine {
         return $this;
     }
 
-    public function setEmptyAtEnd()
+    public function setEmptyAtEnd($value = true)
     {
-        $this->options['emptyAtEnd'] = true;
+        $this->options['emptyAtEnd'] = $value;
         return $this;
     }
 
@@ -364,20 +364,25 @@ class QueryEngine extends BaseEngine {
     {
         if(!is_null($this->orderColumn))
         {
-            foreach ($this->orderColumn as $ordCol) {
-                if(strrpos($ordCol[1], ':')){
-                    $c = explode(':', $ordCol[1]);
-                    if(isset($c[2]))
-                        $c[1] .= "($c[2])";
-                    $prefix = $this->options['emptyAtEnd'] ? "ISNULL({$c[0]}) asc," : '';
-                    $builder = $builder->orderByRaw($prefix." cast($c[0] as $c[1]) ".$this->orderDirection[$ordCol[0]]);
+            $i = 0;
+            foreach($columns as $col)
+            {
+                if($i === (int) $this->orderColumn[0])
+                {
+                    if(isset($this->orderColumn[1]) && strrpos($this->orderColumn[1], ':')){
+                        $c = explode(':', $this->orderColumn[1]);
+                        if(isset($c[2]))
+                            $c[1] .= "($c[2])";
+                        $builder = $builder->orderByRaw("cast($c[0] as $c[1]) ".$this->orderDirection);
+                    }
+                    else
+                        $builder = $builder->orderBy($col->getName(), $this->orderDirection);
+                    return $builder;
                 }
-                else {
-                    $prefix = $this->options['emptyAtEnd'] ? "ISNULL({$ordCol[1]}) asc," : '';
-                    $builder = $builder->orderByRaw($prefix.' '.$ordCol[1].' '.$this->orderDirection[$ordCol[0]]);
-                }
+                $i++;
             }
         }
         return $builder;
+
     }
 }

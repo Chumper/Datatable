@@ -34,7 +34,7 @@ class QueryEngineTest extends PHPUnit_Framework_TestCase {
 
     public function testOrder()
     {
-        $this->builder->shouldReceive('orderBy')->with('id', BaseEngine::ORDER_ASC);
+        $this->builder->shouldReceive('orderByRaw')->with('id', BaseEngine::ORDER_ASC);
 
         Input::merge(
             array(

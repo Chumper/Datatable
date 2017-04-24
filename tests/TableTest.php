@@ -1,16 +1,46 @@
 <?php
 
+use Mockery as m;
 use Chumper\Datatable\Table;
 use Illuminate\Support\Facades\Request;
+use Illuminate\Foundation\Testing\TestCase;
 
-class TableTest extends PHPUnit_Framework_TestCase {
+use Illuminate\View\View;
+use Illuminate\Support\Contracts\ArrayableInterface;
+
+
+class TableTest extends TestCase {
 
     /**
      * @var Table
      */
     private $table;
 
-    protected function setUp()
+    public function createApplication()
+    {
+        $this->view = Mockery::mock('ViewMock');
+        Illuminate\Support\Facades\View::swap($this->view);
+
+        $unitTesting = true;
+        $testEnvironment = 'testing';
+
+        $app = new Illuminate\Foundation\Application;
+
+        $env = $app->detectEnvironment(array(
+            'local' => array('homestead'),
+        ));
+
+
+
+        $app->bindInstallPaths(require __DIR__.'/../resources/paths.php');
+
+        $framework = __DIR__ . '/../vendor/laravel/framework/src';
+        require $framework . '/Illuminate/Foundation/start.php';
+
+        return $app;
+    }
+
+    public function setUp()
     {
         parent::setUp();
 
@@ -29,6 +59,7 @@ class TableTest extends PHPUnit_Framework_TestCase {
             )
         );
 
+
         $this->table = new Table();
     }
 
@@ -37,7 +68,7 @@ class TableTest extends PHPUnit_Framework_TestCase {
      */
     public function testSetOptions()
     {
-        $this->table->setOptions('foo','bar');
+        $this->table->setOptions('foo', 'bar');
 
         $this->table->setOptions(array(
             'foo2' => 'bar2',
@@ -63,7 +94,7 @@ class TableTest extends PHPUnit_Framework_TestCase {
         $this->assertArrayHasKey('foo3', $this->table->getCallbacks());
 
         $this->table->setCallbacks('foo', 'bar', 'baz');
-        $this->assertTrue(False);  // should throw exception before here
+        $this->assertTrue(false);  // should throw exception before here
     }
 
     /**
@@ -82,7 +113,7 @@ class TableTest extends PHPUnit_Framework_TestCase {
         $this->assertArrayHasKey('foo3', $this->table->getCustomValues());
 
         $this->table->setCustomValues('foo', 'bar', 'baz');
-        $this->assertTrue(False);  // should throw exception before here
+        $this->assertTrue(false);  // should throw exception before here
     }
 
     public function testAddColumn()
@@ -91,11 +122,11 @@ class TableTest extends PHPUnit_Framework_TestCase {
 
         $this->assertEquals(1, $this->table->countColumns());
 
-        $this->table->addColumn('foo1','foo2');
+        $this->table->addColumn('foo1', 'foo2');
 
         $this->assertEquals(3, $this->table->countColumns());
 
-        $this->table->addColumn(array('foo3','foo4'));
+        $this->table->addColumn(array('foo3', 'foo4'));
 
         $this->assertEquals(5, $this->table->countColumns());
     }
@@ -141,7 +172,7 @@ class TableTest extends PHPUnit_Framework_TestCase {
         );
 
         $this->table->setData($data);
-        $this->assertEquals($data,$this->table->getData());
+        $this->assertEquals($data, $this->table->getData());
 
     }
 
@@ -149,16 +180,17 @@ class TableTest extends PHPUnit_Framework_TestCase {
     {
         $this->table->setUrl('foo/url');
 
-        $this->assertArrayHasKey('bServerSide',$this->table->getOptions());
-        $this->assertArrayHasKey('sAjaxSource',$this->table->getOptions());
+        $this->assertArrayHasKey('bServerSide', $this->table->getOptions());
+        $this->assertArrayHasKey('sAjaxSource', $this->table->getOptions());
 
         $return = $this->table->getOptions();
 
-        $this->assertEquals('foo/url',$return['sAjaxSource']);
+        $this->assertEquals('foo/url', $return['sAjaxSource']);
     }
 
     protected function tearDown()
     {
         Mockery::close();
     }
+
 }

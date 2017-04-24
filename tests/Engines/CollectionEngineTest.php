@@ -101,7 +101,7 @@ class CollectionEngineTest extends TestCase {
         $engine->searchColumns('id');
         $engine->setAliasMapping();
 
-        $should = '{"aaData":[{"id":"eoo"}],"sEcho":0,"iTotalRecords":2,"iTotalDisplayRecords":1}';
+        $should = '{"aaData":[{"id":"eoo"}],"sEcho":0,"iTotalRecords":2,"iTotalDisplayRecords":1,"aaAdditional":null}';
         $actual = $engine->make()->getContent();
 
         $this->assertEquals($should,$actual);
