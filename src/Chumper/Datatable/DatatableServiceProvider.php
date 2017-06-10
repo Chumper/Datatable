@@ -2,14 +2,15 @@
 
 use Illuminate\Support\ServiceProvider;
 
-class DatatableServiceProvider extends ServiceProvider {
+class DatatableServiceProvider extends ServiceProvider
+{
 
-	/**
-	 * Indicates if loading of the provider is deferred.
-	 *
-	 * @var bool
-	 */
-	protected $defer = false;
+    /**
+     * Indicates if loading of the provider is deferred.
+     *
+     * @var bool
+     */
+    protected $defer = false;
 
     public function boot()
     {
@@ -17,14 +18,13 @@ class DatatableServiceProvider extends ServiceProvider {
     }
 
     /**
-	 * Register the service provider.
-	 *
-	 * @return void
-	 */
+     * Register the service provider.
+     *
+     * @return void
+     */
     public function register()
     {
-        $this->app['datatable'] = $this->app->share(function($app)
-        {
+        $this->app['datatable'] = $this->app->share(function ($app) {
             return new Datatable;
         });
     }
@@ -36,6 +36,6 @@ class DatatableServiceProvider extends ServiceProvider {
      */
     public function provides()
     {
-        return array('datatable');
+        return ['datatable'];
     }
 }

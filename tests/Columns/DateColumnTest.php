@@ -3,7 +3,8 @@
 use Carbon\Carbon;
 use Mockery;
 
-class DateColumnTest extends \PHPUnit_Framework_TestCase {
+class DateColumnTest extends \PHPUnit_Framework_TestCase
+{
 
     public function testAll()
     {
@@ -40,12 +41,12 @@ class DateColumnTest extends \PHPUnit_Framework_TestCase {
             ->andReturn('fooBar');
 
         //now test
-        $this->assertEquals('fooBar', $column1->run(array('foo' => $c)));
-        $this->assertEquals('fooBar', $column2->run(array('foo' => $c)));
-        $this->assertEquals('fooBar', $column3->run(array('foo' => $c)));
-        $this->assertEquals('fooBar', $column4->run(array('foo' => $c)));
-        $this->assertEquals('fooBar', $column5->run(array('foo' => $c)));
-        $this->assertEquals('fooBar', $column6->run(array('foo' => $c)));
+        $this->assertEquals('fooBar', $column1->run(['foo' => $c]));
+        $this->assertEquals('fooBar', $column2->run(['foo' => $c]));
+        $this->assertEquals('fooBar', $column3->run(['foo' => $c]));
+        $this->assertEquals('fooBar', $column4->run(['foo' => $c]));
+        $this->assertEquals('fooBar', $column5->run(['foo' => $c]));
+        $this->assertEquals('fooBar', $column6->run(['foo' => $c]));
     }
 
     protected function tearDown()
@@ -53,4 +54,3 @@ class DateColumnTest extends \PHPUnit_Framework_TestCase {
         Mockery::close();
     }
 }
- 

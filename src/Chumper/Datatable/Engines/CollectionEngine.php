@@ -10,7 +10,8 @@ use Illuminate\Support\Collection;
  * Class CollectionEngine
  * @package Chumper\Datatable\Engines
  */
-class CollectionEngine extends BaseEngine {
+class CollectionEngine extends BaseEngine
+{
 
     /**
      * @var \Illuminate\Support\Collection
@@ -35,11 +36,11 @@ class CollectionEngine extends BaseEngine {
     /**
      * @var array Different options
      */
-    private $options = array(
+    private $options = [
         'stripOrder'        =>  false,
         'stripSearch'       =>  false,
         'caseSensitive'     =>  false,
-    );
+    ];
 
     /**
      * @param Collection $collection
@@ -74,13 +75,12 @@ class CollectionEngine extends BaseEngine {
     {
         $this->handleInputs();
         $this->compileArray($this->columns);
-        $this->doInternalSearch(new Collection(), array());
+        $this->doInternalSearch(new Collection(), []);
         $this->doInternalOrder();
 
         return array_values($this->workingCollection
-            ->slice($this->skip,$this->limit)
-            ->toArray()
-        );
+            ->slice($this->skip, $this->limit)
+            ->toArray());
     }
 
     /**
@@ -128,42 +128,39 @@ class CollectionEngine extends BaseEngine {
     }
     //--------------PRIVATE FUNCTIONS-----------------
 
-    protected function internalMake(Collection $columns, array $searchColumns = array())
+    protected function internalMake(Collection $columns, array $searchColumns = [])
     {
         $this->compileArray($columns);
         $this->doInternalSearch($columns, $searchColumns);
         $this->doInternalOrder();
 
-        return $this->workingCollection->slice($this->skip,$this->limit)->values();
+        return $this->workingCollection->slice($this->skip, $this->limit)->values();
     }
 
     private function doInternalSearch(Collection $columns, array $searchColumns)
     {
-        if((is_null($this->search) || empty($this->search)) && empty($this->fieldSearches))
+        if ((is_null($this->search) || empty($this->search)) && empty($this->fieldSearches)) {
             return;
+        }
 
         $value = $this->search;
         $caseSensitive = $this->options['caseSensitive'];
 
-        $toSearch = array();
+        $toSearch = [];
 
         $searchType = self::AND_CONDITION;
 
         // Map the searchColumns to the real columns
         $ii = 0;
-        foreach($columns as $i => $col)
-        {
-            if(in_array($columns->get($i)->getName(), $searchColumns) || in_array($columns->get($i)->getName(), $this->fieldSearches))
-            {
+        foreach ($columns as $i => $col) {
+            if (in_array($columns->get($i)->getName(), $searchColumns) || in_array($columns->get($i)->getName(), $this->fieldSearches)) {
                 // map values to columns, where there is no value use the global value
-                if(($field = array_search($columns->get($i)->getName(), $this->fieldSearches)) !== FALSE)
-                {
+                if (($field = array_search($columns->get($i)->getName(), $this->fieldSearches)) !== false) {
                     $toSearch[$ii] = $this->columnSearches[$field];
-                }
-                else
-                {
-                    if($value)
+                } else {
+                    if ($value) {
                         $searchType = self::OR_CONDITION;
+                    }
 
                     $toSearch[$ii] = $value;
                 }
@@ -172,75 +169,65 @@ class CollectionEngine extends BaseEngine {
         }
 
         $self = $this;
-        $this->workingCollection = $this->workingCollection->filter(function($row) use ($toSearch, $caseSensitive, $self, $searchType)
-        {
+        $this->workingCollection = $this->workingCollection->filter(function ($row) use ($toSearch, $caseSensitive, $self, $searchType) {
 
-            for($i=0, $stack=array(), $nb=count($row); $i<$nb; $i++)
-            {
-                if(!array_key_exists($i, $toSearch))
+            for ($i=0, $stack=[], $nb=count($row); $i<$nb; $i++) {
+                if (!array_key_exists($i, $toSearch)) {
                     continue;
+                }
 
                 $column = $i;
-                if($self->getAliasMapping())
-                {
+                if ($self->getAliasMapping()) {
                     $column = $self->getNameByIndex($i);
                 }
 
-                if($self->getOption('stripSearch'))
-                {
+                if ($self->getOption('stripSearch')) {
                     $search = strip_tags($row[$column]);
-                }
-                else
-                {
+                } else {
                     $search = $row[$column];
                 }
-                if($caseSensitive)
-                {
-                    if($self->exactWordSearch)
-                    {
-                        if($toSearch[$i] === $search)
+                if ($caseSensitive) {
+                    if ($self->exactWordSearch) {
+                        if ($toSearch[$i] === $search) {
                             $stack[$i] = true;
+                        }
+                    } else {
+                        if (str_contains($search, $toSearch[$i])) {
+                            $stack[$i] = true;
+                        }
                     }
-                    else
-                    {
-                        if(str_contains($search,$toSearch[$i]))
+                } else {
+                    if ($self->getExactWordSearch()) {
+                        if (mb_strtolower($toSearch[$i]) === mb_strtolower($search)) {
                             $stack[$i] = true;
-                    }
-                }
-                else
-                {
-                    if($self->getExactWordSearch())
-                    {
-                        if(mb_strtolower($toSearch[$i]) === mb_strtolower($search))
+                        }
+                    } else {
+                        if (str_contains(mb_strtolower($search), mb_strtolower($toSearch[$i]))) {
                             $stack[$i] = true;
-                    }
-                    else
-                    {
-                        if(str_contains(mb_strtolower($search),mb_strtolower($toSearch[$i])))
-                            $stack[$i] = true;
+                        }
                     }
                 }
             }
 
-            if($searchType == $self::AND_CONDITION)
-            {
+            if ($searchType == $self::AND_CONDITION) {
                 $result = array_diff_key(array_filter($toSearch), $stack);
 
-                if(empty($result))
+                if (empty($result)) {
                     return true;
-            }
-            else
-            {
-                if(!empty($stack))
+                }
+            } else {
+                if (!empty($stack)) {
                     return true;
+                }
             }
         });
     }
 
     private function doInternalOrder()
     {
-        if(is_null($this->orderColumn))
+        if (is_null($this->orderColumn)) {
             return;
+        }
 
         // Bug added on pull request #309
         $column = array_values($this->orderColumn)[0];
@@ -248,24 +235,22 @@ class CollectionEngine extends BaseEngine {
         $stripOrder = $this->options['stripOrder'];
 
         $sortFunction = 'sortBy';
-        if ($direction == BaseEngine::ORDER_DESC)
+        if ($direction == BaseEngine::ORDER_DESC) {
             $sortFunction = 'sortByDesc';
+        }
 
-        $this->workingCollection->{$sortFunction}(function($row) use ($column,$stripOrder) {
+        $this->workingCollection->{$sortFunction}(function ($row) use ($column, $stripOrder) {
 
-            if($this->getAliasMapping())
-            {
+            if ($this->getAliasMapping()) {
                 $column = $this->getNameByIndex($column[0]);
                 return $row[$column];
             }
-            if($stripOrder)
-            {
+            if ($stripOrder) {
                 return strip_tags($row[$column]);
-            }
-            else
-            {
-                if (is_array($column))
+            } else {
+                if (is_array($column)) {
                     return $row[$column[0]];
+                }
                 return $row[$column];
             }
         });
@@ -274,27 +259,21 @@ class CollectionEngine extends BaseEngine {
     private function compileArray($columns)
     {
         $self = $this;
-        $this->workingCollection = $this->collection->map(function($row) use ($columns, $self) {
-            $entry = array();
+        $this->workingCollection = $this->collection->map(function ($row) use ($columns, $self) {
+            $entry = [];
 
             // add class and id if needed
-            if(!is_null($self->getRowClass()) && is_callable($self->getRowClass()))
-            {
-                $entry['DT_RowClass'] = call_user_func($self->getRowClass(),$row);
+            if (!is_null($self->getRowClass()) && is_callable($self->getRowClass())) {
+                $entry['DT_RowClass'] = call_user_func($self->getRowClass(), $row);
             }
-            if(!is_null($self->getRowId()) && is_callable($self->getRowId()))
-            {
-                $entry['DT_RowId'] = call_user_func($self->getRowId(),$row);
+            if (!is_null($self->getRowId()) && is_callable($self->getRowId())) {
+                $entry['DT_RowId'] = call_user_func($self->getRowId(), $row);
             }
             $i=0;
-            foreach ($columns as $col)
-            {
-                if($self->getAliasMapping())
-                {
+            foreach ($columns as $col) {
+                if ($self->getAliasMapping()) {
                     $entry[$col->getName()] =  $col->run($row);
-                }
-                else
-                {
+                } else {
                     $entry[$i] =  $col->run($row);
                 }
 

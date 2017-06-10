@@ -8,7 +8,8 @@ use Input;
  * Class Datatable
  * @package Chumper\Datatable
  */
-class Datatable {
+class Datatable
+{
 
     /**
      * @param $query
@@ -41,9 +42,8 @@ class Datatable {
      */
     public function shouldHandle()
     {
-        $echo = Input::get('sEcho',null);
-        if(/*Request::ajax() && */!is_null($echo) && is_numeric($echo))
-        {
+        $echo = Input::get('sEcho', null);
+        if (/*Request::ajax() && */!is_null($echo) && is_numeric($echo)) {
             return true;
         }
         return false;
