@@ -336,7 +336,7 @@ class Table {
 				}
 				$first = false;
 			} else {
-				$data .= ",\n";
+				$data .= ",";
 			}
 			if (!is_numeric($k)) {
 				$data .= json_encode($k) . ":";
